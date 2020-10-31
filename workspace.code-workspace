@@ -1,0 +1,16 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "..\\term project\\Django-Hospital-Mangement"
+		},
+		{
+			"path": "..\\..\\React\\hospital"
+		}
+	],
+	"settings": {
+		"liveServer.settings.multiRootWorkspaceName": "Django-Hospital-Mangement"
+	}
+}
