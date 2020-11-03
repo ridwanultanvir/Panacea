@@ -136,3 +136,47 @@ def login(credentials):
         response['success'] = False
         # print(response)
         return response
+
+
+def getPatientData(credentials):
+    cursor = connect().cursor()
+    userId = credentials['userId']
+    password = credentials['password']
+
+    query = "SELECT PASSWORD FROM PANACEA.PERSON WHERE USER_ID = :user_id"
+    cursor.execute(query, [userId])
+    result = cursor.fetchone()[0]
+    if result == passwordHash(password):
+        print('authentic user')
+        response = {}
+
+        if userId[:3] == 'P25':
+            query = '''SELECT (P.FIRST_NAME || ' ' || P.LAST_NAME) AS NAME, P.EMAIL,P.PHONE_NUM, P.IMAGE, P.GENDER, P.ADDRESS, 
+                        P.DATE_OF_BIRTH,PT.BIO
+                        FROM PERSON P JOIN PATIENT PT ON(P.ID = PT.ID)
+                        WHERE P.USER_ID = :user_id
+                        '''
+            cursor.execute(query, [userId])
+            result = cursor.fetchone()
+            patientInfo = {}
+            userInfo = getUserInfoDict(result)
+            patientInfo.update(userInfo.copy())
+            patientInfo['bio'] = result[7]
+            response.update(patientInfo.copy())
+            response['errorMessage'] = ''
+            response['category'] = 'patient'
+            response['success'] = True
+        else:
+            response['success'] = False
+            response['errorMessage'] = 'Please enter your patient id'
+
+        return response
+
+    else:
+        print('incorrect password')
+        response = {}
+        response['errorMessage'] = 'Invalid user id or password'
+        response['token'] = None
+        response['userData'] = None
+        response['success'] = False
+        return response

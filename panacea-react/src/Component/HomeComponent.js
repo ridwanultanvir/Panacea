@@ -152,7 +152,7 @@ export default function Home(props) {
                     </div>
 
                     <Link style={{ textDecoration: 'none' }} to='/sign-in'>
-                        <Button variant='text' style={{ marginRight: 10, color: 'gray' }} >Sign in</Button>
+                        <Button variant='text' style={{ marginRight: 10, color: 'gray' }} >{props.User.isAuthenticated !== null && props.User.isAuthenticated ? 'Profile' : 'Sign In'}</Button>
                     </Link>
                     <Link style={{ textDecoration: 'none' }} to='/appointment'>
                         <Button variant="outlined" color="primary">

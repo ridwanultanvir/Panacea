@@ -5,7 +5,7 @@ import { loginUser, loadDocSchedule, deleteSchedule, loadTimeTable, addSchedule 
 
 import Home from './HomeComponent';
 import SignIn from './SignInComponent';
-import Appointment from './AppointmentComponent'
+import AppointmentComponent from './Appointment/AppointmentComponent'
 import Profile from './ProfileComponent';
 import AdminHome from './Admin/Homepage/AdminProfileHomePageComponent';
 import PatientHome from './PatientProfileHomePageComponent';
@@ -38,7 +38,9 @@ class Main extends Component {
             <React.Fragment>
                 <Switch>
                     <Route path='/home'>
-                        <Home />
+                        <Home
+                            User={this.props.User}
+                        />
                     </Route>
                     <Route path='/sign-in'>
                         <SignIn
@@ -47,7 +49,9 @@ class Main extends Component {
                         />
                     </Route>
                     <Route path='/appointment'>
-                        <Appointment />
+                        <AppointmentComponent
+                            User={this.props.User}
+                        />
                     </Route>
                     <Route path='/profile'>
                         <Profile

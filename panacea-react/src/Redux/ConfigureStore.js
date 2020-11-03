@@ -1,6 +1,6 @@
 import { createStore, combineReducers, applyMiddleware } from 'redux';
 import { createForms } from 'react-redux-form';
-import { InitialFeedback, InitialScheduleUserIDValue } from './Reducers/forms';
+import { InitialFeedback, InitialScheduleUserIDValue, AppointmentPageLogin } from './Reducers/forms';
 import thunk from 'redux-thunk';
 import { logger } from 'redux-logger';
 import { User } from './Reducers/User';
@@ -17,6 +17,7 @@ export const configureStore = () => {
             ...createForms({
                 LoginForm: InitialFeedback,
                 AdminScheduleUserID: InitialScheduleUserIDValue,
+                AppointmentPageLogin: AppointmentPageLogin
             })
         }),
         applyMiddleware(thunk, logger)

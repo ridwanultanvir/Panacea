@@ -43,6 +43,7 @@ export const loginUser = (creds) => (dispatch) => {
                 return response;
             }
             else {
+                console.log('ulala1')
                 let err = new Error('Error ' + response.status + ': ' + response.statusText);
                 err.response = response;
                 throw err;
@@ -52,8 +53,9 @@ export const loginUser = (creds) => (dispatch) => {
         .then((response) => {
             //alert(JSON.stringify(response));
             if (response.success) {
+                console.log('ulala2')
                 sessionStorage.setItem('token', response.token);
-                sessionStorage.setItem('userData', response.userData);
+                sessionStorage.setItem('userData', JSON.stringify(response.userData));
                 sessionStorage.setItem('userCategory', response.category);
                 dispatch(userLoginSuccess(response.token, response.userData, response.category))
             }
@@ -64,6 +66,7 @@ export const loginUser = (creds) => (dispatch) => {
             }
         })
         .catch((err) => {
+            console.log('ulala3')
             alert(err.message);
             dispatch(userLoginFailure(err.message))
         });

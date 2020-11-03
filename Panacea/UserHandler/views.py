@@ -15,3 +15,16 @@ def loginUser(request):
     response = execution.login(credentials)
     print(response)
     return Response(response)
+
+
+@api_view(['POST'])
+def getPatientData(request):
+    body = request.body.decode('utf-8')
+    credentials = json.loads(body)
+    print(credentials)
+
+    response = execution.getPatientData(credentials)
+    print(response)
+    print('ulala')
+
+    return Response(response)
