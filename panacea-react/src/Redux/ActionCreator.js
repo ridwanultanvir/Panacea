@@ -1,4 +1,5 @@
 import * as ActionTypes from './ActionTypes';
+import { Appointments } from './Reducers/ReceptionistsAppointment';
 
 export const baseUrl = 'http://localhost:8000/'
 
@@ -309,8 +310,116 @@ export const loadTimeTable = (body) => (dispatch) => {
 
 
 
+const receptionistAppointmentLoading = () => {
+    return {
+        type: ActionTypes.RECEPTIONIST_APPOINTMENT_LOADING
+    };
+}
 
 
+const receptionistAppointmentSuccess = (appointments) => {
+    return {
+        type: ActionTypes.RECEPTIONIST_APPOINTMENT_SUCCESS,
+        appointments: appointments
+    }
+}
+
+const receptionistAppointmentFailure = (message) => {
+    return {
+        type: ActionTypes.RECEPTIONIST_APPOINTMENT_FAILURE,
+        message: message
+    };
+}
+
+export const getReceptionistAppointments = (body) => (dispatch) => {
+    dispatch(receptionistAppointmentLoading());
+
+    fetch(baseUrl + 'appointment/get-receptionist-appointments/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body)
+    })
+        .then((response) => {
+            if (response.ok) {
+                return response;
+            }
+            else {
+                let err = new Error('Error ' + response.status + ': ' + response.statusText);
+                err.response = response;
+                throw err;
+            }
+        })
+        .then((response) => response.json())
+        .then((response) => {
+            if (response.success) {
+                dispatch(receptionistAppointmentSuccess(response.appointments))
+            }
+            else {
+                let err = new Error(response.errorMessage);
+                err.response = response;
+                throw err;
+            }
+        })
+        .catch((err) => {
+            alert(err.message);
+            dispatch(receptionistAppointmentFailure(err.message));
+        });
+}
 
 
+const acceptReceptionistAppointmentLoading = () => {
+    return {
+        type: ActionTypes.ACCEPT_RECEPTIONIST_APPOINTMENT_LOADING
+    }
+}
+const acceptReceptionistAppointmentSuccess = (appointments) => {
+    return {
+        type: ActionTypes.ACCEPT_RECEPTIONIST_APPOINTMENT_SUCCESS,
+        appointments: appointments
+    }
+}
 
+const acceptReceptionistAppointmentFailure = (message) => {
+    return {
+        type: ActionTypes.ACCEPT_RECEPTIONIST_APPOINTMENT_FAILURE,
+        message: message
+    }
+}
+
+export const acceptReceptionistAppointment = (body) => (dispatch) => {
+    dispatch(acceptReceptionistAppointmentLoading());
+    fetch(baseUrl + 'appointment/accept-receptionist-appointment/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body)
+    })
+        .then((response) => {
+            if (response.ok) {
+                return response;
+            }
+            else {
+                let err = new Error('Error ' + response.status + ': ' + response.statusText);
+                err.response = response;
+                throw err;
+            }
+        })
+        .then((response) => response.json())
+        .then((response) => {
+            if (response.success) {
+                dispatch(acceptReceptionistAppointmentSuccess(response.appointments));
+            }
+            else {
+                let err = new Error(response.errorMessage);
+                err.response = response;
+                throw err;
+            }
+        })
+        .catch((err) => {
+            alert(err.message);
+            dispatch(acceptReceptionistAppointmentFailure(err.message));
+        });
+}

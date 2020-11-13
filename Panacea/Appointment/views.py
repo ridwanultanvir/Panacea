@@ -4,6 +4,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 import json
 from . import execution
+from UserHandler.execution import verifyToken
 
 # Create your views here.
 
@@ -68,5 +69,48 @@ def saveAppointment(request):
     data = json.loads(body)
 
     response = execution.saveAppointment(data)
+
+    return Response(response)
+
+
+@api_view(['POST'])
+def getReceptionistAppointments(request):
+    body = request.body.decode('utf-8')
+    data = json.loads(body)
+    userID = None
+    token = None
+
+    if 'userID' in data:
+        userID = data['userID']
+    if 'token' in data:
+        token = data['token']
+
+    if(verifyToken(userID, token)):
+        response = execution.getReceptionistAppointments()
+    else:
+        response = {'success': False, 'errorMessage': 'Invalid request',
+                    'scheduleData': None, 'docData': None}
+
+    return Response(response)
+
+
+@api_view(['POST'])
+def acceptAppointment(request):
+    body = request.body.decode('utf-8')
+    data = json.loads(body)
+
+    userID = None
+    token = None
+
+    if 'userID' in data:
+        userID = data['userID']
+    if 'token' in data:
+        token = data['token']
+
+    if(verifyToken(userID, token)):
+        response = execution.acceptReceptionistAppointment(data['app_sl_no'])
+    else:
+        response = {'success': False, 'errorMessage': 'Invalid request',
+                    'scheduleData': None, 'docData': None}
 
     return Response(response)

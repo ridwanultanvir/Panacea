@@ -8,4 +8,8 @@ urlpatterns = [
     path('check-if-schedule-avalable/', views.checkScheduleForPatient,
          name='checkScheduleForPatient'),
     path('save-appointment/', views.saveAppointment, name='saveAppointment'),
+    path('get-receptionist-appointments/',
+         views.getReceptionistAppointments, name='getReceptionistAppointments'),
+    path('accept-receptionist-appointment/', views.acceptAppointment,
+         name='accept-receptionist-appointment'),
 ]

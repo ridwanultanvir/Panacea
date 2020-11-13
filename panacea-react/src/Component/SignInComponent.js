@@ -138,7 +138,7 @@ class SignIn extends Component {
                         <Grid container justify='center'>
 
                             <Grid item>
-                                <Link to="#" variant="body2">
+                                <Link to="/registration" variant="body2">
                                     {"Don't have an account? Sign Up"}
                                 </Link>
                             </Grid>

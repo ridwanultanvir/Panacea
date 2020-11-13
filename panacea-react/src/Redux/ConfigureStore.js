@@ -6,6 +6,7 @@ import { logger } from 'redux-logger';
 import { User } from './Reducers/User';
 import { ScheduleTable } from './Reducers/ScheduleTable';
 import { TimeTable } from './Reducers/TimeTable';
+import { ReceptionistsAppointments } from './Reducers/ReceptionistsAppointment';
 
 
 export const configureStore = () => {
@@ -14,6 +15,7 @@ export const configureStore = () => {
             User: User,
             ScheduleTable: ScheduleTable,
             TimeTable: TimeTable,
+            ReceptionistsAppointments: ReceptionistsAppointments,
             ...createForms({
                 LoginForm: InitialFeedback,
                 AdminScheduleUserID: InitialScheduleUserIDValue,

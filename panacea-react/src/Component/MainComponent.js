@@ -1,7 +1,15 @@
 import React, { Component } from 'react';
 import { Switch, Route, Redirect, withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { loginUser, loadDocSchedule, deleteSchedule, loadTimeTable, addSchedule } from '../Redux/ActionCreator';
+import {
+    loginUser,
+    loadDocSchedule,
+    deleteSchedule,
+    loadTimeTable,
+    addSchedule,
+    getReceptionistAppointments,
+    acceptReceptionistAppointment
+} from '../Redux/ActionCreator';
 
 import Home from './HomeComponent';
 import SignIn from './SignInComponent';
@@ -11,13 +19,16 @@ import AdminHome from './Admin/Homepage/AdminProfileHomePageComponent';
 import PatientHome from './PatientProfileHomePageComponent';
 import DoctorHome from './DoctorProfileHomePageComponent';
 import Schedule from './Admin/Schedule/ScheduleComponent';
-
+import RegistrationComponent from './Registration/RegistrationComponent'
+import ReceptionistHome from './Receptionist/Homepage/ReceptionistHome';
+import ReceptionistAppointment from './Receptionist/Appointments/Appointments';
 
 const mapStateToProps = (state) => {
     return {
         User: state.User,
         ScheduleTable: state.ScheduleTable,
-        TimeTable: state.TimeTable
+        TimeTable: state.TimeTable,
+        ReceptionistsAppointments: state.ReceptionistsAppointments
     };
 }
 
@@ -27,7 +38,9 @@ const mapDispatchToProps = (dispatch) => {
         loadDocSchedule: (body) => (dispatch(loadDocSchedule(body))),
         deleteSchedule: (body) => (dispatch(deleteSchedule(body))),
         loadTimeTable: (body) => (dispatch(loadTimeTable(body))),
-        addSchedule: (body) => (dispatch(addSchedule(body)))
+        addSchedule: (body) => (dispatch(addSchedule(body))),
+        getReceptionistAppointments: (body) => (dispatch(getReceptionistAppointments(body))),
+        acceptReceptionistAppointment: (body) => (dispatch(acceptReceptionistAppointment(body))),
     };
 }
 
@@ -82,6 +95,22 @@ class Main extends Component {
                     <Route path="/patient/home">
                         <PatientHome
                             User={this.props.User}
+                        />
+                    </Route>
+                    <Route path="/registration">
+                        <RegistrationComponent />
+                    </Route>
+                    <Route path='/receptionist/home'>
+                        <ReceptionistHome
+                            User={this.props.User}
+                        />
+                    </Route>
+                    <Route path='/receptionist/appointments'>
+                        <ReceptionistAppointment
+                            User={this.props.User}
+                            ReceptionistsAppointments={this.props.ReceptionistsAppointments}
+                            getReceptionistAppointments={this.props.getReceptionistAppointments}
+                            acceptReceptionistAppointment={this.props.acceptReceptionistAppointment}
                         />
                     </Route>
                     <Redirect to="/home" />

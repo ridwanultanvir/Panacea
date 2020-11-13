@@ -207,8 +207,8 @@ export default function PatientDetailForm(props) {
             <React.Fragment>
                 <div className={classes.paper}>
                     <Typography variant="h6" gutterBottom>
-                        Sign in
-                </Typography>
+                        Enter UserID and password
+                    </Typography>
                     <Form model='AppointmentPageLogin' className={classes.form} onSubmit={() => { fetchPatientData() }}>
                         <TextField
                             variant="outlined"
@@ -242,7 +242,7 @@ export default function PatientDetailForm(props) {
                             color="primary"
                             className={classes.submit}
                         >
-                            Sign In
+                            Get User Info
                         </Button>
                     </Form>
 

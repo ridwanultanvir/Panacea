@@ -2,6 +2,8 @@ from json import decoder
 import cx_Oracle
 import hashlib
 
+from django.http import response
+
 
 def connect(user_n='PANACEA', pass_n='panacea', host='localhost', port='1521', service_n='ORCL'):
     dsn_tns = cx_Oracle.makedsn(host, port, service_name=service_n)
@@ -91,6 +93,7 @@ def login(credentials):
             empInfo['education'] = result[8]
             empInfo['training'] = result[9]
             empInfo['salary'] = result[10]
+
             response['category'] = empInfo['category']
             response['userData'] = empInfo
             response['success'] = True
@@ -107,6 +110,7 @@ def login(credentials):
             userInfo = getUserInfoDict(result)
             patientInfo.update(userInfo.copy())
             patientInfo['bio'] = result[7]
+
             response['category'] = 'patient'
             response['userData'] = patientInfo
             response['success'] = True
@@ -120,6 +124,7 @@ def login(credentials):
             cursor.execute(query, [userId])
             result = cursor.fetchone()
             userInfo = getUserInfoDict(result)
+
             response['category'] = 'admin'
             response['userData'] = userInfo
             response['success'] = True
@@ -179,4 +184,81 @@ def getPatientData(credentials):
         response['token'] = None
         response['userData'] = None
         response['success'] = False
+        return response
+
+
+def registerPatient(data):
+    connection = connect()
+    cursor = connection.cursor()
+    response = {}
+
+    patientInfo = data['patientInfo']
+    print(patientInfo)
+
+    try:
+        query = "SELECT 'P25' || TO_CHAR(TO_NUMBER(SUBSTR(MAX(USER_ID), 4)) + 1) AS NEW_ID FROM PANACEA.PERSON WHERE USER_ID LIKE 'P25%'"
+
+        cursor.execute(query)
+        result = cursor.fetchone()
+        newUserId = result[0]
+
+        query = '''SELECT ID, USER_ID FROM PANACEA.PERSON
+                    WHERE FIRST_NAME = :firstName
+                    AND LAST_NAME = :lastName
+                    AND EMAIL = :email'''
+        cursor.execute(query, [patientInfo['firstName'],
+                               patientInfo['lastName'], patientInfo['email']])
+
+        result = cursor.fetchall()
+        print(result)
+        if(len(result) > 0):
+            ID = result[0][0]
+            response['message'] = f"There is already a user with the name {patientInfo['firstName']} {patientInfo['lastName']} and email {patientInfo['email']}. Please use another email address"
+
+            print('duplicate')
+            response['success'] = True
+            response['errorMessage'] = ''
+
+            return response
+        else:
+            query = '''
+                DECLARE
+                    NEW_USER_ID VARCHAR2(15);
+                    NEW_PASSWORD VARCHAR2(50);
+                    NEW_ID NUMBER(10,0);
+                BEGIN
+                    SELECT 'P25' || TO_CHAR(TO_NUMBER(SUBSTR(MAX(USER_ID), 4)) + 1)
+                    INTO NEW_USER_ID
+                    FROM PANACEA.PERSON
+                    WHERE USER_ID LIKE 'P25%';
+
+                    NEW_PASSWORD := dbms_crypto.hash(utl_raw.cast_to_raw(NEW_USER_ID), dbms_crypto.HASH_MD5);
+
+                    INSERT INTO PANACEA.PERSON(USER_ID, FIRST_NAME, LAST_NAME, EMAIL, PHONE_NUM, GENDER, ADDRESS,DATE_OF_BIRTH, PASSWORD)
+                    VALUES(NEW_USER_ID, :firstName, :lastName, :email, :phoneNumber, :gender, :address,TO_DATE(:dateOfBirth, 'DD-MM-YYYY') ,NEW_PASSWORD );
+
+                    SELECT ID
+                    INTO NEW_ID
+                    FROM PANACEA.PERSON
+                    WHERE USER_ID = NEW_USER_ID;
+
+                    INSERT INTO PANACEA.PATIENT(ID, BIO, ID_STATUS)
+                    VALUES(NEW_ID, :bio, 'TP');
+
+                END;
+                '''
+
+            cursor.execute(query, [patientInfo['firstName'], patientInfo['lastName'], patientInfo['email'],
+                                   patientInfo['phoneNumber'], patientInfo['gender'], patientInfo['address'], patientInfo['dateOfBirth'], patientInfo['bio']])
+            connection.commit()
+            print('not duplicate')
+
+            response['message'] = f"Sign in to you account with user id = {newUserId} and password = {newUserId} to see ypur details"
+            response['success'] = True
+            response['errorMessage'] = ''
+            return response
+    except cx_Oracle.Error as error:
+        errorObj, = error.args
+        response = {'success': False, 'errorMessage': errorObj.message}
+        print(response)
         return response

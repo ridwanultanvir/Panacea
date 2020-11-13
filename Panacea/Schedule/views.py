@@ -23,7 +23,6 @@ def getScheduleTable(request):
         token = data['token']
 
     if(verifyToken(userID, token)):
-        print('ulala')
         response = execution.getScheduleTable(data['docUserID'])
     else:
         response = {'success': False, 'errorMessage': 'Invalid request',

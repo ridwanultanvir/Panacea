@@ -100,17 +100,17 @@ def addSchedule(docID, timeID, date):
     connection = connect()
     cursor = connection.cursor()
     response = {}
-
+    print(date, docID)
     query = f"SELECT * FROM PANACEA.SCHEDULE WHERE SCHEDULE_DATE = TO_DATE('{date}','dd/MM/yyyy') AND ID = (SELECT ID FROM PANACEA.PERSON WHERE USER_ID = '{docID}') AND TIME_ID = {timeID}"
 
     cursor.execute(query)
     result = cursor.fetchall()
-    if(result != None):
+    print(len(result))
+    if(len(result) != 0):
         response['success'] = False
         response['errorMessage'] = 'Duplicate schedule entry. Please insert a new value'
         response['scheduleData'] = None
         response['docData'] = None
-        print('ulalalalaalalala')
         return response
 
     query = '''INSERT INTO PANACEA.SCHEDULE(SCHEDULE_ID,SCHEDULE_DATE,ID,TIME_ID)

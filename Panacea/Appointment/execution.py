@@ -237,3 +237,67 @@ def saveAppointment(data):
             response = {'success': False, 'errorMessage': errorObj.message}
             print(response)
             return response
+
+
+def getReceptionistAppointments():
+    connection = connect()
+    cursor = connection.cursor()
+
+    query = '''
+    SELECT A.APP_SL_NO,
+    (SELECT (FIRST_NAME || ' ' || LAST_NAME) FROM PERSON WHERE ID =  A.PATIENT_ID) AS "PAT_NAME",
+    (SELECT (FIRST_NAME || ' ' || LAST_NAME) FROM PERSON WHERE ID =  A.DOCTOR_ID) AS "DOC_NAME",
+    TO_CHAR(A.APPNT_DATE), A.PROB_DESC, A.STATUS, TO_CHAR(S.SCHEDULE_DATE), T.START_TIME, T.END_TIME
+    FROM APPOINTMENT A JOIN SCHEDULE S ON(A.SCHEDULE_ID = S.SCHEDULE_ID)
+    JOIN TIME_TABLE T ON(S.TIME_ID = T.TIME_ID)
+    WHERE S.SCHEDULE_DATE = TRUNC(SYSDATE)
+    AND A.STATUS = 'pending'
+    '''
+    response = {}
+    try:
+        cursor.execute(query)
+        result = cursor.fetchall()
+
+        print(result)
+
+        appointments = []
+
+        if(result != None):
+            for appointment in result:
+                appointments.append({'app_sl_no': appointment[0], 'patient_name': appointment[1], 'doctor_name': appointment[2],
+                                     'appointment_date': appointment[3], 'problem_desc': appointment[4], 'status': appointment[5],
+                                     'schedule_date': appointment[6], 'start_time': appointment[7], 'end_time': appointment[8]})
+
+        response['success'] = True
+        response['errorMessage'] = ''
+        response['appointments'] = appointments
+
+        print(response)
+        return response
+    except cx_Oracle.Error as error:
+        errorObj, = error.args
+        response = {'success': False, 'errorMessage': errorObj.message}
+        print(response)
+        return response
+
+
+def acceptReceptionistAppointment(app_sl_no):
+    connection = connect()
+    cursor = connection.cursor()
+
+    query = '''
+    UPDATE PANACEA.APPOINTMENT SET STATUS = 'accepted' WHERE APP_SL_NO = :app_sl_no
+    '''
+
+    try:
+        cursor.execute(query, [app_sl_no])
+        connection.commit()
+        response = getReceptionistAppointments()
+
+        return response
+
+    except cx_Oracle.Error as error:
+        errorObj, = error.args
+        response = {'success': False, 'errorMessage': errorObj.message}
+        print(response)
+        return response

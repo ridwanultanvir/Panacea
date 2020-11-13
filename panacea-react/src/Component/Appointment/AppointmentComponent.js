@@ -7,15 +7,15 @@ import { Form } from 'react-redux-form';
 import Appointment from './Appointment';
 
 
-const styles = (theme) => ({
-    title: {
-        flexGrow: 1
-    },
-    form: {
-        width: '100%', // Fix IE 11 issue.
-        marginTop: theme.spacing(1),
-    },
-})
+// const styles = (theme) => ({
+//     title: {
+//         flexGrow: 1
+//     },
+//     form: {
+//         width: '100%', // Fix IE 11 issue.
+//         marginTop: theme.spacing(1),
+//     },
+// })
 
 class AppointmentComponent extends Component {
     render() {
@@ -27,4 +27,6 @@ class AppointmentComponent extends Component {
     }
 }
 
-export default withStyles(styles)(AppointmentComponent);
+//export default withStyles(styles)(AppointmentComponent);
+
+export default AppointmentComponent;

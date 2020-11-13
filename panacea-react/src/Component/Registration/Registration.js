@@ -9,10 +9,9 @@ import Step from '@material-ui/core/Step';
 import StepLabel from '@material-ui/core/StepLabel';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
-import PatientDetailForm from './PatientDetailForm';
+import RegistrationForm from './RegistrationForm';
 import Review from './Review';
 import { Link } from 'react-router-dom';
-import SelectDoctorForm from './SelectDoctorForm';
 import { baseUrl } from '../../Redux/ActionCreator';
 
 function Copyright() {
@@ -68,14 +67,14 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const steps = ['Patient details', 'Select doctor', 'Review your appointment'];
+const steps = ['Patient details', 'Review your details'];
 
 
 
-export default function Appointment(props) {
+export default function Registrartion(props) {
     const classes = useStyles();
     const [activeStep, setActiveStep] = React.useState(0);
-    // appointment data
+    // registration data
     const [firstName, setFirstName] = React.useState('');
     const [lastName, setLastName] = React.useState('');
     const [address, setAddress] = React.useState('');
@@ -83,20 +82,7 @@ export default function Appointment(props) {
     const [phoneNumber, setPhoneNumber] = React.useState('')
     const [dateOfBirth, setDateOfBirth] = React.useState(new Date());
     const [gender, setGender] = React.useState('');
-    const [fetchedPatientData, setFetchedPatientData] = React.useState(false);
     const [bio, setBio] = React.useState('');
-    const [patientUserID, setPatientUserID] = React.useState('')
-    const [newPatient, setNewPatient] = React.useState(true);
-
-    const [departments, setDepartments] = React.useState([]);
-    const [doctors, setDoctors] = React.useState([]);
-    const [selectedDepartment, setSelectedDepartment] = React.useState('');
-    const [selectedDoctor, setSelectedDoctor] = React.useState('')
-    const [selectedDoctorID, setSelectedDoctorID] = React.useState(0);
-    const [schedule, setSchedule] = React.useState([]);
-    const [selectedSchedule, setSelectedSchedule] = React.useState(0);
-    const [scheduleMarked, setScheduleMarked] = React.useState(false);
-    const [problemDescription, setProblemDescription] = React.useState('');
 
     const [finalMessage, setFinalMessage] = React.useState('')
 
@@ -117,9 +103,8 @@ export default function Appointment(props) {
         else return true;
     }
 
-    const handleConfirmSubmission = () => {
+    const handleConfirmSubmission = () => { // this function needs to be implemented
         let body = {
-            "newPatient": newPatient,
             "patientInfo": {
                 "firstName": firstName,
                 "lastName": lastName,
@@ -129,16 +114,12 @@ export default function Appointment(props) {
                 "dateOfBirth": dateOfBirth.getDate().toString() + '-' + (dateOfBirth.getMonth() + 1).toString() + '-' + dateOfBirth.getFullYear().toString(),
                 "gender": gender,
                 "bio": bio,
-                "patientUserId": patientUserID
-            },
-            "appointmentInfo": {
-                "docId": selectedDoctorID,
-                "problemDescription": problemDescription,
-                "scheduleId": selectedSchedule
             }
         }
 
-        fetch(baseUrl + 'appointment/save-appointment/', {
+        //alert(JSON.stringify(body))
+
+        fetch(baseUrl + 'user/registration/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -170,26 +151,11 @@ export default function Appointment(props) {
             .catch((err) => {
                 alert(err.message);
             });
-
+        //console.log(body);
         //alert(dateOfBirth.getDate().toString() + '-' + dateOfBirth.getMonth().toString() + '-' + dateOfBirth.getFullYear().toString());
         setActiveStep(activeStep + 1);
     }
 
-    const checkScheduleSelected = () => {
-        if (selectedSchedule === 0 && scheduleMarked === false) {
-            alert('Please select a schedule with a doctor');
-            setActiveStep(1);
-            return false;
-        }
-        else if (selectedSchedule === 0 && scheduleMarked === true) {
-            alert('Please check if the schedule is available for you');
-            setActiveStep(1);
-            return false;
-        }
-        else {
-            return true;
-        }
-    }
 
     return (
         <React.Fragment>
@@ -203,7 +169,7 @@ export default function Appointment(props) {
                     </div>
 
                     <Link style={{ textDecoration: 'none' }} to='/sign-in'>
-                        <Button variant='outlined' color='primary' style={{ marginRight: 10 }} >{props.User.isAuthenticated !== null && props.User.isAuthenticated ? 'Profile' : 'Sign In'}</Button>
+                        <Button variant='outlined' color='primary' style={{ marginRight: 10 }} >SIgn in</Button>
                     </Link>
                 </Toolbar>
             </AppBar>
@@ -211,7 +177,7 @@ export default function Appointment(props) {
             <main className={classes.layout}>
                 <Paper className={classes.paper}>
                     <Typography component="h1" variant="h4" align="center">
-                        Appointment
+                        Registration
                     </Typography>
                     <Stepper activeStep={activeStep} className={classes.stepper}>
                         {steps.map((label) => (
@@ -224,7 +190,7 @@ export default function Appointment(props) {
                         {activeStep === steps.length ? (
                             <React.Fragment>
                                 <Typography variant="h5" gutterBottom>
-                                    Thank you for your appointment.
+                                    Thank you for your registration.
                                 </Typography>
                                 <Typography variant="subtitle1">
                                     {finalMessage}
@@ -234,7 +200,7 @@ export default function Appointment(props) {
                                 <React.Fragment>
                                     {/* {getStepContent(activeStep)} */}
                                     {activeStep === 0 ?
-                                        <PatientDetailForm
+                                        <RegistrationForm
                                             User={props.User}
                                             setFirstName={setFirstName}
                                             setLastName={setLastName}
@@ -244,7 +210,6 @@ export default function Appointment(props) {
                                             setDateOfBirth={setDateOfBirth}
                                             setGender={setGender}
                                             setBio={setBio}
-                                            setPatientUserID={setPatientUserID}
                                             firstName={firstName}
                                             lastName={lastName}
                                             email={email}
@@ -253,33 +218,8 @@ export default function Appointment(props) {
                                             dateOfBirth={dateOfBirth}
                                             gender={gender}
                                             bio={bio}
-                                            setFetchedPatientData={setFetchedPatientData}
-                                            fetchedPatientData={fetchedPatientData}
-                                            setNewPatient={setNewPatient}
-
                                         /> : null}
                                     {activeStep === 1 && checkPatientDetailsFilledUp() ?
-                                        <SelectDoctorForm
-                                            departments={departments}
-                                            doctors={doctors}
-                                            selectedDepartment={selectedDepartment}
-                                            selectedDoctor={selectedDoctor}
-                                            selectedDoctorID={selectedDoctorID}
-                                            schedule={schedule}
-                                            setDepartments={setDepartments}
-                                            setDoctors={setDoctors}
-                                            setSelectedDepartment={setSelectedDepartment}
-                                            setSelectedDoctor={setSelectedDoctor}
-                                            setSelectedDoctorID={setSelectedDoctorID}
-                                            setSchedule={setSchedule}
-                                            setSelectedSchedule={setSelectedSchedule}
-                                            patientUserID={patientUserID}
-                                            newPatient={newPatient}
-                                            setScheduleMarked={setScheduleMarked}
-                                            setProblemDescription={setProblemDescription}
-                                        />
-                                        : null}
-                                    {activeStep === 2 && checkScheduleSelected() ?
                                         <Review
                                             firstName={firstName}
                                             lastName={lastName}
@@ -289,11 +229,6 @@ export default function Appointment(props) {
                                             dateOfBirth={dateOfBirth}
                                             gender={gender}
                                             bio={bio}
-                                            selectedDoctor={selectedDoctor}
-                                            selectedDepartment={selectedDepartment}
-                                            schedule={schedule}
-                                            selectedSchedule={selectedSchedule}
-                                            problemDescription={problemDescription}
                                         /> : null}
                                     <div className={classes.buttons}>
                                         {activeStep !== 0 && (
@@ -308,7 +243,7 @@ export default function Appointment(props) {
                                                 onClick={handleConfirmSubmission}
                                                 className={classes.button}
                                             >
-                                                Confirm appointment
+                                                Confirm registration
                                             </Button> :
                                             <Button
                                                 variant="contained"
