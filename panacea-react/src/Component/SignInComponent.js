@@ -11,6 +11,7 @@ import { Button, Avatar, TextField, Grid } from '@material-ui/core';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import { Form } from 'react-redux-form';
 import { Loading } from './LoadingComponent';
+import CopyRight from './Copyright';
 
 const styles = (theme) => ({
     root: {
@@ -51,24 +52,26 @@ class SignIn extends Component {
         }
 
         this.handleSubmit = this.handleSubmit.bind(this);
-        this.Copyright = this.Copyright.bind(this);
+        //this.Copyright = this.Copyright.bind(this);
         this.SignInForm = this.SignInForm.bind(this);
         this.setUserID = this.setUserID.bind(this);
         this.setPassword = this.setPassword.bind(this);
     }
 
-    Copyright() {
-        return (
-            <Typography variant="body2" color="textSecondary" align="center">
-                {'Copyright © '}
-                <Link to='/home' color='inherit'>
-                    Sadat Shahriyar
-                </Link>{' '}
-                {new Date().getFullYear()}
-                {'.'}
-            </Typography>
-        );
-    }
+    // Copyright() {
+
+    //     return (
+    //         <Typography variant="body2" color="textSecondary" align="center">
+    //             {'Copyright © '}
+    //             <Link color="inherit" href="https://sadatshahriyar.pythonanywhere.com/">
+    //                 Sadat Shahriyar
+    //             </Link>{' '}
+    //             {'& Jayanta Sadhu. '}
+    //             {new Date().getFullYear()}
+    //             {'.'}
+    //         </Typography>
+    //     );
+    // }
 
 
 
@@ -88,7 +91,7 @@ class SignIn extends Component {
     SignInForm() {
         const { classes } = this.props;
 
-        const copyRight = this.Copyright();
+        //const copyRight = this.Copyright();
 
         return (
             <Container component="main" maxWidth="xs">
@@ -146,7 +149,7 @@ class SignIn extends Component {
                     </Form>
                 </div>
                 <Box mt={8}>
-                    {copyRight}
+                    {CopyRight}
                 </Box>
             </Container>
         );

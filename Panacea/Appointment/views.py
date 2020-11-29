@@ -114,3 +114,26 @@ def acceptAppointment(request):
                     'scheduleData': None, 'docData': None}
 
     return Response(response)
+
+
+@api_view(['POST'])
+def getAllDocAppointments(request):
+    body = request.body.decode('utf-8')
+    data = json.loads(body)
+
+    userID = None
+    token = None
+
+    if 'userID' in data:
+        userID = data['userID']
+    if 'token' in data:
+        token = data['token']
+
+    if(verifyToken(userID, token)):
+        response = execution.getAllDocAppointments(
+            userID, data['todaysAppointment'])
+    else:
+        response = {'success': False, 'errorMessage': 'Invalid request',
+                    'scheduleData': None, 'docData': None}
+
+    return Response(response)

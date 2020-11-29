@@ -3,6 +3,7 @@ import { withStyles, AppBar, Drawer, Toolbar, List, Divider, CssBaseline, Typogr
 import { mainListItems, secondaryListItems } from '../Homepage/listItems';
 import { Redirect } from 'react-router-dom';
 import AppointmentsTable from './AppointmentsTable';
+import CopyRight from '../../Copyright';
 
 const drawerWidth = 240;
 
@@ -47,7 +48,7 @@ class ReceptionistAppointment extends Component {
         }
 
         this.renderAppointment = this.renderAppointment.bind(this);
-        this.Copyright = this.Copyright.bind(this);
+        //this.Copyright = this.Copyright.bind(this);
     }
 
     componentDidMount() {
@@ -55,23 +56,25 @@ class ReceptionistAppointment extends Component {
         this.props.getReceptionistAppointments({ 'userID': creds.userId, 'token': this.props.User.token });
     }
 
-    Copyright() {
-        return (
-            <Typography variant="body2" color="textSecondary" align="center">
-                {'Copyright © '}
-                <Link color="inherit" href="https://sadatshahriyar.pythonanywhere.com/">
-                    Sadat Shahriyar
-                </Link>{' '}
-                {new Date().getFullYear()}
-                {'.'}
-            </Typography>
-        );
-    }
+    // Copyright() {
+
+    //     return (
+    //         <Typography variant="body2" color="textSecondary" align="center">
+    //             {'Copyright © '}
+    //             <Link color="inherit" href="https://sadatshahriyar.pythonanywhere.com/">
+    //                 Sadat Shahriyar
+    //             </Link>{' '}
+    //             {'& Jayanta Sadhu. '}
+    //             {new Date().getFullYear()}
+    //             {'.'}
+    //         </Typography>
+    //     );
+    // }
 
     renderAppointment() {
         const { classes } = this.props;
         if (this.props.User.isAuthenticated && this.props.User.category === 'RECEPTIONIST') {
-            let copyRight = this.Copyright();
+            //let copyRight = this.Copyright();
             return (
                 <div className={classes.root}>
                     <CssBaseline />
@@ -112,7 +115,7 @@ class ReceptionistAppointment extends Component {
                                 </Grid>
                             </Grid>
                             <Box pt={4}>
-                                {copyRight}
+                                {CopyRight}
                             </Box>
                         </Container>
                     </main>

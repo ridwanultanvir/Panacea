@@ -1,8 +1,14 @@
 import React, { Component } from 'react';
-import { withStyles, AppBar, Drawer, Toolbar, List, Divider, CssBaseline, Typography, Card, Container, Grid, Box, Link } from '@material-ui/core';
-import { mainListItems, secondaryListItems } from './listItems';
 import { Redirect } from 'react-router-dom';
+import {
+    withStyles, AppBar, Drawer, Toolbar,
+    List, InputBase,
+    Divider, CssBaseline, Typography, Container, Grid, Box, TextField
+} from '@material-ui/core';
+import { mainListItems, secondaryListItems } from '../Homepage/listItems';
+import { baseUrl } from '../../../Redux/ActionCreator';
 import CopyRight from '../../Copyright';
+import AppointmentsTable from './AppointmentsTable';
 
 const drawerWidth = 240;
 
@@ -36,49 +42,78 @@ const styles = (theme) => ({
     fixedHeight: {
         height: 240,
     },
+    inline: {
+        display: 'inline',
+    },
 });
 
-class ReceptionistHome extends Component {
+class ApproveTest extends Component {
     constructor(props) {
         super(props);
-
         this.state = {
-
-        }
-
-        this.renderProfile = this.renderProfile.bind(this);
-        //this.Copyright = this.Copyright.bind(this);
+            checkupList: null
+        };
+        this.renderApprovePage = this.renderApprovePage.bind(this);
+        this.fetchData = this.fetchData.bind(this);
     }
 
 
-    // Copyright() {
+    fetchData(body) {
+        fetch(baseUrl + 'checkup/receptionist/tests/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(body)
+        })
+            .then((response) => {
+                console.log(response);
+                if (response.ok) {
+                    return response;
+                }
+                else {
+                    let err = new Error('Error ' + response.status + ': ' + response.statusText);
+                    err.response = response;
+                    throw err;
+                }
+            })
+            .then((response) => response.json())
+            .then((response) => {
+                if (response.success) {
+                    console.log(response);
+                    this.setState({ checkupList: response.tests });
+                }
+                else {
+                    let err = new Error(response.errorMessage);
+                    err.response = response;
+                    throw err;
+                }
+            })
+            .catch((err) => {
+                alert(err.message);
+            });
+    }
 
-    //     return (
-    //         <Typography variant="body2" color="textSecondary" align="center">
-    //             {'Copyright © '}
-    //             <Link color="inherit" href="https://sadatshahriyar.pythonanywhere.com/">
-    //                 Sadat Shahriyar
-    //             </Link>{' '}
-    //             {'& Jayanta Sadhu. '}
-    //             {new Date().getFullYear()}
-    //             {'.'}
-    //         </Typography>
-    //     );
-    // }
+    componentDidMount() {
+        let creds = JSON.parse(this.props.User.creds);
+        let body = { 'userID': creds.userId, 'token': this.props.User.token, 'allTests': false, 'app_sl_no': null };
+        this.fetchData(body);
+    }
 
-    renderProfile() {
+
+
+    renderApprovePage() {
         const { classes } = this.props;
 
         if (this.props.User.isAuthenticated && this.props.User.category === 'RECEPTIONIST') {
             let userData = JSON.parse(this.props.User.userData);
-            //let copyRight = this.Copyright();
             return (
                 <div className={classes.root}>
                     <CssBaseline />
                     <AppBar position="fixed" className={classes.appBar}>
                         <Toolbar>
                             <Typography variant="h6" noWrap>
-                                Receptionist
+                                Doctor
                             </Typography>
                         </Toolbar>
                     </AppBar>
@@ -104,17 +139,11 @@ class ReceptionistHome extends Component {
                         <Container maxWidth="lg" >
                             <Grid container spacing={3}>
                                 <Grid item xs={12}>
-                                    <Card style={{ padding: 20 }}>
-                                        <Typography variant='h6'>{userData.name}</Typography>
-                                        <Typography variant='body1'>Email: {userData.email}</Typography>
-                                        <Typography variant='body1'>Address: {userData.address}</Typography>
-                                        <Typography variant='body1'>Phone number: {userData.phoneNum}</Typography>
-                                        <Typography variant='body1'>Date of birth: {userData.date_of_birth}</Typography>
-                                        <Typography variant='body1'>Education: {userData.education}</Typography>
-                                        <Typography variant='body1'>Training: {userData.training}</Typography>
-                                        <Typography variant='body1'>Salary: {userData.salary}</Typography>
-                                        <Typography variant='body1'>Gender: {userData.gender}</Typography>
-                                    </Card>
+                                    <AppointmentsTable
+                                        User={this.props.User}
+                                        checkupList={this.state.checkupList}
+                                        fetchData={(body) => { this.fetchData(body) }}
+                                    />
                                 </Grid>
                             </Grid>
                             <Box pt={4}>
@@ -126,19 +155,18 @@ class ReceptionistHome extends Component {
             );
         }
         else {
-            return (<Redirect to='/sign-in' />);
+            return (<Redirect to='/sign-in' />)
         }
     }
-    render() {
-        const { classes } = this.props;
 
-        const profile = this.renderProfile();
+    render() {
+        let app = this.renderApprovePage()
         return (
             <React.Fragment>
-                {profile}
+                {app}
             </React.Fragment>
         );
     }
 }
 
-export default withStyles(styles)(ReceptionistHome);
+export default withStyles(styles)(ApproveTest);

@@ -18,6 +18,7 @@ import Chart from './Chart';
 import Deposits from './Deposits';
 import Orders from './Orders';
 import { Redirect } from 'react-router-dom';
+import CopyRight from '../../Copyright';
 
 const drawerWidth = 240;
 
@@ -53,18 +54,20 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-function Copyright() {
-    return (
-        <Typography variant="body2" color="textSecondary" align="center">
-            {'Copyright © '}
-            <Link color="inherit" href="https://sadatshahriyar.pythonanywhere.com/">
-                Sadat Shahriyar
-      </Link>{' '}
-            {new Date().getFullYear()}
-            {'.'}
-        </Typography>
-    );
-}
+// function Copyright() {
+
+//     return (
+//         <Typography variant="body2" color="textSecondary" align="center">
+//             {'Copyright © '}
+//             <Link color="inherit" href="https://sadatshahriyar.pythonanywhere.com/">
+//                 Sadat Shahriyar
+//                 </Link>{' '}
+//             {'& Jayanta Sadhu. '}
+//             {new Date().getFullYear()}
+//             {'.'}
+//         </Typography>
+//     );
+// }
 
 
 export default function AdminHome(props) {
@@ -120,7 +123,7 @@ export default function AdminHome(props) {
                             </Grid>
                         </Grid>
                         <Box pt={4}>
-                            <Copyright />
+                            {CopyRight}
                         </Box>
                     </Container>
                 </main>

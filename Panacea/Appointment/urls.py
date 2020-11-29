@@ -12,4 +12,7 @@ urlpatterns = [
          views.getReceptionistAppointments, name='getReceptionistAppointments'),
     path('accept-receptionist-appointment/', views.acceptAppointment,
          name='accept-receptionist-appointment'),
+
+    path('get-all-doc-appointment/', views.getAllDocAppointments,
+         name='getAllDocAppointments')
 ]

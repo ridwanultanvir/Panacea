@@ -14,7 +14,7 @@ import { } from '@material-ui/icons';
 
 export const mainListItems = (
     <div>
-        <Link to='/receptionist/home' style={{ textDecoration: 'none', color: 'black' }}>
+        <Link to='/doctor/home' style={{ textDecoration: 'none', color: 'black' }}>
             <ListItem button>
                 <ListItemIcon>
                     <DashboardIcon />
@@ -22,7 +22,7 @@ export const mainListItems = (
                 <ListItemText primary="Profile" />
             </ListItem>
         </Link>
-        <Link to='/receptionist/appointments' style={{ textDecoration: 'none', color: 'black' }}>
+        <Link to='/doctor/appointment' style={{ textDecoration: 'none', color: 'black' }}>
             <ListItem button >
                 <ListItemIcon>
                     <PeopleIcon />
@@ -30,12 +30,12 @@ export const mainListItems = (
                 <ListItemText primary="Appointments" />
             </ListItem>
         </Link>
-        <Link to='/receptionist/approve-service' style={{ textDecoration: 'none', color: 'black' }}>
+        <Link to="/doctor/appointment/all" style={{ textDecoration: 'none', color: 'black' }}>
             <ListItem button>
                 <ListItemIcon>
                     <ShoppingCartIcon />
                 </ListItemIcon>
-                <ListItemText primary="Approve service" />
+                <ListItemText primary="All appointments" />
             </ListItem>
         </Link>
         <ListItem button>

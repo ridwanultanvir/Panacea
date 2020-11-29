@@ -1,0 +1,379 @@
+from django.http import response
+from UserHandler.execution import connect
+import cx_Oracle
+
+
+def getDiagnosisList(app_sl_no):
+    connection = connect()
+    cursor = connection.cursor()
+    response = {}
+
+    try:
+        query = '''
+        SELECT (P.FIRST_NAME || ' ' || P.LAST_NAME) AS NAME, P.EMAIL,P.PHONE_NUM, P.GENDER, P.ADDRESS,P.DATE_OF_BIRTH, PT.BIO
+        FROM PERSON P JOIN PATIENT PT ON(P.ID = PT.ID)
+        WHERE P.ID = (SELECT PATIENT_ID FROM APPOINTMENT WHERE APP_SL_NO = :app_sl_no)
+        '''
+        cursor.execute(query, [app_sl_no])
+        result = cursor.fetchone()
+
+        response['patient_info'] = {'name': result[0], 'email': result[1], 'phone_number': result[2], 'gender': result[3],
+                                    'address': result[4], 'date_of_birth': result[5], 'bio': result[6]}
+
+        query = '''
+        SELECT SERVICE_ID, CATEGORY, SERVICE_NAME,SERVICE_DESC, COST
+        FROM SERVICE
+        WHERE CATEGORY = 'TEST'
+        ORDER BY SERVICE_ID
+        '''
+        cursor.execute(query)
+        result = cursor.fetchall()
+        tests = []
+
+        for test in result:
+            tests.append({'service_id': test[0], 'category': test[1],
+                          'service_name': test[2], 'service_desc': test[3], 'cost': test[4]})
+        # print(tests)
+
+        response['tests'] = tests
+
+        query = '''
+        SELECT *
+        FROM SERVICE
+        WHERE CATEGORY = 'SURGERY'
+        ORDER BY SERVICE_ID
+        '''
+        cursor.execute(query)
+        result = cursor.fetchall()
+        surgeries = []
+
+        for surgery in result:
+            surgeries.append({'service_id': surgery[0], 'category': surgery[1], 'service_name': surgery[2],
+                              'service_desc': surgery[3], 'cost': surgery[4], 'department': surgery[5]})
+        # print(surgeries)
+
+        response['surgeries'] = surgeries
+
+        response['success'] = True
+        response['errorMessage'] = ''
+
+        # print(response)
+        return response
+
+    except cx_Oracle.Error as error:
+        errorObj, = error.args
+        response = {'success': False, 'errorMessage': errorObj.message}
+        print(response)
+        return response
+
+
+def diagnosis(data):
+    connection = connect()
+    cursor = connection.cursor()
+    response = {}
+    service_id = ''
+    if len(data['tests']) != 0:
+        for testID in data['tests']:
+            if service_id == '':
+                service_id = service_id + str(testID)
+            else:
+                service_id = service_id + '-' + str(testID)
+
+    if len(data['surgeries']) != 0:
+        for surgID in data['surgeries']:
+            if service_id == '':
+                service_id = service_id + str(surgID)
+            else:
+                service_id = service_id + '-' + str(surgID)
+
+    if service_id == '':
+        service_id = None
+    else:
+        service_id = f"{service_id}"
+    if data['specialSurgery'] == None:
+        surg_desc = None
+    else:
+        surg_desc = f"{data['specialSurgery']}"
+    print(data)
+    print(service_id)
+    print(surg_desc)
+    print(data['medicine'])
+    print(data['diagnosisDescription'])
+    try:
+        cursor.callproc('INSERT_DIAGNOSIS',
+                        [int(data['app_sl_no']), service_id, surg_desc, f"{data['medicine']}", f"{data['diagnosisDescription']}"])
+        connection.commit()
+        return {'success': True, 'errorMessage': '', 'message': 'Diagnosis added successfully'}
+
+    except cx_Oracle.Error as error:
+        errorObj, = error.args
+        response = {'success': False, 'errorMessage': errorObj.message}
+        print(response)
+        return response
+
+
+def receptionistTests(data):
+    connection = connect()
+    cursor = connection.cursor()
+    response = {}
+    if(data['allTests']):
+        query = '''
+        SELECT C.APP_SL_NO, C.DIAGNOSIS_ID, 
+        (SELECT (FIRST_NAME || ' ' || LAST_NAME) FROM PERSON WHERE ID = A.PATIENT_ID) AS "PATIENT_NAME",
+        (SELECT (FIRST_NAME || ' ' || LAST_NAME) FROM PERSON WHERE ID = A.DOCTOR_ID) AS "DOCTOR_NAME", TO_CHAR(C.CHECKUP_DATE)
+        FROM CHECKUP C JOIN APPOINTMENT A ON(C.APP_SL_NO = A.APP_SL_NO)
+        ORDER BY C.APP_SL_NO DESC, DIAGNOSIS_ID DESC
+        '''
+
+        try:
+            cursor.execute(query)
+            result = cursor.fetchall()
+            checkups = []
+
+            for checkup in result:
+                checkups.append({'app_sl_no': checkup[0], 'diagnosis_id': checkup[1], 'patient_name': checkup[2], 'doctor_name': checkup[3],
+                                 'date': checkup[4]})
+
+            response['tests'] = checkups
+            response['success'] = True
+            response['errorMessage'] = ''
+
+            return response
+
+        except cx_Oracle.Error as error:
+            errorObj, = error.args
+            response = {'success': False, 'errorMessage': errorObj.message}
+            print(response)
+            return response
+    elif data['app_sl_no'] != None:
+        query = '''
+        SELECT C.APP_SL_NO, C.DIAGNOSIS_ID, 
+        (SELECT (FIRST_NAME || ' ' || LAST_NAME) FROM PERSON WHERE ID = A.PATIENT_ID) AS "PATIENT_NAME",
+        (SELECT (FIRST_NAME || ' ' || LAST_NAME) FROM PERSON WHERE ID = A.DOCTOR_ID) AS "DOCTOR_NAME", TO_CHAR(C.CHECKUP_DATE)
+        FROM CHECKUP C JOIN APPOINTMENT A ON(C.APP_SL_NO = A.APP_SL_NO)
+        WHERE C.APP_SL_NO = :app_sl_no
+        ORDER BY DIAGNOSIS_ID DESC
+        '''
+
+        try:
+            cursor.execute(query, [data['app_sl_no']])
+            result = cursor.fetchall()
+            checkups = []
+
+            for checkup in result:
+                checkups.append({'app_sl_no': checkup[0], 'diagnosis_id': checkup[1], 'patient_name': checkup[2], 'doctor_name': checkup[3],
+                                 'date': checkup[4]})
+
+            response['tests'] = checkups
+            response['success'] = True
+            response['errorMessage'] = ''
+
+            return response
+
+        except cx_Oracle.Error as error:
+            errorObj, = error.args
+            response = {'success': False, 'errorMessage': errorObj.message}
+            print(response)
+            return response
+
+    else:
+        query = '''
+        SELECT C.APP_SL_NO, C.DIAGNOSIS_ID, 
+        (SELECT (FIRST_NAME || ' ' || LAST_NAME) FROM PERSON WHERE ID = A.PATIENT_ID) AS "PATIENT_NAME",
+        (SELECT (FIRST_NAME || ' ' || LAST_NAME) FROM PERSON WHERE ID = A.DOCTOR_ID) AS "DOCTOR_NAME", TO_CHAR(C.CHECKUP_DATE)
+        FROM CHECKUP C JOIN APPOINTMENT A ON(C.APP_SL_NO = A.APP_SL_NO)
+        WHERE (SYSDATE - C.CHECKUP_DATE) < 15
+        ORDER BY C.APP_SL_NO DESC, DIAGNOSIS_ID DESC
+        '''
+
+        try:
+            cursor.execute(query)
+            result = cursor.fetchall()
+            checkups = []
+
+            for checkup in result:
+                checkups.append({'app_sl_no': checkup[0], 'diagnosis_id': checkup[1], 'patient_name': checkup[2], 'doctor_name': checkup[3],
+                                 'date': checkup[4]})
+
+            response['tests'] = checkups
+            response['success'] = True
+            response['errorMessage'] = ''
+
+            return response
+
+        except cx_Oracle.Error as error:
+            errorObj, = error.args
+            response = {'success': False, 'errorMessage': errorObj.message}
+            print(response)
+            return response
+
+
+def serviceResultsTable(diagnosisID):
+    connection = connect()
+    cursor = connection.cursor()
+    response = {}
+    try:
+        query = '''
+        SELECT T.TEST_RESULT_ID, S.SERVICE_NAME, S.COST
+        FROM TEST_RESULTS T JOIN SERVICE S ON(T.SERVICE_ID = S.SERVICE_ID)
+        WHERE T.TEST_RESULT_ID IN (select regexp_substr((SELECT SERVICE_RESULTS FROM DIAGNOSIS WHERE DIAGNOSIS_ID = :diagnosisID),'[^-]+', 1, level) AS "SERVICE_ID"
+                                    from dual
+                                    connect BY regexp_substr((SELECT SERVICE_RESULTS FROM DIAGNOSIS WHERE DIAGNOSIS_ID = :diagnosisID), '[^-]+', 1, level)
+                                    is not null)
+              AND T.COMPLETED = 'F'
+        '''
+
+        cursor.execute(query, [diagnosisID, diagnosisID])
+        result = cursor.fetchall()
+
+        pendingTests = []
+        for test in result:
+            pendingTests.append(
+                {'test_result_id': test[0], 'service_name': test[1], 'cost': test[2]})
+
+        response['pending_tests'] = pendingTests
+
+        query = '''
+        SELECT S.SURGERY_RESULT_ID, S.SURGERY_DESC, S1.SERVICE_NAME, S1.COST, S1.DEPARTMENT
+        FROM SURGERY_RESULTS S LEFT OUTER JOIN SERVICE S1 ON(S.SERVICE_ID = S1.SERVICE_ID)
+        WHERE S.SURGERY_RESULT_ID IN (select regexp_substr((SELECT SERVICE_RESULTS FROM DIAGNOSIS WHERE DIAGNOSIS_ID = :diagnosisID),'[^-]+', 1, level) AS "SERVICE_ID"
+                                    from dual
+                                    connect BY regexp_substr((SELECT SERVICE_RESULTS FROM DIAGNOSIS WHERE DIAGNOSIS_ID = :diagnosisID), '[^-]+', 1, level)
+                                    is not null)
+              AND S.COMPLETED = 'F'
+        '''
+
+        cursor.execute(query, [diagnosisID, diagnosisID])
+        result = cursor.fetchall()
+
+        pendingSurgery = []
+        for surgery in result:
+            pendingSurgery.append({'surgery_result_id': surgery[0], 'surgery_desc': surgery[1],
+                                   'service_name': surgery[2], 'cost': surgery[3], 'department': surgery[4]})
+
+        response['pending_surgeries'] = pendingSurgery
+
+        response['success'] = True
+        response['errorMessage'] = ''
+
+        return response
+
+    except cx_Oracle.Error as error:
+        errorObj, = error.args
+        response = {'success': False, 'errorMessage': errorObj.message}
+        print(response)
+        return response
+
+
+def receptionistApproveTest(diagnosisID, test_result_id):
+    connection = connect()
+    cursor = connection.cursor()
+
+    try:
+        query = '''
+        UPDATE TEST_RESULTS SET COMPLETED = 'A'
+        WHERE TEST_RESULT_ID = :test_result_id
+        '''
+        cursor.execute(query, [test_result_id])
+        connection.commit()
+        return serviceResultsTable(diagnosisID)
+
+    except cx_Oracle.Error as error:
+        errorObj, = error.args
+        response = {'success': False, 'errorMessage': errorObj.message}
+        print(response)
+        return response
+
+
+def receptionistApproveSurgery(diagnosisID, surgery_result_id):
+    connection = connect()
+    cursor = connection.cursor()
+
+    try:
+        query = '''
+        UPDATE SURGERY_RESULTS SET COMPLETED = 'A'
+        WHERE SURGERY_RESULT_ID = :surgery_result_id
+        '''
+        cursor.execute(query, [surgery_result_id])
+        connection.commit()
+        return serviceResultsTable(diagnosisID)
+
+    except cx_Oracle.Error as error:
+        errorObj, = error.args
+        response = {'success': False, 'errorMessage': errorObj.message}
+        print(response)
+        return response
+
+
+def technicianPendingTests(data):
+    connection = connect()
+    cursor = connection.cursor()
+
+    try:
+        if data['all_tests']:
+            query = '''
+            SELECT T.TEST_RESULT_ID,S.SERVICE_NAME, (P.FIRST_NAME || ' ' || P.LAST_NAME) AS "PATIENT NAME" 
+            FROM TEST_RESULTS T JOIN SERVICE S ON(T.SERVICE_ID = S.SERVICE_ID)
+            JOIN PERSON P ON(T.PATIENT_ID = P.ID)
+            WHERE T.COMPLETED = 'T' OR T.COMPLETED = 'A'
+            '''
+            cursor.execute(query)
+            result = cursor.fetchall()
+        elif data['test_result_id'] != None:
+            query = '''
+            SELECT T.TEST_RESULT_ID,S.SERVICE_NAME, (P.FIRST_NAME || ' ' || P.LAST_NAME) AS "PATIENT NAME" 
+            FROM TEST_RESULTS T JOIN SERVICE S ON(T.SERVICE_ID = S.SERVICE_ID)
+            JOIN PERSON P ON(T.PATIENT_ID = P.ID)
+            WHERE T.TEST_RESULT_ID = :test_result_id AND (T.COMPLETED = 'A' OR T.COMPLETED = 'T')
+            '''
+            cursor.execute(query, [data['test_result_id']])
+            result = cursor.fetchall()
+        else:
+            query = '''
+            SELECT T.TEST_RESULT_ID,S.SERVICE_NAME, (P.FIRST_NAME || ' ' || P.LAST_NAME) AS "PATIENT NAME" 
+            FROM TEST_RESULTS T JOIN SERVICE S ON(T.SERVICE_ID = S.SERVICE_ID)
+            JOIN PERSON P ON(T.PATIENT_ID = P.ID)
+            WHERE T.COMPLETED = 'A'
+            '''
+            cursor.execute(query)
+            result = cursor.fetchall()
+
+        pendingTests = []
+
+        for test in result:
+            pendingTests.append(
+                {'test_result_id': test[0], 'service_name': test[1], 'patient_name': test[2]})
+
+        response = {'success': True, 'errorMessage': '',
+                    'pending_tests': pendingTests}
+        return response
+
+    except cx_Oracle.Error as error:
+        errorObj, = error.args
+        response = {'success': False, 'errorMessage': errorObj.message}
+        print(response)
+        return response
+
+
+def updateTestResult(data):
+    connection = connect()
+    cursor = connection.cursor()
+    print(data)
+    try:
+        query = '''
+        UPDATE TEST_RESULTS SET SAMPLE_NO = :sample_no, TEST_DATE = TO_DATE(:test_date,'DD-MM-YYYY'), RESULT = :result, COMPLETED = 'T'
+        WHERE TEST_RESULT_ID = :test_result_id
+        '''
+
+        cursor.execute(query, [data['sample_no'], data['date'],
+                               f"{data['test_result']}", data['test_result_id']])
+        connection.commit()
+
+        response = {'success': True, 'errorMessage': ''}
+        return response
+
+    except cx_Oracle.Error as error:
+        errorObj, = error.args
+        response = {'success': False, 'errorMessage': errorObj.message}
+        print(response)
+        return response

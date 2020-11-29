@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
-import { withStyles, AppBar, Drawer, Toolbar, List, Divider, CssBaseline, Typography, Card, Container, Grid, Box, Link } from '@material-ui/core';
-import { mainListItems, secondaryListItems } from './listItems';
 import { Redirect } from 'react-router-dom';
+import { withStyles, AppBar, Drawer, Toolbar, List, Divider, CssBaseline, Typography, Card, Container, Grid, Box, Link } from '@material-ui/core';
+import { mainListItems, secondaryListItems } from '../Homepage/listItems';
+import AppointmentsTable from './AppointmentsTable';
 import CopyRight from '../../Copyright';
 
 const drawerWidth = 240;
@@ -38,18 +39,17 @@ const styles = (theme) => ({
     },
 });
 
-class ReceptionistHome extends Component {
+class DoctorAppointment extends Component {
     constructor(props) {
         super(props);
-
-        this.state = {
-
-        }
-
-        this.renderProfile = this.renderProfile.bind(this);
+        this.renderAppointment = this.renderAppointment.bind(this);
         //this.Copyright = this.Copyright.bind(this);
     }
 
+    componentDidMount() {
+        let creds = JSON.parse(this.props.User.creds);
+        this.props.getDoctorsAppointment({ 'userID': creds.userId, 'token': this.props.User.token, 'todaysAppointment': true });
+    }
 
     // Copyright() {
 
@@ -66,10 +66,10 @@ class ReceptionistHome extends Component {
     //     );
     // }
 
-    renderProfile() {
+    renderAppointment() {
         const { classes } = this.props;
 
-        if (this.props.User.isAuthenticated && this.props.User.category === 'RECEPTIONIST') {
+        if (this.props.User.isAuthenticated && this.props.User.category === 'doctor') {
             let userData = JSON.parse(this.props.User.userData);
             //let copyRight = this.Copyright();
             return (
@@ -78,7 +78,7 @@ class ReceptionistHome extends Component {
                     <AppBar position="fixed" className={classes.appBar}>
                         <Toolbar>
                             <Typography variant="h6" noWrap>
-                                Receptionist
+                                Doctor
                             </Typography>
                         </Toolbar>
                     </AppBar>
@@ -104,17 +104,9 @@ class ReceptionistHome extends Component {
                         <Container maxWidth="lg" >
                             <Grid container spacing={3}>
                                 <Grid item xs={12}>
-                                    <Card style={{ padding: 20 }}>
-                                        <Typography variant='h6'>{userData.name}</Typography>
-                                        <Typography variant='body1'>Email: {userData.email}</Typography>
-                                        <Typography variant='body1'>Address: {userData.address}</Typography>
-                                        <Typography variant='body1'>Phone number: {userData.phoneNum}</Typography>
-                                        <Typography variant='body1'>Date of birth: {userData.date_of_birth}</Typography>
-                                        <Typography variant='body1'>Education: {userData.education}</Typography>
-                                        <Typography variant='body1'>Training: {userData.training}</Typography>
-                                        <Typography variant='body1'>Salary: {userData.salary}</Typography>
-                                        <Typography variant='body1'>Gender: {userData.gender}</Typography>
-                                    </Card>
+                                    <AppointmentsTable
+                                        DoctorsAppointments={this.props.DoctorsAppointments}
+                                    />
                                 </Grid>
                             </Grid>
                             <Box pt={4}>
@@ -126,19 +118,18 @@ class ReceptionistHome extends Component {
             );
         }
         else {
-            return (<Redirect to='/sign-in' />);
+            return (<Redirect to='/sign-in' />)
         }
     }
-    render() {
-        const { classes } = this.props;
 
-        const profile = this.renderProfile();
+    render() {
+        let app = this.renderAppointment()
         return (
             <React.Fragment>
-                {profile}
+                {app}
             </React.Fragment>
         );
     }
 }
 
-export default withStyles(styles)(ReceptionistHome);
+export default withStyles(styles)(DoctorAppointment);

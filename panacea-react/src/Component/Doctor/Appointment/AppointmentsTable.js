@@ -7,7 +7,8 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
-import { FormControl, Select, Menu, MenuItem, FormHelperText } from '@material-ui/core';
+import { FormControl, Select, Menu, MenuItem, FormHelperText, Button } from '@material-ui/core';
+import { Link } from 'react-router-dom';
 
 const useStyles = makeStyles((theme) => ({
     table: {
@@ -22,8 +23,12 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-function createData(serialNo, patName, docName, probDesc, appntDate, schedule_date, time, status) {
-    return { serialNo, patName, docName, probDesc, appntDate, schedule_date, time, status };
+// function createData(serialNo, patName, docName, probDesc, appntDate, schedule_date, time, status) {
+//     return { serialNo, patName, docName, probDesc, appntDate, schedule_date, time, status };
+// }
+
+function createData(app_sl_no, patient_name, shift_title, time, problem_desc, appointment_date, submission_date) {
+    return { app_sl_no, patient_name, shift_title, time, problem_desc, appointment_date, submission_date };
 }
 
 let rows = [];
@@ -39,12 +44,12 @@ export default function AppointmentsTable(props) {
     };
 
     rows = [];
-    let appointments = props.ReceptionistsAppointments.appointments;
-    //console.log(props.ReceptionistsAppointments)
+    let appointments = props.DoctorsAppointments.appointments;
+    console.log(props.ReceptionistsAppointments)
     if (appointments !== null) {
         appointments.map((appointment) => {
             console.log(appointment.schedule_date);
-            rows.push(createData(appointment.app_sl_no, appointment.patient_name, appointment.doctor_name, appointment.problem_desc, appointment.appointment_date, appointment.schedule_date, appointment.start_time + '-' + appointment.end_time, appointment.status));
+            rows.push(createData(appointment.app_sl_no, appointment.patient_name, appointment.shift_title, appointment.time, appointment.problem_desc, appointment.appointment_date, appointment.submission_date));
         })
     }
     let idx = 1;
@@ -54,13 +59,13 @@ export default function AppointmentsTable(props) {
                 <TableHead>
                     <TableRow>
                         <TableCell>Serial No.</TableCell>
-                        <TableCell align="right">Patients's name</TableCell>
-                        <TableCell align="right">Doctor's Name</TableCell>
-                        <TableCell align="right">Problem description</TableCell>
-                        <TableCell align="right">Application date</TableCell>
-                        <TableCell align="right">Schedule date</TableCell>
+                        <TableCell align="right">Patient's name</TableCell>
+                        <TableCell align="right">Shift Title</TableCell>
                         <TableCell align="right">Time</TableCell>
-                        <TableCell align="right">Status</TableCell>
+                        <TableCell align="right">Problem description</TableCell>
+                        <TableCell align="right">Appointment date</TableCell>
+                        <TableCell align="right">Submission date</TableCell>
+                        <TableCell align="right">Diagnosis</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
@@ -70,13 +75,20 @@ export default function AppointmentsTable(props) {
                                 <TableCell component="th" scope="row">
                                     {idx++}
                                 </TableCell>
-                                <TableCell align="right">{row.patName}</TableCell>
-                                <TableCell align="right">{row.docName}</TableCell>
-                                <TableCell align="right">{row.probDesc}</TableCell>
-                                <TableCell align="right">{row.appntDate}</TableCell>
-                                <TableCell align="right">{row.schedule_date}</TableCell>
+                                <TableCell align="right">{row.patient_name}</TableCell>
+                                <TableCell align="right">{row.shift_title}</TableCell>
                                 <TableCell align="right">{row.time}</TableCell>
+                                <TableCell align="right">{row.problem_desc}</TableCell>
+                                <TableCell align="right">{row.appointment_date}</TableCell>
+                                <TableCell align="right">{row.submission_date}</TableCell>
                                 <TableCell align="right">
+                                    <Link to={`/doctor/appointment/${row.app_sl_no}`} style={{ textDecoration: 'none', color: 'black' }}>
+                                        <Button variant='contained'>
+                                            Prescribe
+                                        </Button>
+                                    </Link>
+                                </TableCell>
+                                {/* <TableCell align="right">
                                     <FormControl className={classes.formControl}>
                                         <Select
                                             defaultValue='pending'
@@ -91,7 +103,7 @@ export default function AppointmentsTable(props) {
                                             <MenuItem value={row.serialNo}>accepted</MenuItem>
                                         </Select>
                                     </FormControl>
-                                </TableCell>
+                                </TableCell> */}
                             </TableRow>
                         );
                     })}

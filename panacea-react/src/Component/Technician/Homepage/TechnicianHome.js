@@ -38,7 +38,7 @@ const styles = (theme) => ({
     },
 });
 
-class ReceptionistHome extends Component {
+class TechnicianHome extends Component {
     constructor(props) {
         super(props);
 
@@ -51,25 +51,12 @@ class ReceptionistHome extends Component {
     }
 
 
-    // Copyright() {
 
-    //     return (
-    //         <Typography variant="body2" color="textSecondary" align="center">
-    //             {'Copyright © '}
-    //             <Link color="inherit" href="https://sadatshahriyar.pythonanywhere.com/">
-    //                 Sadat Shahriyar
-    //             </Link>{' '}
-    //             {'& Jayanta Sadhu. '}
-    //             {new Date().getFullYear()}
-    //             {'.'}
-    //         </Typography>
-    //     );
-    // }
 
     renderProfile() {
         const { classes } = this.props;
 
-        if (this.props.User.isAuthenticated && this.props.User.category === 'RECEPTIONIST') {
+        if (this.props.User.isAuthenticated && this.props.User.category === 'TECHNICIAN') {
             let userData = JSON.parse(this.props.User.userData);
             //let copyRight = this.Copyright();
             return (
@@ -78,7 +65,7 @@ class ReceptionistHome extends Component {
                     <AppBar position="fixed" className={classes.appBar}>
                         <Toolbar>
                             <Typography variant="h6" noWrap>
-                                Receptionist
+                                Technician
                             </Typography>
                         </Toolbar>
                     </AppBar>
@@ -141,4 +128,4 @@ class ReceptionistHome extends Component {
     }
 }
 
-export default withStyles(styles)(ReceptionistHome);
+export default withStyles(styles)(TechnicianHome);

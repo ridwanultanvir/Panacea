@@ -14,19 +14,22 @@ import Review from './Review';
 import { Link } from 'react-router-dom';
 import SelectDoctorForm from './SelectDoctorForm';
 import { baseUrl } from '../../Redux/ActionCreator';
+import CopyRight from '../Copyright';
 
-function Copyright() {
-    return (
-        <Typography variant="body2" color="textSecondary" align="center">
-            {'Copyright © '}
-            <Link color="inherit" href="https://material-ui.com/">
-                Sadat Shahriyar
-            </Link>{' '}
-            {new Date().getFullYear()}
-            {'.'}
-        </Typography>
-    );
-}
+// function Copyright() {
+
+//     return (
+//         <Typography variant="body2" color="textSecondary" align="center">
+//             {'Copyright © '}
+//             <Link color="inherit" href="https://sadatshahriyar.pythonanywhere.com/">
+//                 Sadat Shahriyar
+//                 </Link>{' '}
+//             {'& Jayanta Sadhu. '}
+//             {new Date().getFullYear()}
+//             {'.'}
+//         </Typography>
+//     );
+// }
 
 const useStyles = makeStyles((theme) => ({
     appBar: {
@@ -332,7 +335,7 @@ export default function Appointment(props) {
                             )}
                     </React.Fragment>
                 </Paper>
-                <Copyright />
+                {CopyRight}
             </main>
         </React.Fragment>
     );

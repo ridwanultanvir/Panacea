@@ -1,7 +1,6 @@
 from json import decoder
 import cx_Oracle
 import hashlib
-
 from django.http import response
 from UserHandler.execution import connect
 
@@ -22,7 +21,8 @@ def getAllDepartments():
         print(response)
         return response
     except cx_Oracle.Error as error:
-        response = {'success': False, 'errorMessage': error}
+        errorObj, = error.args
+        response = {'success': False, 'errorMessage': errorObj.message}
         print(response)
         return response
 
@@ -44,7 +44,8 @@ def getAllDoctorsInADeptartment(deptName):
                     'doctors': doctorsName}
         return response
     except cx_Oracle.Error as error:
-        response = {'success': False, 'errorMessage': error}
+        errorObj, = error.args
+        response = {'success': False, 'errorMessage': errorObj.message}
         print(response)
         return response
 
@@ -78,7 +79,8 @@ def getScheduleOfDoctor(docID):
         print(response)
         return response
     except cx_Oracle.Error as error:
-        response = {'success': False, 'errorMessage': error}
+        errorObj, = error.args
+        response = {'success': False, 'errorMessage': errorObj.message}
         print(response)
         return response
 
@@ -115,7 +117,8 @@ def checkScheduleForPatient(patientID, scheduleID):
         return response
 
     except cx_Oracle.Error as error:
-        response = {'success': False, 'errorMessage': error}
+        errorObj, = error.args
+        response = {'success': False, 'errorMessage': errorObj.message}
         print(response)
         return response
 
@@ -296,6 +299,57 @@ def acceptReceptionistAppointment(app_sl_no):
 
         return response
 
+    except cx_Oracle.Error as error:
+        errorObj, = error.args
+        response = {'success': False, 'errorMessage': errorObj.message}
+        print(response)
+        return response
+
+
+def getAllDocAppointments(docId, todaysAppointment):
+    connection = connect()
+    cursor = connection.cursor()
+
+    if todaysAppointment:
+        query = '''
+        SELECT A.APP_SL_NO, (SELECT (FIRST_NAME || ' ' || LAST_NAME) FROM PERSON WHERE ID = A.PATIENT_ID) AS "NAME",
+        TO_CHAR(A.APPNT_DATE) AS "SUBMISSION DATE", A.PROB_DESC, TO_CHAR(S.SCHEDULE_DATE) AS "APPOINTMENT DATE", T.SHIFT_TITLE,
+        (T.START_TIME || '-' || T.END_TIME) AS "TIME"
+        FROM APPOINTMENT A JOIN SCHEDULE S ON(A.SCHEDULE_ID = S.SCHEDULE_ID)
+        JOIN TIME_TABLE T ON (S.TIME_ID = T.TIME_ID)
+        WHERE A.DOCTOR_ID = (SELECT ID FROM PERSON WHERE USER_ID = :docId)
+        AND TRUNC(S.SCHEDULE_DATE) = TRUNC(SYSDATE)
+        AND A.STATUS = 'accepted'
+        ORDER BY A.APP_SL_NO
+        '''
+    else:
+        query = '''
+        SELECT A.APP_SL_NO, (SELECT (FIRST_NAME || ' ' || LAST_NAME) FROM PERSON WHERE ID = A.PATIENT_ID) AS "NAME",
+        TO_CHAR(A.APPNT_DATE) AS "SUBMISSION DATE", A.PROB_DESC, TO_CHAR(S.SCHEDULE_DATE) AS "APPOINTMENT DATE", T.SHIFT_TITLE,
+        (T.START_TIME || '-' || T.END_TIME) AS "TIME"
+        FROM APPOINTMENT A JOIN SCHEDULE S ON(A.SCHEDULE_ID = S.SCHEDULE_ID)
+        JOIN TIME_TABLE T ON (S.TIME_ID = T.TIME_ID)
+        WHERE A.DOCTOR_ID = (SELECT ID FROM PERSON WHERE USER_ID = :docId)
+        AND A.STATUS = 'accepted'
+        ORDER BY A.APP_SL_NO
+        '''
+
+    response = {}
+    try:
+        cursor.execute(query, [docId])
+        result = cursor.fetchall()
+        appointments = []
+        print(len(result))
+        for appointment in result:
+            appointments.append({'app_sl_no': appointment[0], 'patient_name': appointment[1], 'submission_date': appointment[2],
+                                 'problem_desc': appointment[3], 'appointment_date': appointment[4], 'shift_title': appointment[5],
+                                 'time': appointment[6]})
+
+        response['appointments'] = appointments
+        response['success'] = True
+        response['errorMessage'] = ''
+
+        return response
     except cx_Oracle.Error as error:
         errorObj, = error.args
         response = {'success': False, 'errorMessage': errorObj.message}

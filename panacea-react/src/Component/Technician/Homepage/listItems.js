@@ -14,31 +14,31 @@ import { } from '@material-ui/icons';
 
 export const mainListItems = (
     <div>
-        <Link to='/receptionist/home' style={{ textDecoration: 'none', color: 'black' }}>
+        <Link to='/technician/home' style={{ textDecoration: 'none', color: 'black' }}>
             <ListItem button>
                 <ListItemIcon>
-                    <DashboardIcon />
+                    <PeopleIcon />
                 </ListItemIcon>
                 <ListItemText primary="Profile" />
             </ListItem>
         </Link>
-        <Link to='/receptionist/appointments' style={{ textDecoration: 'none', color: 'black' }}>
+        <Link to='/technician/pending-tests' style={{ textDecoration: 'none', color: 'black' }}>
             <ListItem button >
                 <ListItemIcon>
-                    <PeopleIcon />
+                    <DashboardIcon />
                 </ListItemIcon>
-                <ListItemText primary="Appointments" />
+                <ListItemText primary="Pending tests" />
             </ListItem>
         </Link>
-        <Link to='/receptionist/approve-service' style={{ textDecoration: 'none', color: 'black' }}>
+        {/* <Link to='#' style={{ textDecoration: 'none', color: 'black' }}>
             <ListItem button>
                 <ListItemIcon>
-                    <ShoppingCartIcon />
+                    <DashboardIcon />
                 </ListItemIcon>
-                <ListItemText primary="Approve service" />
+                <ListItemText primary="All tests" />
             </ListItem>
-        </Link>
-        <ListItem button>
+        </Link> */}
+        {/* <ListItem button>
             <ListItemIcon>
                 <BarChartIcon />
             </ListItemIcon>
@@ -49,13 +49,13 @@ export const mainListItems = (
                 <LayersIcon />
             </ListItemIcon>
             <ListItemText primary="Doctor's schedule" />
-        </ListItem>
+        </ListItem> */}
     </div>
 );
 
 export const secondaryListItems = (
     <div>
-        <ListSubheader inset>Saved reports</ListSubheader>
+        {/* <ListSubheader inset>Saved reports</ListSubheader>
         <ListItem button>
             <ListItemIcon>
                 <AssignmentIcon />
@@ -73,6 +73,6 @@ export const secondaryListItems = (
                 <AssignmentIcon />
             </ListItemIcon>
             <ListItemText primary="Year-end sale" />
-        </ListItem>
+        </ListItem> */}
     </div>
 );

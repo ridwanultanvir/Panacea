@@ -17,6 +17,7 @@ import { Form } from 'react-redux-form';
 import { TextField, Button, CardContent, Card } from '@material-ui/core';
 import ScheduleTable from './ScheduleTable';
 import AddScheduleForm from './AddSchedule';
+import CopyRight from '../../Copyright';
 
 const drawerWidth = 240;
 
@@ -65,7 +66,7 @@ class Schedule extends Component {
             docID: null
         };
 
-        this.Copyright = this.Copyright.bind(this);
+        //this.Copyright = this.Copyright.bind(this);
         this.renderSchedule = this.renderSchedule.bind(this);
         this.handleUserIdSubmit = this.handleUserIdSubmit.bind(this);
         this.setUserId = this.setUserId.bind(this);
@@ -79,18 +80,20 @@ class Schedule extends Component {
         this.props.loadTimeTable({ 'userID': creds.userId, 'token': this.props.User.token })
     }
 
-    Copyright() {
-        return (
-            <Typography variant="body2" color="textSecondary" align="center">
-                {'Copyright © '}
-                <Link color="inherit" href="https://sadatshahriyar.pythonanywhere.com/">
-                    Sadat Shahriyar
-                </Link>{' '}
-                {new Date().getFullYear()}
-                {'.'}
-            </Typography>
-        );
-    }
+    // Copyright() {
+
+    //     return (
+    //         <Typography variant="body2" color="textSecondary" align="center">
+    //             {'Copyright © '}
+    //             <Link color="inherit" href="https://sadatshahriyar.pythonanywhere.com/">
+    //                 Sadat Shahriyar
+    //             </Link>{' '}
+    //             {'& Jayanta Sadhu. '}
+    //             {new Date().getFullYear()}
+    //             {'.'}
+    //         </Typography>
+    //     );
+    // }
 
     setUserId(id) {
         this.setState({ docID: id });
@@ -122,7 +125,7 @@ class Schedule extends Component {
 
     renderSchedule() {
         const { classes } = this.props;
-        const copyRight = this.Copyright();
+        //const copyRight = this.Copyright();
         if (this.props.User.isAuthenticated && this.props.User.category === 'admin') {
             return (
                 <div className={classes.root}>
@@ -222,7 +225,7 @@ class Schedule extends Component {
 
 
                             <Box pt={4}>
-                                {copyRight}
+                                {CopyRight}
                             </Box>
                         </Container>
                     </main>

@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'UserHandler.apps.UserhandlerConfig',
     'Schedule.apps.ScheduleConfig',
+    'Checkup.apps.CheckupConfig',
     'rest_framework',
     'corsheaders'
 ]

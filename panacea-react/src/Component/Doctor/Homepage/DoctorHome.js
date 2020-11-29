@@ -1,9 +1,8 @@
 import React, { Component } from 'react';
+import { Redirect } from 'react-router-dom';
 import { withStyles, AppBar, Drawer, Toolbar, List, Divider, CssBaseline, Typography, Card, Container, Grid, Box, Link } from '@material-ui/core';
 import { mainListItems, secondaryListItems } from './listItems';
-import { Redirect } from 'react-router-dom';
 import CopyRight from '../../Copyright';
-
 const drawerWidth = 240;
 
 const styles = (theme) => ({
@@ -38,18 +37,10 @@ const styles = (theme) => ({
     },
 });
 
-class ReceptionistHome extends Component {
+class DoctorHome extends Component {
     constructor(props) {
         super(props);
-
-        this.state = {
-
-        }
-
-        this.renderProfile = this.renderProfile.bind(this);
-        //this.Copyright = this.Copyright.bind(this);
     }
-
 
     // Copyright() {
 
@@ -67,9 +58,10 @@ class ReceptionistHome extends Component {
     // }
 
     renderProfile() {
+
         const { classes } = this.props;
 
-        if (this.props.User.isAuthenticated && this.props.User.category === 'RECEPTIONIST') {
+        if (this.props.User.isAuthenticated && this.props.User.category === 'doctor') {
             let userData = JSON.parse(this.props.User.userData);
             //let copyRight = this.Copyright();
             return (
@@ -78,7 +70,7 @@ class ReceptionistHome extends Component {
                     <AppBar position="fixed" className={classes.appBar}>
                         <Toolbar>
                             <Typography variant="h6" noWrap>
-                                Receptionist
+                                Doctor
                             </Typography>
                         </Toolbar>
                     </AppBar>
@@ -105,14 +97,14 @@ class ReceptionistHome extends Component {
                             <Grid container spacing={3}>
                                 <Grid item xs={12}>
                                     <Card style={{ padding: 20 }}>
-                                        <Typography variant='h6'>{userData.name}</Typography>
+                                        <Typography variant='h6'>Dr. {userData.name}</Typography>
                                         <Typography variant='body1'>Email: {userData.email}</Typography>
                                         <Typography variant='body1'>Address: {userData.address}</Typography>
                                         <Typography variant='body1'>Phone number: {userData.phoneNum}</Typography>
                                         <Typography variant='body1'>Date of birth: {userData.date_of_birth}</Typography>
-                                        <Typography variant='body1'>Education: {userData.education}</Typography>
-                                        <Typography variant='body1'>Training: {userData.training}</Typography>
-                                        <Typography variant='body1'>Salary: {userData.salary}</Typography>
+                                        <Typography variant='body1'>Department: {userData.department}</Typography>
+                                        <Typography variant='body1'>Designation: {userData.designation}</Typography>
+                                        <Typography variant='body1'>Qualification: {userData.qualification}</Typography>
                                         <Typography variant='body1'>Gender: {userData.gender}</Typography>
                                     </Card>
                                 </Grid>
@@ -129,9 +121,8 @@ class ReceptionistHome extends Component {
             return (<Redirect to='/sign-in' />);
         }
     }
-    render() {
-        const { classes } = this.props;
 
+    render() {
         const profile = this.renderProfile();
         return (
             <React.Fragment>
@@ -141,4 +132,4 @@ class ReceptionistHome extends Component {
     }
 }
 
-export default withStyles(styles)(ReceptionistHome);
+export default withStyles(styles)(DoctorHome);

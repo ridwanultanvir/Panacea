@@ -1,8 +1,11 @@
 import React, { Component } from 'react';
 import { withStyles, AppBar, Drawer, Toolbar, List, Divider, CssBaseline, Typography, Card, Container, Grid, Box, Link } from '@material-ui/core';
-import { mainListItems, secondaryListItems } from './listItems';
+import { mainListItems, secondaryListItems } from '../Homepage/listItems';
 import { Redirect } from 'react-router-dom';
 import CopyRight from '../../Copyright';
+import { baseUrl } from '../../../Redux/ActionCreator';
+import TestsTable from './TestsTable';
+
 
 const drawerWidth = 240;
 
@@ -38,47 +41,74 @@ const styles = (theme) => ({
     },
 });
 
-class ReceptionistHome extends Component {
+class PendingTests extends Component {
     constructor(props) {
         super(props);
 
         this.state = {
-
+            pendingTests: null
         }
 
-        this.renderProfile = this.renderProfile.bind(this);
-        //this.Copyright = this.Copyright.bind(this);
+        this.renderPendingTests = this.renderPendingTests.bind(this);
+        this.fetchData = this.fetchData.bind(this);
+    }
+
+    fetchData(body) {
+        fetch(baseUrl + 'checkup/technician/pending-tests/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(body)
+        })
+            .then((response) => {
+                console.log(response);
+                if (response.ok) {
+                    return response;
+                }
+                else {
+                    let err = new Error('Error ' + response.status + ': ' + response.statusText);
+                    err.response = response;
+                    throw err;
+                }
+            })
+            .then((response) => response.json())
+            .then((response) => {
+                if (response.success) {
+                    console.log(response);
+                    this.setState({ pendingTests: response.pending_tests });
+                }
+                else {
+                    let err = new Error(response.errorMessage);
+                    err.response = response;
+                    throw err;
+                }
+            })
+            .catch((err) => {
+                alert(err.message);
+            });
+    }
+
+    componentDidMount() {
+        let creds = JSON.parse(this.props.User.creds);
+        let body = { 'userID': creds.userId, 'token': this.props.User.token, 'test_result_id': null, 'all_tests': false };
+        this.fetchData(body);
     }
 
 
-    // Copyright() {
 
-    //     return (
-    //         <Typography variant="body2" color="textSecondary" align="center">
-    //             {'Copyright © '}
-    //             <Link color="inherit" href="https://sadatshahriyar.pythonanywhere.com/">
-    //                 Sadat Shahriyar
-    //             </Link>{' '}
-    //             {'& Jayanta Sadhu. '}
-    //             {new Date().getFullYear()}
-    //             {'.'}
-    //         </Typography>
-    //     );
-    // }
-
-    renderProfile() {
+    renderPendingTests() {
         const { classes } = this.props;
 
-        if (this.props.User.isAuthenticated && this.props.User.category === 'RECEPTIONIST') {
+        if (this.props.User.isAuthenticated && this.props.User.category === 'TECHNICIAN') {
             let userData = JSON.parse(this.props.User.userData);
-            //let copyRight = this.Copyright();
             return (
                 <div className={classes.root}>
                     <CssBaseline />
                     <AppBar position="fixed" className={classes.appBar}>
                         <Toolbar>
                             <Typography variant="h6" noWrap>
-                                Receptionist
+                                Technician
                             </Typography>
                         </Toolbar>
                     </AppBar>
@@ -104,17 +134,11 @@ class ReceptionistHome extends Component {
                         <Container maxWidth="lg" >
                             <Grid container spacing={3}>
                                 <Grid item xs={12}>
-                                    <Card style={{ padding: 20 }}>
-                                        <Typography variant='h6'>{userData.name}</Typography>
-                                        <Typography variant='body1'>Email: {userData.email}</Typography>
-                                        <Typography variant='body1'>Address: {userData.address}</Typography>
-                                        <Typography variant='body1'>Phone number: {userData.phoneNum}</Typography>
-                                        <Typography variant='body1'>Date of birth: {userData.date_of_birth}</Typography>
-                                        <Typography variant='body1'>Education: {userData.education}</Typography>
-                                        <Typography variant='body1'>Training: {userData.training}</Typography>
-                                        <Typography variant='body1'>Salary: {userData.salary}</Typography>
-                                        <Typography variant='body1'>Gender: {userData.gender}</Typography>
-                                    </Card>
+                                    <TestsTable
+                                        pendingTests={this.state.pendingTests}
+                                        User={this.props.User}
+                                        fetchData={(body) => { this.fetchData(body) }}
+                                    />
                                 </Grid>
                             </Grid>
                             <Box pt={4}>
@@ -132,13 +156,13 @@ class ReceptionistHome extends Component {
     render() {
         const { classes } = this.props;
 
-        const profile = this.renderProfile();
+        const Component = this.renderPendingTests();
         return (
             <React.Fragment>
-                {profile}
+                {Component}
             </React.Fragment>
         );
     }
 }
 
-export default withStyles(styles)(ReceptionistHome);
+export default withStyles(styles)(PendingTests);

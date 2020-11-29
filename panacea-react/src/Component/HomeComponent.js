@@ -19,6 +19,7 @@ import PhoneInTalkIcon from '@material-ui/icons/PhoneInTalk';
 import LocalHospitalIcon from '@material-ui/icons/LocalHospital';
 import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
 import FormatQuoteIcon from '@material-ui/icons/FormatQuote';
+import CopyRight from './Copyright';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -75,18 +76,20 @@ ScrollTop.propTypes = {
     window: PropTypes.func,
 };
 
-function Copyright() {
-    return (
-        <Typography variant="body2" color="textSecondary" align="center">
-            {'Copyright © '}
-            <Link color="inherit" to="https://sadatshahriyar.pythnanywhere.com">
-                Sadat Shahriyar
-            </Link>{' '}
-            {new Date().getFullYear()}
-            {'.'}
-        </Typography>
-    );
-}
+// function Copyright() {
+
+//     return (
+//         <Typography variant="body2" color="textSecondary" align="center">
+//             {'Copyright © '}
+//             <Link color="inherit" href="https://sadatshahriyar.pythonanywhere.com/">
+//                 Sadat Shahriyar
+//                 </Link>{' '}
+//             {'& Jayanta Sadhu. '}
+//             {new Date().getFullYear()}
+//             {'.'}
+//         </Typography>
+//     );
+// }
 
 
 function Footer(props) {
@@ -102,7 +105,7 @@ function Footer(props) {
                 <Typography variant="subtitle1" align="center" color="textSecondary" component="p">
                     {description}
                 </Typography>
-                <Copyright />
+                {CopyRight}
             </Container>
         </footer>
     );

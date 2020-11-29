@@ -7,6 +7,7 @@ import { User } from './Reducers/User';
 import { ScheduleTable } from './Reducers/ScheduleTable';
 import { TimeTable } from './Reducers/TimeTable';
 import { ReceptionistsAppointments } from './Reducers/ReceptionistsAppointment';
+import { DoctorsAppointments } from './Reducers/DoctorsAppointments';
 
 
 export const configureStore = () => {
@@ -16,6 +17,7 @@ export const configureStore = () => {
             ScheduleTable: ScheduleTable,
             TimeTable: TimeTable,
             ReceptionistsAppointments: ReceptionistsAppointments,
+            DoctorsAppointments: DoctorsAppointments,
             ...createForms({
                 LoginForm: InitialFeedback,
                 AdminScheduleUserID: InitialScheduleUserIDValue,

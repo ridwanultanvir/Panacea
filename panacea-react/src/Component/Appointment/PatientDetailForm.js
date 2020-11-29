@@ -344,7 +344,7 @@ export default function PatientDetailForm(props) {
                             <FormControl className={classes.formControl}>
                                 <InputLabel shrink id="demo-simple-select-placeholder-label-label">
                                     Gender
-                            </InputLabel>
+                                </InputLabel>
                                 <Select
                                     labelId="demo-simple-select-placeholder-label-label"
                                     id="demo-simple-select-placeholder-label"

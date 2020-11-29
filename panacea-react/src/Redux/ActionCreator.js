@@ -423,3 +423,60 @@ export const acceptReceptionistAppointment = (body) => (dispatch) => {
             dispatch(acceptReceptionistAppointmentFailure(err.message));
         });
 }
+
+const doctorAppointmentLoading = () => {
+    return {
+        type: ActionTypes.DOCTORS_APPOINTMENT_LOADING
+    }
+}
+
+const doctorAppointmentSuccess = (appointments) => {
+    return {
+        type: ActionTypes.DOCTORS_APPOINTMENT_SUCCESS,
+        appointments: appointments
+    }
+}
+
+const doctorsAppointmentFailure = (message) => {
+    return {
+        type: ActionTypes.DOCTORS_APPOINTMENT_FAILURE,
+        message: message
+    }
+}
+
+export const getDoctorsAppointment = (body) => (dispatch) => {
+    dispatch(doctorAppointmentLoading());
+
+    fetch(baseUrl + 'appointment/get-all-doc-appointment/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body)
+    })
+        .then((response) => {
+            if (response.ok) {
+                return response;
+            }
+            else {
+                let err = new Error('Error ' + response.status + ': ' + response.statusText);
+                err.response = response;
+                throw err;
+            }
+        })
+        .then((response) => response.json())
+        .then((response) => {
+            if (response.success) {
+                dispatch(doctorAppointmentSuccess(response.appointments))
+            }
+            else {
+                let err = new Error(response.errorMessage);
+                err.response = response;
+                throw err;
+            }
+        })
+        .catch((err) => {
+            alert(err.message);
+            dispatch(doctorsAppointmentFailure(err.message));
+        });
+}
