@@ -250,7 +250,7 @@ def serviceResultsTable(diagnosisID):
         for surgery in result:
             pendingSurgery.append({'surgery_result_id': surgery[0], 'surgery_desc': surgery[1],
                                    'service_name': surgery[2], 'cost': surgery[3], 'department': surgery[4]})
-
+        print(pendingSurgery)
         response['pending_surgeries'] = pendingSurgery
 
         response['success'] = True
@@ -292,7 +292,7 @@ def receptionistApproveSurgery(diagnosisID, surgery_result_id):
     try:
         query = '''
         UPDATE SURGERY_RESULTS SET COMPLETED = 'A'
-        WHERE SURGERY_RESULT_ID = :surgery_result_id AND STATUS = 'PENDING'
+        WHERE SURGERY_RESULT_ID = :surgery_result_id
         '''
         cursor.execute(query, [surgery_result_id])
         connection.commit()

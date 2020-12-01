@@ -6,10 +6,23 @@ import {
     loadDocSchedule,
     deleteSchedule,
     loadTimeTable,
+    loadWardTable,
     addSchedule,
     getReceptionistAppointments,
     acceptReceptionistAppointment,
-    getDoctorsAppointment
+    getDoctorsAppointment,
+    loadEmpSchedule,
+    loadWardCategory,
+    addScheduleRange,
+    loadAppointmentData,
+    loadDocDeptData,
+    loadRoomData,
+    loadAdmitRoomData,
+    patientDetails,
+    loadFreeSURTimeData,
+    addSurgerySchedule,
+    loadRoomTypes,
+    addAdmitPatient,
 } from '../Redux/ActionCreator';
 
 import Home from './HomeComponent';
@@ -20,9 +33,13 @@ import AdminHome from './Admin/Homepage/AdminProfileHomePageComponent';
 import AddUser from './Admin/AddUser/AddUser';
 import PatientHome from './PatientProfileHomePageComponent';
 import Schedule from './Admin/Schedule/ScheduleComponent';
+import ScheduleEmp from './Admin/Schedule/ScheduleEmpComponent'
 import RegistrationComponent from './Registration/RegistrationComponent'
 import ReceptionistHome from './Receptionist/Homepage/ReceptionistHome';
 import ReceptionistAppointment from './Receptionist/Appointments/Appointments';
+import ReceptionistSurSchedule from './Receptionist/Schedule/ScheduleComponent';
+import ReceptionistAdmitPatient from './Receptionist/Schedule/AdmitPatientComponent';
+import PutInCharge from './Receptionist/Schedule/putInCharge';
 import DoctorHome from './Doctor/Homepage/DoctorHome';
 import DoctorAppointment from './Doctor/Appointment/Appointment';
 import AllDoctorAppointment from './Doctor/AllAppointments/AllAppointments';
@@ -40,7 +57,11 @@ const mapStateToProps = (state) => {
     return {
         User: state.User,
         ScheduleTable: state.ScheduleTable,
+        ScheduleEmpTable: state.ScheduleEmpTable,
         TimeTable: state.TimeTable,
+        WardTable: state.WardTable,
+        ScheduleSurgeryTable: state.ScheduleSurgeryTable,
+        AdmitPatientTable: state.AdmitPatientTable,
         ReceptionistsAppointments: state.ReceptionistsAppointments,
         DoctorsAppointments: state.DoctorsAppointments
     };
@@ -50,9 +71,22 @@ const mapDispatchToProps = (dispatch) => {
     return {
         loginUser: (creds) => (dispatch(loginUser(creds))),
         loadDocSchedule: (body) => (dispatch(loadDocSchedule(body))),
+        loadEmpSchedule: (body) => (dispatch(loadEmpSchedule(body))),
         deleteSchedule: (body) => (dispatch(deleteSchedule(body))),
         loadTimeTable: (body) => (dispatch(loadTimeTable(body))),
+        loadWardCategory: (body) => (dispatch(loadWardCategory(body))),
+        loadWardTable: (body) => (dispatch(loadWardTable(body))),
         addSchedule: (body) => (dispatch(addSchedule(body))),
+        addScheduleRange: (body) => (dispatch(addScheduleRange(body))),
+        loadAppointmentData: (body) => (dispatch(loadAppointmentData(body))),
+        loadDocDeptData: (body) => (dispatch(loadDocDeptData(body))),
+        loadRoomData: (body) => (dispatch(loadRoomData(body))),
+        patientDetails: (body) => (dispatch(patientDetails(body))),
+        loadFreeSURTimeData: (body) => (dispatch(loadFreeSURTimeData(body))),
+        addSurgerySchedule: (body) => (dispatch(addSurgerySchedule(body))),
+        loadAdmitRoomData: (body) => (dispatch(loadAdmitRoomData(body))),
+        loadRoomTypes: (body) => (dispatch(loadRoomTypes(body))),
+        addAdmitPatient: (body) => (dispatch(addAdmitPatient(body))),
         getReceptionistAppointments: (body) => (dispatch(getReceptionistAppointments(body))),
         acceptReceptionistAppointment: (body) => (dispatch(acceptReceptionistAppointment(body))),
         getDoctorsAppointment: (body) => (dispatch(getDoctorsAppointment(body))),
@@ -162,10 +196,28 @@ class Main extends Component {
                             User={this.props.User}
                             ScheduleTable={this.props.ScheduleTable}
                             TimeTable={this.props.TimeTable}
+                            WardTable={this.props.WardTable}
                             loadDocSchedule={this.props.loadDocSchedule}
                             deleteSchedule={this.props.deleteSchedule}
                             loadTimeTable={this.props.loadTimeTable}
+                            loadWardCategory={this.props.loadWardCategory}
+                            loadWardTable={this.props.loadWardTable}
                             addSchedule={this.props.addSchedule}
+                        />
+                    </Route>
+                    <Route path="/admin/schedule_emp">
+                        <ScheduleEmp
+                            User={this.props.User}
+                            ScheduleEmpTable={this.props.ScheduleEmpTable}
+                            TimeTable={this.props.TimeTable}
+                            WardTable={this.props.WardTable}
+                            loadEmpSchedule={this.props.loadEmpSchedule}
+                            deleteSchedule={this.props.deleteSchedule}
+                            loadTimeTable={this.props.loadTimeTable}
+                            loadWardCategory={this.props.loadWardCategory}
+                            loadWardTable={this.props.loadWardTable}
+                            addSchedule={this.props.addSchedule}
+                            addScheduleRange = {this.props.addScheduleRange}
                         />
                     </Route>
                     <Route path='/admin/add-user'>
@@ -221,6 +273,35 @@ class Main extends Component {
                             acceptReceptionistAppointment={this.props.acceptReceptionistAppointment}
                         />
                     </Route>
+                    <Route path="/receptionist/surgery-schedule">
+                        <ReceptionistSurSchedule
+                            User={this.props.User}
+                            ScheduleSurgeryTable={this.props.ScheduleSurgeryTable}
+                            loadAppointmentData={this.props.loadAppointmentData}
+                            loadDocDeptData={this.props.loadDocDeptData}
+                            loadRoomData={this.props.loadRoomData}
+                            loadFreeSURTimeData={this.props.loadFreeSURTimeData}
+                            addSurgerySchedule={this.props.addSurgerySchedule}
+                        />
+                    </Route>
+                    <Route path="/receptionist/patient-admit">
+                        <ReceptionistAdmitPatient
+                            User={this.props.User}
+                            WardTable={this.props.WardTable}
+                            AdmitPatientTable={this.props.AdmitPatientTable}
+                            loadWardCategory={this.props.loadWardCategory}
+                            loadWardTable={this.props.loadWardTable}
+                            loadRoomTypes={this.props.loadRoomTypes}
+                            loadAdmitRoomData = {this.props.loadAdmitRoomData}
+                            patientDetails={this.props.patientDetails}
+                            addAdmitPatient={this.props.addAdmitPatient}
+                        />
+                    </Route>
+                    {/* <Route path="/receptionist/put-in-charge">
+                        <PutInCharge>
+
+                        </PutInCharge>
+                    </Route> */}
                     <Route exact path='/receptionist/approve-service'>
                         <ApproveTest
                             User={this.props.User}

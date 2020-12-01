@@ -113,7 +113,7 @@ class ApproveTest extends Component {
                     <AppBar position="fixed" className={classes.appBar}>
                         <Toolbar>
                             <Typography variant="h6" noWrap>
-                                Doctor
+                                Receptionist
                             </Typography>
                         </Toolbar>
                     </AppBar>

@@ -441,7 +441,7 @@ class AddUser extends Component {
                                                         required
                                                         inputRef={this.docQualification}
                                                         id="standard-basic"
-                                                        label="Qalification"
+                                                        label="Qualification"
                                                         onBlur={(event) => { this.setState({ qualification: event.target.value, docValues: true }) }}
                                                         style={{ width: 820, marginTop: 10 }}
                                                     />

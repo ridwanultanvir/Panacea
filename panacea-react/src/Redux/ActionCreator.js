@@ -75,6 +75,14 @@ export const loginUser = (creds) => (dispatch) => {
     // alert(JSON.stringify(creds))
 }
 
+const scheduleLoading = (userID) => {
+    return {
+        type: ActionTypes.SHCEDULE_TABLE_LOADING,
+        userID: userID
+    }
+}
+
+
 const docScheduleLoading = (userID) => {
     return {
         type: ActionTypes.SHCEDULE_TABLE_LOADING,
@@ -89,11 +97,65 @@ const docScheduleSuccess = (scheduleData, docData) => {
     }
 }
 
+const empScheduleSuccess = (scheduleData, empData) => {
+    return {
+        type: ActionTypes.SCHEDULE_TABLE_SUCCESS,
+        scheduleData: scheduleData,
+        empData: empData
+    }
+}
+
 const docScheduleFailure = (message) => {
     return {
         type: ActionTypes.SCHEDULE_TABLE_FAILURE,
         message: message
     }
+}
+
+const scheduleFailure = (message) => {
+    return {
+        type: ActionTypes.SCHEDULE_TABLE_FAILURE,
+        message: message
+    }
+}
+
+
+export const loadEmpSchedule = (body) => (dispatch) => {
+    console.log(body.empUserID);
+    dispatch(scheduleLoading(body.empUserID));
+
+    fetch(baseUrl + 'schedule/schedule-table/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body)
+    })
+        .then((response) => {
+            if (response.ok) {
+                return response;
+            }
+            else {
+                let err = new Error('Error ' + response.status + ': ' + response.statusText);
+                err.response = response;
+                throw err;
+            }
+        })
+        .then((response) => response.json())
+        .then((response) => {
+            if (response.success) {
+                dispatch(empScheduleSuccess(response.scheduleData, response.empData));
+            }
+            else {
+                let err = new Error(response.errorMessage);
+                err.response = response;
+                throw err;
+            }
+        })
+        .catch((err) => {
+            alert(err.message);
+            dispatch(scheduleFailure(err.message));
+        });
 }
 
 
@@ -248,7 +310,41 @@ export const addSchedule = (body) => (dispatch) => {
         });
 }
 
-
+export const addScheduleRange = (body) => (dispatch) => {
+    dispatch(addScheduleLoading());
+    fetch(baseUrl + 'schedule/add-schedule-range/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body)
+    })
+        .then((response) => {
+            if (response.ok) {
+                return response;
+            }
+            else {
+                let err = new Error('Error ' + response.status + ': ' + response.statusText);
+                err.response = response;
+                throw err;
+            }
+        })
+        .then((response) => response.json())
+        .then((response) => {
+            if (response.success) {
+                dispatch(addScheduleSuccess(response.scheduleData));
+            }
+            else {
+                let err = new Error(response.errorMessage);
+                err.response = response;
+                throw err;
+            }
+        })
+        .catch((err) => {
+            alert(err.message);
+            dispatch(addScheduleFailure(err.message));
+        });
+}
 
 const timeTableLoading = () => {
     return {
@@ -308,6 +404,544 @@ export const loadTimeTable = (body) => (dispatch) => {
         });
 }
 
+
+const wardTableLoading = () => {
+    return {
+        type: ActionTypes.WARD_TABLE_LOADING
+    }
+}
+
+const wardTableSuccess = (wardTableData) => {
+    return {
+        type: ActionTypes.WARD_TABLE_SUCCESS,
+        wardTableData: wardTableData
+    }
+}
+
+const wardTableLoadWards = (wardCategory) => {
+    return {
+        type: ActionTypes.WARD_TABLE_LOAD_WARDS,
+        wardCategory: wardCategory
+    }
+}
+
+const wardTableFailure = (message) => {
+    return {
+        type: ActionTypes.WARD_TABLE_FAILURE,
+        message: message
+    }
+}
+
+export const loadWardCategory = (body) => (dispatch) => {
+    dispatch(wardTableLoading());
+
+    fetch(baseUrl + 'schedule/ward-category/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body)
+    })
+        .then((response) => {
+            if (response.ok) {
+                return response;
+            }
+            else {
+                let err = new Error('Error ' + response.status + ': ' + response.statusText);
+                err.response = response;
+                throw err;
+            }
+        })
+        .then((response) => response.json())
+        .then((response) => {
+            if (response.success) {
+                dispatch(wardTableLoadWards(response.wardCategory));
+            }
+            else {
+                let err = new Error(response.errorMessage);
+                err.response = response;
+                throw err;
+            }
+        })
+        .catch((err) => {
+            alert(err.message);
+            dispatch(wardTableFailure(err.message));
+        });
+}
+
+
+export const loadWardTable = (body) => (dispatch) => {
+    dispatch(wardTableLoading());
+
+    fetch(baseUrl + 'schedule/ward-table/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body)
+    })
+        .then((response) => {
+            if (response.ok) {
+                return response;
+            }
+            else {
+                let err = new Error('Error ' + response.status + ': ' + response.statusText);
+                err.response = response;
+                throw err;
+            }
+        })
+        .then((response) => response.json())
+        .then((response) => {
+            if (response.success) {
+                dispatch(wardTableSuccess(response.blockList));
+            }
+            else {
+                let err = new Error(response.errorMessage);
+                err.response = response;
+                throw err;
+            }
+        })
+        .catch((err) => {
+            alert(err.message);
+            dispatch(wardTableFailure(err.message));
+        });
+}
+
+
+const appointmentDataLoading = (userID) => {
+    return {
+        type: ActionTypes.SCH_SUR_TABLE_LOADING,
+        userID: userID
+    }
+}
+
+const appointmentDataSuccess = (appointmentData) => {
+    return {
+        type: ActionTypes.LOAD_APPNT_DATA_SUCCESS,
+        patientData : appointmentData.patientData,
+        appntDocData: appointmentData.appntDocData,
+    }
+}
+
+export const loadAppointmentData = (body) => (dispatch) => {
+    dispatch(appointmentDataLoading(body.userID));
+
+    fetch(baseUrl + 'schedule/appointment-data/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body)
+    })
+        .then((response) => {
+            if (response.ok) {
+                return response;
+            }
+            else {
+                let err = new Error('Error ' + response.status + ': ' + response.statusText);
+                err.response = response;
+                throw err;
+            }
+        })
+        .then((response) => response.json())
+        .then((response) => {
+            if (response.success) {
+                dispatch(appointmentDataSuccess(response.appointmentData));
+            }
+            else {
+                let err = new Error(response.errorMessage);
+                err.response = response;
+                throw err;
+            }
+        })
+        .catch((err) => {
+            alert(err.message);
+            //dispatch(scheduleFailure(err.message));
+        });
+}
+
+
+const docDeptDataLoading = (userID) => {
+    return {
+        type: ActionTypes.SCH_SUR_TABLE_LOADING,
+        userID: userID
+    }
+}
+
+
+const docDeptDataSuccess = (docData) => {
+    return {
+        type: ActionTypes.LOAD_DOC_DATA_SUCCESS,
+        docData: docData,
+    }
+}
+
+
+export const loadDocDeptData = (body) => (dispatch) => {
+    dispatch(docDeptDataLoading(body.userID));
+
+    fetch(baseUrl + 'schedule/doc-dept-list/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body)
+    })
+        .then((response) => {
+            if (response.ok) {
+                return response;
+            }
+            else {
+                let err = new Error('Error ' + response.status + ': ' + response.statusText);
+                err.response = response;
+                throw err;
+            }
+        })
+        .then((response) => response.json())
+        .then((response) => {
+            if (response.alertMessage === "Not Okay")
+            {
+                alert("No Doctor available on the selected Day");
+            }
+            else if (response.success) {
+                console.log("dispatching");
+                dispatch(docDeptDataSuccess(response.docData));
+            }
+            else {
+                let err = new Error(response.errorMessage);
+                err.response = response;
+                throw err;
+            }
+        })
+        .catch((err) => {
+            alert(err.message);
+            //dispatch(scheduleFailure(err.message));
+        });
+}
+
+
+const roomDataSuccess = (roomData) => {
+    return {
+        type: ActionTypes.LOAD_ROOM_DATA_SUCCESS,
+        roomData: roomData,
+    }
+}
+
+
+export const loadRoomData = (body) => (dispatch) => {
+    dispatch(docDeptDataLoading());
+
+    fetch(baseUrl + 'schedule/surgery-room-list/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body)
+    })
+        .then((response) => {
+            if (response.ok) {
+                return response;
+            }
+            else {
+                let err = new Error('Error ' + response.status + ': ' + response.statusText);
+                err.response = response;
+                throw err;
+            }
+        })
+        .then((response) => response.json())
+        .then((response) => {
+            if (response.success !== true)
+            {
+                alert(response.alertMessage);
+            }
+            else if (response.success) {
+                dispatch(roomDataSuccess(response.roomData));
+            }
+            else {
+                let err = new Error(response.errorMessage);
+                err.response = response;
+                throw err;
+            }
+        })
+        .catch((err) => {
+            alert(err.message);
+            dispatch(scheduleFailure(err.message));
+        });
+}
+
+
+const admitRoomDataSuccess = (roomData) => {
+    return {
+        type: ActionTypes.LOAD_ADMIT_ROOM_DATA_SUCCESS,
+        roomData: roomData,
+    }
+}
+
+export const loadAdmitRoomData = (body) => (dispatch) => {
+    fetch(baseUrl + 'schedule/admit-room-list/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body)
+    })
+        .then((response) => {
+            if (response.ok) {
+                return response;
+            }
+            else {
+                let err = new Error('Error ' + response.status + ': ' + response.statusText);
+                err.response = response;
+                throw err;
+            }
+        })
+        .then((response) => response.json())
+        .then((response) => {
+            if (response.success !== true)
+            {
+                alert(response.alertMessage);
+            }
+            else if (response.success) {
+                dispatch(admitRoomDataSuccess(response.roomData));
+            }
+            else {
+                let err = new Error(response.errorMessage);
+                err.response = response;
+                throw err;
+            }
+        })
+        .catch((err) => {
+            alert(err.message);
+            //dispatch(scheduleFailure(err.message));
+        });
+}
+
+
+const fetchRoomTypesSuccess = (roomTypes) => {
+    return {
+        type: ActionTypes.LOAD_ROOM_TYPES_SUCCESS,
+        roomTypes: roomTypes,
+    }
+}
+
+
+export const loadRoomTypes = (body) => (dispatch) => {
+    fetch(baseUrl + 'schedule/room-types-for-categories/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body)
+    })
+        .then((response) => {
+            if (response.ok) {
+                return response;
+            }
+            else {
+                let err = new Error('Error ' + response.status + ': ' + response.statusText);
+                err.response = response;
+                throw err;
+            }
+        })
+        .then((response) => response.json())
+        .then((response) => {
+            if (response.success !== true)
+            {
+                alert(response.alertMessage);
+            }
+            else if (response.success) {
+                dispatch(fetchRoomTypesSuccess(response.roomTypes));
+            }
+            else {
+                let err = new Error(response.errorMessage);
+                err.response = response;
+                throw err;
+            }
+        })
+        .catch((err) => {
+            alert(err.message);
+            //dispatch(scheduleFailure(err.message));
+        });
+}
+
+
+
+const patientDataLoading = (userID) => {
+    return {
+        type: ActionTypes.ADMIT_TABLE_LOADING,
+        userID: userID
+    }
+}
+
+const patientDataSuccess = (patientData) => {
+    return {
+        type: ActionTypes.LOAD_PATIENT_DATA_SUCCESS,
+        patientData: patientData
+    }
+}
+
+export const patientDetails = (body) => (dispatch) => {
+    dispatch(patientDataLoading(body.userID));
+
+    fetch(baseUrl + 'schedule/patient-details/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body)
+    })
+        .then((response) => {
+            if (response.ok) {
+                return response;
+            }
+            else {
+                let err = new Error('Error ' + response.status + ': ' + response.statusText);
+                err.response = response;
+                throw err;
+            }
+        })
+        .then((response) => response.json())
+        .then((response) => {
+            if (response.success) {
+                dispatch(patientDataSuccess(response.patientData));
+            }
+            else {
+                let err = new Error(response.errorMessage);
+                err.response = response;
+                throw err;
+            }
+        })
+        .catch((err) => {
+            alert(err.message);
+            //dispatch(scheduleFailure(err.message));
+        });
+}
+
+export const addSurgerySchedule = (body) => (dispatch) => {
+    dispatch(docDeptDataLoading());
+
+    fetch(baseUrl + 'schedule/add-sur-schedule/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body)
+    })
+        .then((response) => {
+            if (response.ok) {
+                return response;
+            }
+            else {
+                let err = new Error('Error ' + response.status + ': ' + response.statusText);
+                err.response = response;
+                throw err;
+            }
+        })
+        .then((response) => response.json())
+        .then((response) => {
+            if (response.success !== true)
+            {
+                alert("Error in Insertion");
+            }
+            else if (response.success) {
+                alert(response.message);
+            }
+            else {
+                let err = new Error(response.errorMessage);
+                err.response = response;
+                throw err;
+            }
+        })
+        .catch((err) => {
+            alert(err.message);
+            dispatch(scheduleFailure(err.message));
+        });
+}
+
+export const addAdmitPatient = (body) => (dispatch) => {
+
+    fetch(baseUrl + 'schedule/admit-patient/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body)
+    })
+        .then((response) => {
+            if (response.ok) {
+                return response;
+            }
+            else {
+                let err = new Error('Error ' + response.status + ': ' + response.statusText);
+                err.response = response;
+                throw err;
+            }
+        })
+        .then((response) => response.json())
+        .then((response) => {
+            if (response.success !== true)
+            {
+                alert(response.alertMessage)
+            }
+            else if (response.success) {
+                alert(response.alertMessage);
+            }
+            else {
+                let err = new Error(response.errorMessage);
+                err.response = response;
+                throw err;
+            }
+        })
+        .catch((err) => {
+            alert(err.message);
+            //dispatch(scheduleFailure(err.message));
+        });
+}
+
+const freeTimeSURDataSuccess = (freeTimeData) => {
+    return {
+        type: ActionTypes.LOAD_FREE_TIME_DATA,
+        freeTimeData: freeTimeData,
+    }
+}
+
+
+export const loadFreeSURTimeData = (body) => (dispatch) => {
+    dispatch(docDeptDataLoading());
+
+    fetch(baseUrl + 'schedule/surgery-room-list/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body)
+    })
+        .then((response) => {
+            if (response.ok) {
+                return response;
+            }
+            else {
+                let err = new Error('Error ' + response.status + ': ' + response.statusText);
+                err.response = response;
+                throw err;
+            }
+        })
+        .then((response) => response.json())
+        .then((response) => {
+            if (response.success) {
+                dispatch(freeTimeSURDataSuccess(response.appointmentData));
+            }
+            else {
+                let err = new Error(response.errorMessage);
+                err.response = response;
+                throw err;
+            }
+        })
+        .catch((err) => {
+            alert(err.message);
+            dispatch(scheduleFailure(err.message));
+        });
+}
 
 
 const receptionistAppointmentLoading = () => {

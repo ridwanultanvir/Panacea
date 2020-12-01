@@ -112,6 +112,7 @@ export default function Appointment(props) {
     };
 
     const checkPatientDetailsFilledUp = () => {
+        console.log(firstName,lastName, address, email, phoneNumber, gender);
         if (firstName === '' || lastName === '' || address === '' || email === '' || phoneNumber === '' || gender === '') {
             alert('Please fill in all the information');
             setActiveStep(0);
@@ -121,6 +122,7 @@ export default function Appointment(props) {
     }
 
     const handleConfirmSubmission = () => {
+        let date_of_birth = new Date(dateOfBirth);
         let body = {
             "newPatient": newPatient,
             "patientInfo": {
@@ -129,7 +131,7 @@ export default function Appointment(props) {
                 "address": address,
                 "email": email,
                 "phoneNumber": phoneNumber,
-                "dateOfBirth": dateOfBirth.getDate().toString() + '-' + (dateOfBirth.getMonth() + 1).toString() + '-' + dateOfBirth.getFullYear().toString(),
+                "dateOfBirth": date_of_birth.getDate().toString() + '-' + (date_of_birth.getMonth() + 1).toString() + '-' + date_of_birth.getFullYear().toString(),
                 "gender": gender,
                 "bio": bio,
                 "patientUserId": patientUserID

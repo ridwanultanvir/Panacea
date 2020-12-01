@@ -31,7 +31,7 @@ const useStyles = makeStyles((theme) => ({
 
 }));
 
-export default function AddScheduleForm(props) {
+export default function AddScheduleEmpForm(props) {
     const classes = useStyles();
     const [time, setTime] = React.useState('');
     const [open, setOpen] = React.useState(false);
@@ -57,13 +57,13 @@ export default function AddScheduleForm(props) {
         setBlockList(blockListTemp);
     }, [props.WardTable.wardTable]);
 
-
     let wardCategoryMenu = null;
     if (props.WardTable.wardCategory !== null) {
         wardCategoryMenu = props.WardTable.wardCategory.map((category) => {
             return (<MenuItem value={category.CATEGORY}>{category.CATEGORY}</MenuItem>)
         })
     }
+
 
     let timeTableMenu = null;
     if (props.TimeTable.timeTable !== null) {
@@ -80,8 +80,7 @@ export default function AddScheduleForm(props) {
         setCategory(event.target.value);
         props.handleWardCategorySelect(event.target.value);
     };
-
-
+    // here 
     const handleChange = (event) => {
         setTime(event.target.value);
     };
@@ -108,13 +107,11 @@ export default function AddScheduleForm(props) {
         else {
             alert('Please insert a valid shift');
         }
-        // console.log(time + ' ' + selectedDate.getDate() + '/' + month + '/' + selectedDate.getFullYear())
-        // alert(time + ' ' + selectedDate.getDate() + '/' + selectedDate.getMonth() + '/' + selectedDate.getFullYear());
     }
 
     return (
         <div>
-            <Typography variant='h6'>Add Schedule</Typography>
+            <Typography variant='h6'>Add Daily Schedule</Typography>
             <MuiPickersUtilsProvider utils={DateFnsUtils}>
                 <Grid container justify="space-around">
                     <KeyboardDatePicker

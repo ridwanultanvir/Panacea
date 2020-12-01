@@ -15,8 +15,9 @@ import { mainListItems, secondaryListItems } from '../Homepage/listItems';
 import { Redirect } from 'react-router-dom';
 import { Form } from 'react-redux-form';
 import { TextField, Button, CardContent, Card } from '@material-ui/core';
-import ScheduleTable from './ScheduleTable';
-import AddScheduleForm from './AddSchedule';
+import ScheduleEmpTable from './ScheduleEmpTable';
+import AddScheduleEmpForm from './AddScheduleEmp';
+import AddScheduleRangeForm from './AddScheduleRange'
 
 const drawerWidth = 240;
 
@@ -57,12 +58,12 @@ const styles = (theme) => ({
 });
 
 
-class Schedule extends Component {
+class ScheduleEmp extends Component {
     constructor(props) {
         super(props);
 
         this.state = {
-            docID: null
+            empID: null
         };
 
         this.Copyright = this.Copyright.bind(this);
@@ -71,13 +72,13 @@ class Schedule extends Component {
         this.setUserId = this.setUserId.bind(this);
         this.handleScheduleDelete = this.handleScheduleDelete.bind(this);
         this.handleAddSchedule = this.handleAddSchedule.bind(this);
+        this.handleAddScheduleRange = this.handleAddScheduleRange.bind(this);
         this.handleWardCategorySelect = this.handleWardCategorySelect.bind(this);
     }
 
     componentDidMount() {
         let creds = JSON.parse(this.props.User.creds);
-        // console.log(creds);
-        this.props.loadTimeTable({ 'userID': creds.userId, 'token': this.props.User.token })
+        this.props.loadTimeTable({ 'userID': creds.userId, 'token': this.props.User.token });
         this.props.loadWardCategory({'userID': creds.userId, 'token': this.props.User.token});
     }
 
@@ -95,27 +96,19 @@ class Schedule extends Component {
     }
 
     setUserId(id) {
-        this.setState({ docID: id });
+        this.setState({ empID: id });
     }
 
     handleUserIdSubmit() {
-        if (this.state.docID === null || this.state.docID === '') {
-            alert("Please insert doctor's ID");
+        if (this.state.empID === null || this.state.empID === '') {
+            alert("Please insert employee's ID");
         }
         else {
             let creds = JSON.parse(this.props.User.creds);
             console.log(creds);
-            this.props.loadDocSchedule({ 'userID': creds.userId, 'token': this.props.User.token, 
-                                        'docUserID': this.state.docID, 'userCategory': "doctor" })
+            this.props.loadEmpSchedule({ 'userID': creds.userId, 'token': this.props.User.token, 
+                                        'empUserID': this.state.empID, 'userCategory': "employee" });
         }
-    }
-
-    handleScheduleDelete(selectedScheduleID) {
-        let creds = JSON.parse(this.props.User.creds);
-        console.log(creds);
-        console.log(selectedScheduleID)
-        this.props.deleteSchedule({ 'userID': creds.userId, 'token': this.props.User.token, 
-                                'docUserID': this.state.docID, 'userCategory': "doctor", 'selectedSchedules': selectedScheduleID });
     }
 
     handleWardCategorySelect(category) {
@@ -124,13 +117,29 @@ class Schedule extends Component {
         this.props.loadWardTable({'userID': creds.userId, 'token': this.props.User.token, 'category': category});
     }
 
+    handleScheduleDelete(selectedScheduleID) {
+        let creds = JSON.parse(this.props.User.creds);
+        console.log(creds);
+        console.log(selectedScheduleID)
+        this.props.deleteSchedule({ 'userID': creds.userId, 'token': this.props.User.token, 
+                                'empUserID': this.state.empID, 'userCategory': "employee", 'selectedSchedules': selectedScheduleID });
+    }
+
     handleAddSchedule(timeID, date, block) {
         let creds = JSON.parse(this.props.User.creds);
         console.log(timeID + ' ' + date);
         console.log('block id', block);
         this.props.addSchedule({ 'userID': creds.userId, 'token': this.props.User.token, 
-                                'docUserID': this.state.docID, 'userCategory': "doctor", 
-                                'timeID': timeID, 'date': date, 'block': block })
+                                'empUserID': this.state.empID, 'userCategory': "employee", 
+                                'timeID': timeID, 'date': date, 'block': block });
+    }
+
+    handleAddScheduleRange(timeID, days, blockID, scheduleLength) {
+        let creds = JSON.parse(this.props.User.creds);
+        this.props.addScheduleRange({'userID': creds.userId, 'token': this.props.User.token, 
+                                    'empUserID': this.state.empID, 'userCategory': "employee", 
+                                    'timeID': timeID, 'days': days, 'blockID': blockID, 
+                                    'scheduleLength': scheduleLength });
     }
 
     renderSchedule() {
@@ -192,51 +201,71 @@ class Schedule extends Component {
                                 </Button>
                             </Form>
 
-                            {this.props.ScheduleTable.docData !== null ?
+                            {this.props.ScheduleEmpTable.empData !== null ?
                                 <Card style={{ marginBottom: 20 }}>
                                     <CardContent>
-                                        <Typography variant="h6">Dr. {this.props.ScheduleTable.docData.name}</Typography>
-                                        <Typography variant="body1">Department: {this.props.ScheduleTable.docData.department}</Typography>
-                                        <Typography variant="body1">Designation: {this.props.ScheduleTable.docData.designation}</Typography>
-                                        <Typography variant="body1">Qualification: {this.props.ScheduleTable.docData.qualification}</Typography>
+                                        <Typography variant="h6">{this.props.ScheduleEmpTable.empData.category} :
+                                                                {this.props.ScheduleEmpTable.empData.name}</Typography>
                                     </CardContent>
                                 </Card> :
                                 null
                             }
 
-                            {this.props.ScheduleTable.schedule !== null ?
-                                (this.props.ScheduleTable.schedule[0].SCHEDULE_ID !== null ?
+                            {this.props.ScheduleEmpTable.schedule !== null ?
+                                (this.props.ScheduleEmpTable.schedule[0].SCHEDULE_ID !== null ?
                                     (<div>
-                                        <ScheduleTable
-                                            ScheduleTable={this.props.ScheduleTable}
+                                        <ScheduleEmpTable
+                                            ScheduleEmpTable={this.props.ScheduleEmpTable}
                                             handleScheduleDelete={(selectedScheduleID) => this.handleScheduleDelete(selectedScheduleID)}
                                         />
+                                        <div>
                                         <Card style={{ padding: 20 }}>
-                                            <AddScheduleForm
+                                            <AddScheduleEmpForm
                                                 TimeTable={this.props.TimeTable}
                                                 WardTable={this.props.WardTable}
                                                 handleWardCategorySelect = {(category) => this.handleWardCategorySelect(category)}
                                                 handleAddSchedule={(timeID, date, block) => this.handleAddSchedule(timeID, date, block)}
                                             />
                                         </Card>
+                                        </div>
+                                        <div style = {{marginTop:20}}>
+                                        <Card style ={{ padding: 20 }}>
+                                            <AddScheduleRangeForm 
+                                                TimeTable={this.props.TimeTable}
+                                                WardTable={this.props.WardTable}
+                                                handleWardCategorySelect = {(category) => this.handleWardCategorySelect(category)}
+                                                handleAddScheduleRange={(timeID, days, blockID, scheduleLength) => this.handleAddScheduleRange(timeID, days, blockID, scheduleLength)}
+                                            />
+                                        </Card>
+                                        </div>
                                     </div>) :
                                     <div>
                                         <Card style={{ padding: 20, marginBottom: 20 }}>
                                             <Typography variant="body1">No Schedule available</Typography>
                                         </Card>
+                                        <div>
                                         <Card style={{ padding: 20 }}>
-                                            <AddScheduleForm
+                                            <AddScheduleEmpForm
                                                 TimeTable={this.props.TimeTable}
                                                 WardTable={this.props.WardTable}
                                                 handleWardCategorySelect = {(category) => this.handleWardCategorySelect(category)}
                                                 handleAddSchedule={(timeID, date, block) => this.handleAddSchedule(timeID, date, block)}
                                             />
                                         </Card>
+                                        </div>
+                                        <div style = {{marginTop:20}}>
+                                        <Card style ={{ padding: 20 }}>
+                                            <AddScheduleRangeForm 
+                                                TimeTable={this.props.TimeTable}
+                                                WardTable={this.props.WardTable}
+                                                handleWardCategorySelect = {(category) => this.handleWardCategorySelect(category)}
+                                                handleAddScheduleRange={(timeID, days, blockID, scheduleLength) => this.handleAddScheduleRange(timeID, days, blockID, scheduleLength)}
+                                            />
+                                        </Card>
+                                        </div>
                                     </div>) :
                                 null
                             }
-
-
 
                             <Box pt={4}>
                                 {copyRight}
@@ -260,4 +289,4 @@ class Schedule extends Component {
     }
 }
 
-export default withStyles(styles)(Schedule);
+export default withStyles(styles)(ScheduleEmp);

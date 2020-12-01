@@ -8,6 +8,10 @@ import { ScheduleTable } from './Reducers/ScheduleTable';
 import { TimeTable } from './Reducers/TimeTable';
 import { ReceptionistsAppointments } from './Reducers/ReceptionistsAppointment';
 import { DoctorsAppointments } from './Reducers/DoctorsAppointments';
+import { WardTable } from './Reducers/WardTable';
+import { ScheduleSurgeryTable } from './Reducers/ScheduleSurgery';
+import { AdmitPatientTable } from './Reducers/AdmitpatientTable';
+import {ScheduleEmpTable} from './Reducers/ScheduleEmpTable';
 
 
 export const configureStore = () => {
@@ -15,7 +19,11 @@ export const configureStore = () => {
         combineReducers({
             User: User,
             ScheduleTable: ScheduleTable,
+            ScheduleEmpTable: ScheduleEmpTable,
             TimeTable: TimeTable,
+            WardTable: WardTable,
+            ScheduleSurgeryTable: ScheduleSurgeryTable,
+            AdmitPatientTable: AdmitPatientTable,
             ReceptionistsAppointments: ReceptionistsAppointments,
             DoctorsAppointments: DoctorsAppointments,
             ...createForms({
