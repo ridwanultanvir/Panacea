@@ -14,4 +14,10 @@ urlpatterns = [
          name='technicianPendingTests'),
     path('technician/update-test-result/',
          views.updateTestResult, name='updateTestResult'),
+    path('doctor/get-pending-surgeries/',
+         views.getPendingSurgeries, name="getPendingSurgeries"),
+    path('doctor/update-surgery-result/',
+         views.updateSurgeryResult, name='update-surgery-result'),
+    path('doctor/get-diagnosis-history/',
+         views.getDiagnosisHistory, name='getDIagnosisHistory'),
 ]

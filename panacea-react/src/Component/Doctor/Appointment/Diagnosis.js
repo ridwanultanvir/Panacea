@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
-import { Redirect } from 'react-router-dom';
+import { Redirect, Link } from 'react-router-dom';
 import {
     withStyles, AppBar, Drawer, Toolbar,
     List, ListItemIcon, ListItemText, Checkbox, Button,
-    Divider, CssBaseline, Typography, Card, Container, Grid, Box, Link, ListItem, FormControl, TextField
+    Divider, CssBaseline, Typography, Card, Container, Grid, Box, ListItem, FormControl, TextField
 } from '@material-ui/core';
 import { mainListItems, secondaryListItems } from '../Homepage/listItems';
 import AppointmentsTable from './AppointmentsTable';
@@ -11,6 +11,7 @@ import { baseUrl, getDoctorsAppointment } from '../../../Redux/ActionCreator';
 import { FixedSizeList } from 'react-window';
 import CopyRight from '../../Copyright';
 import { LocalForm } from 'react-redux-form';
+
 
 const drawerWidth = 240;
 
@@ -72,6 +73,10 @@ class DocDiagnosis extends Component {
         this.handleSubmission = this.handleSubmission.bind(this);
         this.handleSpecialSurgery = this.handleSpecialSurgery.bind(this);
         this.handleMedicine = this.handleMedicine.bind(this);
+
+        this.medicineRef = React.createRef();
+        this.surgRef = React.createRef();
+        this.descRef = React.createRef();
     }
 
     getDiagnosisList(body) {
@@ -201,6 +206,9 @@ class DocDiagnosis extends Component {
                     })
                     console.log(response);
                     alert(response.message);
+                    this.medicineRef.current.value = '';
+                    this.surgRef.current.value = '';
+                    this.descRef.current.value = '';
                 }
                 else {
                     let err = new Error(response.errorMessage);
@@ -249,6 +257,17 @@ class DocDiagnosis extends Component {
                         <div />
                         <Container maxWidth="lg" >
                             <Grid container spacing={3}>
+                                <Grid item xs={12}>
+                                    <Link
+                                        to={`/doctor/diagnosis-history/${this.props.app_sl_no}`}
+                                        style={{ textDecoration: 'none', color: 'black', marginLeft: 'auto', marginBottom: 20, marginTop: 10 }}
+                                    >
+                                        <Button variant='contained'>
+                                            Diagnosis history
+                                        </Button>
+
+                                    </Link>
+                                </Grid>
                                 <Grid item xs={12}>
                                     {this.state.errorMessage !== null ?
                                         <h1>{this.state.errorMessage}</h1> :
@@ -343,6 +362,7 @@ class DocDiagnosis extends Component {
                                     <Typography variant='h6'>Special surgery: </Typography>
                                     <FormControl fullWidth>
                                         <TextField
+                                            inputRef={this.surgRef}
                                             multiline
                                             rows={4}
                                             variant='outlined'
@@ -357,6 +377,7 @@ class DocDiagnosis extends Component {
                                     <Typography variant='h6'>Medicine: </Typography>
                                     <FormControl fullWidth>
                                         <TextField
+                                            inputRef={this.medicineRef}
                                             multiline
                                             rows={4}
                                             variant='outlined'
@@ -370,6 +391,7 @@ class DocDiagnosis extends Component {
                                     <Typography variant='h6'>Description: </Typography>
                                     <FormControl fullWidth>
                                         <TextField
+                                            inputRef={this.descRef}
                                             multiline
                                             rows={4}
                                             variant='outlined'

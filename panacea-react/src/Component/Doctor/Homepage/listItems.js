@@ -38,12 +38,14 @@ export const mainListItems = (
                 <ListItemText primary="All appointments" />
             </ListItem>
         </Link>
-        <ListItem button>
-            <ListItemIcon>
-                <BarChartIcon />
-            </ListItemIcon>
-            <ListItemText primary="Service report" />
-        </ListItem>
+        <Link to="/doctor/surgery" style={{ textDecoration: 'none', color: 'black' }}>
+            <ListItem button>
+                <ListItemIcon>
+                    <BarChartIcon />
+                </ListItemIcon>
+                <ListItemText primary="Surgery" />
+            </ListItem>
+        </Link>
         <ListItem button>
             <ListItemIcon>
                 <LayersIcon />

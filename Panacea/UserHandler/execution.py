@@ -262,3 +262,118 @@ def registerPatient(data):
         response = {'success': False, 'errorMessage': errorObj.message}
         print(response)
         return response
+
+
+def adminAddUser(data):
+    connection = connect()
+    cursor = connection.cursor()
+    response = {}
+
+    if data['category'] == 'doctor':
+        try:
+            query = '''
+            SELECT 'D210' || TO_CHAR(TO_NUMBER(SUBSTR(MAX(USER_ID), 4)) + 1) AS NEW_ID FROM PANACEA.PERSON WHERE USER_ID LIKE 'D21%'
+            '''
+
+            cursor.execute(query)
+            result = cursor.fetchone()
+            newUserId = result[0]
+
+            query = '''
+                DECLARE
+                    NEW_USER_ID VARCHAR2(15);
+                    NEW_PASSWORD VARCHAR2(50);
+                    NEW_ID NUMBER(10,0);
+                BEGIN
+                    SELECT 'D210' || TO_CHAR(TO_NUMBER(SUBSTR(MAX(USER_ID), 4)) + 1)
+                    INTO NEW_USER_ID
+                    FROM PANACEA.PERSON
+                    WHERE USER_ID LIKE 'D21%';
+
+                    NEW_PASSWORD := dbms_crypto.hash(utl_raw.cast_to_raw(NEW_USER_ID), dbms_crypto.HASH_MD5);
+
+                    INSERT INTO PANACEA.PERSON(USER_ID, FIRST_NAME, LAST_NAME, EMAIL, PHONE_NUM, GENDER, ADDRESS,DATE_OF_BIRTH, PASSWORD)
+                    VALUES(NEW_USER_ID, :firstName, :lastName, :email, :phoneNumber, :gender, :address,TO_DATE(:dateOfBirth, 'DD-MM-YYYY') ,NEW_PASSWORD );
+
+                    SELECT ID
+                    INTO NEW_ID
+                    FROM PANACEA.PERSON
+                    WHERE USER_ID = NEW_USER_ID;
+
+                    INSERT INTO PANACEA.DOCTOR(ID, HIRE_DATE, DEPARTMENT, DESIGNATION, QUALIFICATION, STATUS, DEPARTMENT_HEAD_ID)
+                    VALUES(NEW_ID, TO_DATE(:hire_date,'DD-MM-YYYY'), :department, :designation, :qualification,'active', :dept_head_id );
+
+                END;
+            '''
+            cursor.execute(query, [data['firstName'],
+                                   data['lastName'], data['email'], data['phoneNumber'], data['gender'],
+                                   data['address'], data['dateOfBirth'],
+                                   data['hireDate'], data['department'], data['designation'], data['qualification'],
+                                   data['departmentHead']])
+            connection.commit()
+
+            response['message'] = f"New user id = {newUserId} and password = {newUserId} "
+            response['success'] = True
+            response['errorMessage'] = ''
+            return response
+
+        except cx_Oracle.Error as error:
+            errorObj, = error.args
+            response = {'success': False, 'errorMessage': errorObj.message}
+            print(response)
+            return response
+
+    else:
+        '''employee'''
+        try:
+            query = '''
+            SELECT 'E28' || TO_CHAR(TO_NUMBER(SUBSTR(MAX(USER_ID), 4)) + 1) AS NEW_ID FROM PANACEA.PERSON WHERE USER_ID LIKE 'E28%'
+            '''
+
+            cursor.execute(query)
+            result = cursor.fetchone()
+            newUserId = result[0]
+
+            query = '''
+                DECLARE
+                    NEW_USER_ID VARCHAR2(15);
+                    NEW_PASSWORD VARCHAR2(50);
+                    NEW_ID NUMBER(10,0);
+                BEGIN
+                    SELECT 'E28' || TO_CHAR(TO_NUMBER(SUBSTR(MAX(USER_ID), 4)) + 1)
+                    INTO NEW_USER_ID
+                    FROM PANACEA.PERSON
+                    WHERE USER_ID LIKE 'E28%';
+
+                    NEW_PASSWORD := dbms_crypto.hash(utl_raw.cast_to_raw(NEW_USER_ID), dbms_crypto.HASH_MD5);
+
+                    INSERT INTO PANACEA.PERSON(USER_ID, FIRST_NAME, LAST_NAME, EMAIL, PHONE_NUM, GENDER, ADDRESS,DATE_OF_BIRTH, PASSWORD)
+                    VALUES(NEW_USER_ID, :firstName, :lastName, :email, :phoneNumber, :gender, :address,TO_DATE(:dateOfBirth, 'DD-MM-YYYY') ,NEW_PASSWORD );
+
+                    SELECT ID
+                    INTO NEW_ID
+                    FROM PANACEA.PERSON
+                    WHERE USER_ID = NEW_USER_ID;
+
+                    INSERT INTO PANACEA.EMPLOYEE(ID, HIRE_DATE, CATEGORY, EDUCATION, TRAINING, SALARY, COMMISSION_PCT)
+                    VALUES(NEW_ID, TO_DATE(:hire_date,'DD-MM-YYYY'), :category, :education, :training, :salary, :commission_pct );
+
+                END;
+            '''
+            cursor.execute(query, [data['firstName'],
+                                   data['lastName'], data['email'], data['phoneNumber'], data['gender'],
+                                   data['address'], data['dateOfBirth'],
+                                   data['hireDate'], data['category'], data['education'], data['training'],
+                                   data['salary'], data['commission']])
+            connection.commit()
+
+            response['message'] = f"New user id = {newUserId} and password = {newUserId}"
+            response['success'] = True
+            response['errorMessage'] = ''
+            return response
+
+        except cx_Oracle.Error as error:
+            errorObj, = error.args
+            response = {'success': False, 'errorMessage': errorObj.message}
+            print(response)
+            return response

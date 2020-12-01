@@ -292,7 +292,7 @@ def receptionistApproveSurgery(diagnosisID, surgery_result_id):
     try:
         query = '''
         UPDATE SURGERY_RESULTS SET COMPLETED = 'A'
-        WHERE SURGERY_RESULT_ID = :surgery_result_id
+        WHERE SURGERY_RESULT_ID = :surgery_result_id AND STATUS = 'PENDING'
         '''
         cursor.execute(query, [surgery_result_id])
         connection.commit()
@@ -377,3 +377,228 @@ def updateTestResult(data):
         response = {'success': False, 'errorMessage': errorObj.message}
         print(response)
         return response
+
+
+def getPendingSurgeries(data):
+    connection = connect()
+    cursor = connection.cursor()
+
+    try:
+        if data['all_surgery']:
+            query = '''
+            SELECT SURGERY_RESULT_ID, SURGERY_DESC, COMPLETED,TO_CHAR(SURGERY_DATE), STATUS, RESULT
+            FROM TABLE(RETURN_SURGERY_RESULT_TABLE((SELECT ID FROM PERSON WHERE USER_ID = :docID)))
+            WHERE COMPLETED = 'A' OR COMPLETED = 'T'
+            '''
+            cursor.execute(query, [data['doc_id']])
+            result = cursor.fetchall()
+
+        elif data['surgery_id'] != None:
+            query = '''
+            SELECT SURGERY_RESULT_ID, SURGERY_DESC, COMPLETED,TO_CHAR(SURGERY_DATE), STATUS,RESULT
+            FROM TABLE(RETURN_SURGERY_RESULT_TABLE((SELECT ID FROM PERSON WHERE USER_ID = :docID)))
+            WHERE SURGERY_RESULT_ID = :surgery_id AND COMPLETED = 'A'
+            '''
+            cursor.execute(query, [data['doc_id'], data['surgery_id']])
+            result = cursor.fetchall()
+        else:
+            query = '''
+            SELECT SURGERY_RESULT_ID, SURGERY_DESC, COMPLETED,TO_CHAR(SURGERY_DATE), STATUS,RESULT
+            FROM TABLE(RETURN_SURGERY_RESULT_TABLE((SELECT ID FROM PERSON WHERE USER_ID = :docID)))
+            WHERE COMPLETED = 'A'
+            '''
+            cursor.execute(query, [data['doc_id']])
+            result = cursor.fetchall()
+
+        surgeries = []
+        for surg in result:
+            if surg[5] == None:
+                comment = 'N/A'
+            else:
+                comment = surg[5]
+            if surg[3] == None:
+                surg_date = 'N/A'
+            else:
+                surg_date = surg[3]
+            surgeries.append({'surgery_result_id': surg[0], 'surgery_desc': surg[1], 'completed': surg[2],
+                              'surgery_date': surg_date, 'status': surg[4], 'result': comment})
+
+        response = {}
+        response['success'] = True
+        response['errorMessage'] = ''
+        response['surgeries'] = surgeries
+
+        return response
+
+    except cx_Oracle.Error as error:
+        errorObj, = error.args
+        response = {'success': False, 'errorMessage': errorObj.message}
+        print(response)
+        return response
+
+
+def updateSurgeryResult(data):
+    connection = connect()
+    cursor = connection.cursor()
+
+    try:
+        query = '''
+        UPDATE SURGERY_RESULTS SET RESULT = :result, COMPLETED = 'T', STATUS = :status, SURGERY_DATE = TO_DATE(:surgery_date,'DD-MM-YYYY')
+        WHERE SURGERY_RESULT_ID = :surgery_result_id
+        '''
+
+        cursor.execute(query, [data['comment'], data['status'],
+                               data['date'], data['surgery_result_id']])
+        connection.commit()
+
+        response = {'success': True, 'errorMessage': ''}
+
+        return response
+    except cx_Oracle.Error as error:
+        errorObj, = error.args
+        response = {'success': False, 'errorMessage': errorObj.message}
+        print(response)
+        return response
+
+
+def getDiagnosisHistory(data):
+    connection = connect()
+    cursor = connection.cursor()
+
+    response = {}
+
+    if data['full_history']:
+        try:
+            query = '''
+            SELECT T.TEST_RESULT_ID, S.SERVICE_NAME, TO_CHAR(T.TEST_DATE), T.RESULT,T.COMPLETED
+            FROM TEST_RESULTS T JOIN SERVICE S ON(T.SERVICE_ID = S.SERVICE_ID)
+            WHERE T.PATIENT_ID = (SELECT PATIENT_ID FROM APPOINTMENT WHERE APP_SL_NO = :app_sl_no)
+            ORDER BY T.TEST_RESULT_ID DESC
+            '''
+
+            cursor.execute(query, [data['app_sl_no']])
+            result = cursor.fetchall()
+
+            tests = []
+
+            for test in result:
+                if test[2] == None:
+                    test_date = 'N/A'
+                else:
+                    test_date = test[2]
+                if test[3] == None:
+                    res = 'N/A'
+                else:
+                    res = test[3]
+                tests.append({'test_result_id': test[0], 'test_name': test[1],
+                              'test_complete_date': test_date, 'test_result': res, 'completed': test[4]})
+
+            response['tests'] = tests
+
+            query = '''
+            SELECT APP_SL_NO, SURGERY_RESULT_ID, TO_CHAR(SURGERY_DATE), SURGERY_DESC, COMPLETED, STATUS, RESULT
+            FROM TABLE(RETURN_SURGERY_RESULT_PATIENT((SELECT P.USER_ID FROM PERSON P JOIN APPOINTMENT A ON(P.ID = A.PATIENT_ID)
+                                                    WHERE A.APP_SL_NO = :app_sl_no)))
+            ORDER BY SURGERY_RESULT_ID DESC
+            '''
+
+            cursor.execute(query, [data['app_sl_no']])
+            result = cursor.fetchall()
+
+            surgeries = []
+            for surgery in result:
+                if surgery[2] == None:
+                    surg_date = 'N/A'
+                else:
+                    surg_date = surgery[2]
+                if surgery[5] == None:
+                    surg_status = 'N/A'
+                else:
+                    surg_status = surgery[5]
+                if surgery[6] == None:
+                    surg_res = 'N/A'
+                else:
+                    surg_res = surgery[6]
+                surgeries.append({'app_sl_no': surgery[0], 'surgery_result_id': surgery[1], 'surgery_date': surg_date,
+                                  'surgery_desc': surgery[3], 'completed': surgery[4], 'status': surg_status, 'result': surg_res})
+
+            response['surgeries'] = surgeries
+
+            response['success'] = True
+            response['errorMessage'] = ''
+            return response
+
+        except cx_Oracle.Error as error:
+            errorObj, = error.args
+            response = {'success': False, 'errorMessage': errorObj.message}
+            print(response)
+            return response
+
+    else:
+        try:
+            query = '''
+            SELECT APP_SL_NO, TEST_RESULT_ID, SERVICE_NAME, TO_CHAR(TEST_COMPLETE_DATE) AS "DATE", TEST_RESULT, COMPLETED 
+            FROM TABLE(RETURN_TEST_RESULT_TABLE((SELECT P.USER_ID FROM PERSON P JOIN APPOINTMENT A ON(P.ID = A.PATIENT_ID)
+                                                    WHERE A.APP_SL_NO = :app_sl_no)))
+            WHERE APP_SL_NO = :app_sl_no
+            ORDER BY TEST_RESULT_ID DESC
+            '''
+
+            cursor.execute(query, [data['app_sl_no'], data['app_sl_no']])
+            result = cursor.fetchall()
+
+            tests = []
+            for test in result:
+                if test[3] == None:
+                    test_date = 'N/A'
+                else:
+                    test_date = test[3]
+                if test[4] == None:
+                    res = 'N/A'
+                else:
+                    res = test[4]
+                tests.append({'app_sl_no': test[0], 'test_result_id': test[1], 'test_name': test[2], 'test_complete_date': test_date,
+                              'test_result': res, 'completed': test[5]})
+
+            response['tests'] = tests
+
+            query = '''
+            SELECT APP_SL_NO, SURGERY_RESULT_ID, TO_CHAR(SURGERY_DATE) AS "DATE", SURGERY_DESC, COMPLETED,STATUS,RESULT
+            FROM TABLE(RETURN_SURGERY_RESULT_PATIENT((SELECT P.USER_ID
+                                                    FROM PERSON P JOIN APPOINTMENT A ON(P.ID = A.PATIENT_ID)
+                                                    WHERE A.APP_SL_NO = :app_sl_no)))
+            WHERE APP_SL_NO = :app_sl_no
+            ORDER BY SURGERY_RESULT_ID DESC
+            '''
+
+            cursor.execute(query, [data['app_sl_no'], data['app_sl_no']])
+            result = cursor.fetchall()
+
+            surgeries = []
+            for surgery in result:
+                if surgery[2] == None:
+                    surg_date = 'N/A'
+                else:
+                    surg_date = surgery[2]
+                if surgery[5] == None:
+                    surg_status = 'N/A'
+                else:
+                    surg_status = surgery[5]
+                if surgery[6] == None:
+                    surg_res = 'N/A'
+                else:
+                    surg_res = surgery[6]
+                surgeries.append({'app_sl_no': surgery[0], 'surgery_result_id': surgery[1], 'surgery_date': surg_date,
+                                  'surgery_desc': surgery[3], 'completed': surgery[4], 'status': surg_status, 'result': surg_res})
+
+            response['surgeries'] = surgeries
+
+            response['success'] = True
+            response['errorMessage'] = ''
+
+            return response
+        except cx_Oracle.Error as error:
+            errorObj, = error.args
+            response = {'success': False, 'errorMessage': errorObj.message}
+            print(response)
+            return response

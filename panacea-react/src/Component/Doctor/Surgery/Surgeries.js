@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
 import { Redirect } from 'react-router-dom';
 import { withStyles, AppBar, Drawer, Toolbar, List, Divider, CssBaseline, Typography, Card, Container, Grid, Box, Link } from '@material-ui/core';
-import { mainListItems, secondaryListItems } from './listItems';
+import { mainListItems, secondaryListItems } from '../Homepage/listItems';
 import CopyRight from '../../Copyright';
+import { baseUrl } from "../../../Redux/ActionCreator";
+import SurgeryTable from './SurgeryTable';
 const drawerWidth = 240;
 
 const styles = (theme) => ({
@@ -37,20 +39,55 @@ const styles = (theme) => ({
     },
 });
 
-class DoctorHome extends Component {
+class DoctorSurgery extends Component {
     constructor(props) {
         super(props);
-        this.handleLogout = this.handleLogout.bind(this);
-        this.renderProfile = this.renderProfile.bind(this);
+        this.state = {
+            surgeries: null
+        }
+        this.fetchData = this.fetchData.bind(this);
     }
 
-    handleLogout() {
-        sessionStorage.removeItem('token');
-        sessionStorage.removeItem('creds');
-        sessionStorage.removeItem('userData');
-        sessionStorage.removeItem('userCategory');
+    fetchData(body) {
+        fetch(baseUrl + 'checkup/doctor/get-pending-surgeries/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(body)
+        })
+            .then((response) => {
+                console.log(response);
+                if (response.ok) {
+                    return response;
+                }
+                else {
+                    let err = new Error('Error ' + response.status + ': ' + response.statusText);
+                    err.response = response;
+                    throw err;
+                }
+            })
+            .then((response) => response.json())
+            .then((response) => {
+                if (response.success) {
+                    this.setState({ surgeries: response.surgeries })
+                }
+                else {
+                    let err = new Error(response.errorMessage);
+                    err.response = response;
+                    throw err;
+                }
+            })
+            .catch((err) => {
+                alert(err.message);
+            });
     }
 
+    componentDidMount() {
+        let creds = JSON.parse(this.props.User.creds);
+        let body = { 'userID': creds.userId, 'token': this.props.User.token, 'doc_id': creds.userId, 'all_surgery': false, 'surgery_id': null };
+        this.fetchData(body)
+    }
 
     renderProfile() {
 
@@ -66,9 +103,6 @@ class DoctorHome extends Component {
                             <Typography variant="h6" noWrap>
                                 Doctor
                             </Typography>
-                            <Link color='inherit' href='http://localhost:3000/home' onClick={() => { this.handleLogout() }} style={{ marginLeft: 'auto' }}>
-                                Logout
-                            </Link>
                         </Toolbar>
                     </AppBar>
                     <Drawer
@@ -93,17 +127,11 @@ class DoctorHome extends Component {
                         <Container maxWidth="lg" >
                             <Grid container spacing={3}>
                                 <Grid item xs={12}>
-                                    <Card style={{ padding: 20 }}>
-                                        <Typography variant='h6'>Dr. {userData.name}</Typography>
-                                        <Typography variant='body1'>Email: {userData.email}</Typography>
-                                        <Typography variant='body1'>Address: {userData.address}</Typography>
-                                        <Typography variant='body1'>Phone number: {userData.phoneNum}</Typography>
-                                        <Typography variant='body1'>Date of birth: {userData.date_of_birth}</Typography>
-                                        <Typography variant='body1'>Department: {userData.department}</Typography>
-                                        <Typography variant='body1'>Designation: {userData.designation}</Typography>
-                                        <Typography variant='body1'>Qualification: {userData.qualification}</Typography>
-                                        <Typography variant='body1'>Gender: {userData.gender}</Typography>
-                                    </Card>
+                                    <SurgeryTable
+                                        User={this.props.User}
+                                        fetchData={(body) => { this.fetchData(body) }}
+                                        surgeries={this.state.surgeries}
+                                    />
                                 </Grid>
                             </Grid>
                             <Box pt={4}>
@@ -129,4 +157,4 @@ class DoctorHome extends Component {
     }
 }
 
-export default withStyles(styles)(DoctorHome);
+export default withStyles(styles)(DoctorSurgery);

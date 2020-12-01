@@ -166,3 +166,63 @@ def updateTestResult(request):
         response = {'success': False, 'errorMessage': 'Invalid request'}
 
     return Response(response)
+
+
+@api_view(['POST'])
+def getPendingSurgeries(request):
+    body = request.body.decode('utf-8')
+    data = json.loads(body)
+
+    userID = None
+    token = None
+    if 'userID' in data:
+        userID = data['userID']
+    if 'token' in data:
+        token = data['token']
+    if(verifyToken(userID, token)):
+        response = execution.getPendingSurgeries(data)
+    else:
+        response = {'success': False, 'errorMessage': 'Invalid request'}
+
+    return Response(response)
+
+
+@api_view(['POST'])
+def updateSurgeryResult(request):
+    body = request.body.decode('utf-8')
+    data = json.loads(body)
+
+    userID = None
+    token = None
+    if 'userID' in data:
+        userID = data['userID']
+    if 'token' in data:
+        token = data['token']
+    if(verifyToken(userID, token)):
+        response = execution.updateSurgeryResult(data)
+    else:
+        response = {'success': False, 'errorMessage': 'Invalid request'}
+
+    return Response(response)
+
+
+@api_view(['POST'])
+def getDiagnosisHistory(request):
+    body = request.body.decode('utf-8')
+    data = json.loads(body)
+
+    userID = None
+    token = None
+
+    if 'userID' in data:
+        userID = data['userID']
+    if 'token' in data:
+        token = data['token']
+
+    if(verifyToken(userID, token)):
+        response = execution.getDiagnosisHistory(data)
+    else:
+        response = {'success': False, 'errorMessage': 'Invalid request',
+                    'scheduleData': None, 'docData': None}
+
+    return Response(response)
