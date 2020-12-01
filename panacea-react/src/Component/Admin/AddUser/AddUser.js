@@ -242,7 +242,7 @@ class AddUser extends Component {
                     <AppBar position="fixed" className={classes.appBar}>
                         <Toolbar>
                             <Typography variant="h6" noWrap>
-                                Doctor
+                                Admin
                             </Typography>
                             <Link color='inherit' href='http://localhost:3000/home' onClick={() => { this.handleLogout() }} style={{ marginLeft: 'auto' }}>
                                 Logout

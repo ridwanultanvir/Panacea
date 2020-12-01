@@ -69,6 +69,12 @@ const useStyles = makeStyles((theme) => ({
 //     );
 // }
 
+function handleLogout() {
+    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('creds');
+    sessionStorage.removeItem('userData');
+    sessionStorage.removeItem('userCategory');
+}
 
 export default function AdminHome(props) {
     const classes = useStyles();
@@ -81,7 +87,10 @@ export default function AdminHome(props) {
                     <Toolbar>
                         <Typography variant="h6" noWrap>
                             Admin
-                </Typography>
+                        </Typography>
+                        <Link color='inherit' href='http://localhost:3000/home' onClick={() => { handleLogout() }} style={{ marginLeft: 'auto' }}>
+                            Logout
+                        </Link>
                     </Toolbar>
                 </AppBar>
                 <Drawer

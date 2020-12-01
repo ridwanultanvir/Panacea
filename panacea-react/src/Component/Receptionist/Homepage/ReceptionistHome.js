@@ -66,6 +66,13 @@ class ReceptionistHome extends Component {
     //     );
     // }
 
+    handleLogout() {
+        sessionStorage.removeItem('token');
+        sessionStorage.removeItem('creds');
+        sessionStorage.removeItem('userData');
+        sessionStorage.removeItem('userCategory');
+    }
+
     renderProfile() {
         const { classes } = this.props;
 
@@ -80,6 +87,9 @@ class ReceptionistHome extends Component {
                             <Typography variant="h6" noWrap>
                                 Receptionist
                             </Typography>
+                            <Link color='inherit' href='http://localhost:3000/home' onClick={() => { this.handleLogout() }} style={{ marginLeft: 'auto' }}>
+                                Logout
+                            </Link>
                         </Toolbar>
                     </AppBar>
                     <Drawer

@@ -50,7 +50,12 @@ class TechnicianHome extends Component {
         //this.Copyright = this.Copyright.bind(this);
     }
 
-
+    handleLogout() {
+        sessionStorage.removeItem('token');
+        sessionStorage.removeItem('creds');
+        sessionStorage.removeItem('userData');
+        sessionStorage.removeItem('userCategory');
+    }
 
 
     renderProfile() {
@@ -67,6 +72,9 @@ class TechnicianHome extends Component {
                             <Typography variant="h6" noWrap>
                                 Technician
                             </Typography>
+                            <Link color='inherit' href='http://localhost:3000/home' onClick={() => { this.handleLogout() }} style={{ marginLeft: 'auto' }}>
+                                Logout
+                            </Link>
                         </Toolbar>
                     </AppBar>
                     <Drawer

@@ -17,6 +17,15 @@ def passwordHash(password):
     return result.hexdigest()
 
 
+def checkPassword(userId, password):
+    connection = connect()
+    cursor = connection.cursor()
+
+    result = cursor.callfunc("CHECK_LOGIN", int, [userId, password])
+    print(result)
+    return result
+
+
 '''the following two functions needs to be implemented'''
 
 
@@ -49,11 +58,14 @@ def login(credentials):
     userId = credentials['userId']
     password = credentials['password']
 
-    query = "SELECT PASSWORD FROM PANACEA.PERSON WHERE USER_ID = :user_id"
-    cursor.execute(query, [userId])
+    # query = "SELECT PASSWORD FROM PANACEA.PERSON WHERE USER_ID = :user_id"
+    # cursor.execute(query, [userId])
 
-    result = cursor.fetchone()[0]
-    if result == passwordHash(password):
+    # checkPassword(userId, password)
+
+    # result = cursor.fetchone()[0]
+    # if result == passwordHash(password):
+    if checkPassword(userId, password) == 1:
         print('logged in')
         response = {}
         response['errorMessage'] = ''
