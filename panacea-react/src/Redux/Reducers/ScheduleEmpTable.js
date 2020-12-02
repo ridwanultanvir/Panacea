@@ -8,11 +8,11 @@ export const ScheduleEmpTable = (state = {
     schedule: null
 }, action) => {
     switch (action.type) {
-        case ActionTypes.SHCEDULE_TABLE_LOADING:
+        case ActionTypes.EMP_SHCEDULE_TABLE_LOADING:
             return { ...state, isLoading: true, errorMessage: null, userID: action.userID, schedule: null, empData: null };
-        case ActionTypes.SCHEDULE_TABLE_SUCCESS:
+        case ActionTypes.EMP_SCHEDULE_TABLE_SUCCESS:
             return { ...state, isLoading: false, errorMessage: null, schedule: action.scheduleData, empData: action.empData };
-        case ActionTypes.SCHEDULE_TABLE_FAILURE:
+        case ActionTypes.EMP_SCHEDULE_TABLE_FAILURE:
             return { ...state, isLoading: false, errorMessage: action.message, userID: null, schedule: null, empData: null };
 
         case ActionTypes.DELETE_SCHEDULE_LOADING:

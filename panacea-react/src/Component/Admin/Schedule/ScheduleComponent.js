@@ -166,7 +166,7 @@ class Schedule extends Component {
                         <div />
                         <Container maxWidth="lg" >
                             <Typography variant="h5">
-                                User's ID:
+                                Doctor's User ID:
                             </Typography>
                             <Form model='AdminScheduleUserID' onSubmit={() => this.handleUserIdSubmit()}>
                                 <TextField

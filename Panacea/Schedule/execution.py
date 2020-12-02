@@ -331,11 +331,12 @@ def getPatientDetails(patientID):
     query = '''SELECT (FIRST_NAME||' '||LAST_NAME) AS pNAME, EMAIL AS pEMAIL, PHONE_NUM AS pPHONE, GENDER AS pGENDER, 
             (ROUND(MONTHS_BETWEEN(SYSDATE, DATE_OF_BIRTH)/12)||' years '||FLOOR(MOD(MONTHS_BETWEEN(SYSDATE, DATE_OF_BIRTH), 12))||' months') as pAGE,
             ID AS pID FROM PERSON 
-            WHERE ID = :patientID'''
+            WHERE USER_ID = (:patientID)'''
     # print(query, patientID)
     cursor.execute(query, [patientID])
     resultTemp = cursor.fetchall()
     cursor.close()
+    # print(resultTemp)
 
     result = {
         'patientData': {
@@ -408,13 +409,13 @@ def admitPatient(patientID, room_no, admission_date):
     connection = connect()
     cursor = connection.cursor()
     query = '''SELECT ROOM_NO FROM ROOM_ADMISSION
-                WHERE PATIENT_ID = (:patientID) AND RELEASE_DATE IS NULL'''
+                WHERE PATIENT_ID = (select ID from Person where USER_ID = (:patientID)) AND RELEASE_DATE IS NULL'''
     cursor.execute(query, [patientID])
     resultTemp = cursor.fetchall()
     if len(resultTemp) > 0:
         return {'success': True, 'alertMessage': "Error in Insertion. Patient Already Admitted!"}
     query = '''INSERT INTO ROOM_ADMISSION(PATIENT_ID, ROOM_NO, ADMISSION_DATE)
-                VALUES (:patientID, :room_no, TO_DATE(:admission_date, 'DD/MM/YYYY'))'''
+                VALUES ((select ID from Person where USER_ID = (:patientID)), :room_no, TO_DATE(:admission_date, 'DD/MM/YYYY'))'''
     cursor.execute(query, [patientID, room_no, admission_date])
     connection.commit()
     cursor.close()
