@@ -9,6 +9,7 @@ import PeopleIcon from '@material-ui/icons/People';
 import BarChartIcon from '@material-ui/icons/BarChart';
 import LayersIcon from '@material-ui/icons/Layers';
 import AssignmentIcon from '@material-ui/icons/Assignment';
+import AirlineSeatFlatIcon from '@material-ui/icons/AirlineSeatFlat';
 import { Link } from 'react-router-dom';
 import { } from '@material-ui/icons';
 
@@ -38,7 +39,15 @@ export const mainListItems = (
                 <ListItemText primary="Approve service" />
             </ListItem>
         </Link>
-        <ListItem button>
+        <Link to='/receptionist/put-in-charge' style={{ textDecoration: 'none', color: 'black' }}>
+            <ListItem button>
+                <ListItemIcon>
+                    <BarChartIcon />
+                </ListItemIcon>
+                <ListItemText primary="Put In Charge" />
+            </ListItem>
+        </Link>
+        {/* <ListItem button>
             <ListItemIcon>
                 <BarChartIcon />
             </ListItemIcon>
@@ -49,13 +58,29 @@ export const mainListItems = (
                 <LayersIcon />
             </ListItemIcon>
             <ListItemText primary="Doctor's schedule" />
-        </ListItem>
+        </ListItem> */}
+        <Link to='/receptionist/surgery-schedule' style={{ textDecoration: 'none', color: 'black' }}>
+            <ListItem button >
+                <ListItemIcon>
+                    <AirlineSeatFlatIcon />
+                </ListItemIcon>
+                <ListItemText primary="Surgery Schedule" />
+            </ListItem>
+        </Link>
+        <Link to='/receptionist/patient-admit' style={{ textDecoration: 'none', color: 'black' }}>
+            <ListItem button >
+                <ListItemIcon>
+                    <AirlineSeatFlatIcon />
+                </ListItemIcon>
+                <ListItemText primary="Admit Patient" />
+            </ListItem>
+        </Link>
     </div>
 );
 
 export const secondaryListItems = (
     <div>
-        <ListSubheader inset>Saved reports</ListSubheader>
+        {/* <ListSubheader inset>Saved reports</ListSubheader>
         <ListItem button>
             <ListItemIcon>
                 <AssignmentIcon />
@@ -73,6 +98,6 @@ export const secondaryListItems = (
                 <AssignmentIcon />
             </ListItemIcon>
             <ListItemText primary="Year-end sale" />
-        </ListItem>
+        </ListItem> */}
     </div>
 );

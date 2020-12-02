@@ -26,7 +26,15 @@ export const mainListItems = (
                 <ListItemIcon>
                     <PeopleIcon />
                 </ListItemIcon>
-                <ListItemText primary="Make Schedule" />
+                <ListItemText primary="Make Doctor Schedule" />
+            </ListItem>
+        </Link>
+        <Link to='/admin/schedule_emp' style={{ textDecoration: 'none', color: 'black' }}>
+            <ListItem button >
+                <ListItemIcon>
+                    <PeopleIcon />
+                </ListItemIcon>
+                <ListItemText primary="Make Employee Schedule" />
             </ListItem>
         </Link>
         <Link to='/admin/add-user' style={{ textDecoration: 'none', color: 'black' }}>
@@ -37,7 +45,7 @@ export const mainListItems = (
                 <ListItemText primary="Add user" />
             </ListItem>
         </Link>
-        <ListItem button>
+        {/* <ListItem button>
             <ListItemIcon>
                 <BarChartIcon />
             </ListItemIcon>
@@ -48,13 +56,13 @@ export const mainListItems = (
                 <LayersIcon />
             </ListItemIcon>
             <ListItemText primary="Integrations" />
-        </ListItem>
+        </ListItem> */}
     </div>
 );
 
 export const secondaryListItems = (
     <div>
-        <ListSubheader inset>Saved reports</ListSubheader>
+        {/* <ListSubheader inset>Saved reports</ListSubheader>
         <ListItem button>
             <ListItemIcon>
                 <AssignmentIcon />
@@ -72,6 +80,6 @@ export const secondaryListItems = (
                 <AssignmentIcon />
             </ListItemIcon>
             <ListItemText primary="Year-end sale" />
-        </ListItem>
+        </ListItem> */}
     </div>
 );

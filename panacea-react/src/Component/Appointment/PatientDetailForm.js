@@ -146,15 +146,16 @@ export default function PatientDetailForm(props) {
     if (props.User.isAuthenticated && props.User.category === 'patient') {
         let userData = JSON.parse(props.User.userData);
         let creds = JSON.parse(props.User.creds)
-        let name = userData.name.split(" ");
-        let firstName = name[0];
-        let lastName = name[1];
+        var name = userData.name.split(" ");
+        var firstName = name[0];
+        var lastName = name[1];
         props.setFirstName(firstName);
         props.setLastName(lastName);
         props.setAddress(userData.address);
         props.setEmail(userData.email);
         props.setPhoneNumber(userData.phoneNum);
         if (userData.date_of_birth != null) {
+            //console.log('dob', userData.date_of_birth);
             props.setDateOfBirth(userData.date_of_birth);
         }
         props.setGender(userData.gender);
@@ -363,12 +364,12 @@ export default function PatientDetailForm(props) {
                         </Grid>
                     </MuiPickersUtilsProvider>
 
-                    <Grid item xs={12}>
+                    {/* <Grid item xs={12}>
                         <FormControlLabel
                             control={<Checkbox color="secondary" name="patientBeforeCheck" value="yes" onClick={handleCheck} />}
                             label="Has been a patient before"
                         />
-                    </Grid>
+                    </Grid> */}
                 </Grid>
             </React.Fragment>
         );
