@@ -77,7 +77,7 @@ export const loginUser = (creds) => (dispatch) => {
 
 const scheduleLoading = (userID) => {
     return {
-        type: ActionTypes.SHCEDULE_TABLE_LOADING,
+        type: ActionTypes.EMP_SHCEDULE_TABLE_LOADING,
         userID: userID
     }
 }
@@ -99,7 +99,7 @@ const docScheduleSuccess = (scheduleData, docData) => {
 
 const empScheduleSuccess = (scheduleData, empData) => {
     return {
-        type: ActionTypes.SCHEDULE_TABLE_SUCCESS,
+        type: ActionTypes.EMP_SCHEDULE_TABLE_SUCCESS,
         scheduleData: scheduleData,
         empData: empData
     }
@@ -114,14 +114,14 @@ const docScheduleFailure = (message) => {
 
 const scheduleFailure = (message) => {
     return {
-        type: ActionTypes.SCHEDULE_TABLE_FAILURE,
+        type: ActionTypes.EMP_SCHEDULE_TABLE_FAILURE,
         message: message
     }
 }
 
 
 export const loadEmpSchedule = (body) => (dispatch) => {
-    console.log(body.empUserID);
+    //console.log(body.empUserID);
     dispatch(scheduleLoading(body.empUserID));
 
     fetch(baseUrl + 'schedule/schedule-table/', {
@@ -160,7 +160,7 @@ export const loadEmpSchedule = (body) => (dispatch) => {
 
 
 export const loadDocSchedule = (body) => (dispatch) => {
-    console.log(body.docUserID);
+    //console.log(body.docUserID);
     dispatch(docScheduleLoading(body.docUserID));
 
     fetch(baseUrl + 'schedule/schedule-table/', {

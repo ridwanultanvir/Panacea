@@ -135,7 +135,7 @@ class ReceptionistAdmitPatient extends Component {
     
     
     handleAdmitPatient(room_no, dateString) {
-        console.log(this.state.patientID, dateString, room_no);
+        //console.log(this.state.patientID, dateString, room_no);
         this.props.addAdmitPatient({'patientID': this.state.patientID, 'date': dateString, 'room_no': room_no});
         // let body = {
         //     'patientID': this.state.patientID,
