@@ -355,3 +355,75 @@ def getAllDocAppointments(docId, todaysAppointment):
         response = {'success': False, 'errorMessage': errorObj.message}
         print(response)
         return response
+
+
+def getPatientAppointments(userID):
+    connection = connect()
+    cursor = connection.cursor()
+
+    query = '''SELECT * FROM TABLE(RETURN_APPNT_DETAILS_TABLE(:userID))'''
+    response = {}
+    try:
+        cursor.execute(query, [userID])
+        resultTemp = cursor.fetchall()
+        appointment_data = []
+        for data in resultTemp:
+            appointment_data.append({
+                'doc_name': data[1],
+                'department': data[2],
+                'appnt_date': data[3],
+                'schedule_date': data[4],
+                'prob_desc': data[5],
+                'medicine': data[6],
+                'test': data[7],
+            })
+        response['appointment_data'] = appointment_data
+        response['success'] = True
+        response['alertMessage'] = "All okay"
+        return response
+    except cx_Oracle.Error as error:
+        errorObj, = error.args
+        response = {'success': False, 'alertMessage': errorObj.message}
+        return response
+
+
+def getNextAppointments(userID):
+    connection = connect()
+    cursor = connection.cursor()
+
+    query = '''SELECT
+                    A.APP_SL_NO,
+                    ( D.FIRST_NAME || ' ' || D.LAST_NAME ) AS DOCTOR_NAME,
+                    ( SELECT DEPARTMENT FROM DOCTOR WHERE ID = A.DOCTOR_ID ) AS DEPARTMENT,
+                    A.PROB_DESC,
+                    TO_CHAR(A.APPNT_DATE, 'DD/MM/YYYY'),
+                    TO_CHAR(SCH.SCHEDULE_DATE, 'DD/MM/YYYY') AS VISITING_DATE
+                FROM
+                    APPOINTMENT A
+                    JOIN PERSON D ON D.ID = A.DOCTOR_ID 
+                    AND A.PATIENT_ID = ( SELECT ID FROM PERSON WHERE USER_ID = (:userID) ) 
+                    AND A.STATUS = 'pending'
+                    JOIN SCHEDULE SCH ON A.SCHEDULE_ID = SCH.SCHEDULE_ID AND 
+                    SCH.SCHEDULE_DATE >= TRUNC(SYSDATE)'''
+    response = {}
+    try:
+        cursor.execute(query, [userID])
+        resultTemp = cursor.fetchall()
+        nextAppntData = []
+        for data in resultTemp:
+            nextAppntData.append({
+                'doc_name': data[1],
+                'department': data[2],
+                'appnt_date': data[4],
+                'schedule_date': data[5],
+                'prob_desc': data[3],
+                'sl_no': data[0]
+            })
+        response['nextAppntData'] = nextAppntData
+        response['success'] = True
+        response['alertMessage'] = "All okay"
+        return response
+    except cx_Oracle.Error as error:
+        errorObj, = error.args
+        response = {'success': False, 'alertMessage': errorObj.message}
+        return response

@@ -31,7 +31,7 @@ import AppointmentComponent from './Appointment/AppointmentComponent'
 import Profile from './ProfileComponent';
 import AdminHome from './Admin/Homepage/AdminProfileHomePageComponent';
 import AddUser from './Admin/AddUser/AddUser';
-import PatientHome from './PatientProfileHomePageComponent';
+import PatientHome from './Patient/Homepage/PatientProfileHomePageComponent';
 import Schedule from './Admin/Schedule/ScheduleComponent';
 import ScheduleEmp from './Admin/Schedule/ScheduleEmpComponent'
 import RegistrationComponent from './Registration/RegistrationComponent'
@@ -52,6 +52,7 @@ import Services from './Receptionist/ApproveTests/Services';
 import TechnicianHome from './Technician/Homepage/TechnicianHome';
 import PendingTests from './Technician/PendingTests/PendingTests';
 import TestResult from './Technician/PendingTests/TestResult';
+import UpcomingAppointment from './Patient/Homepage/UpcomingAppointment';
 
 const mapStateToProps = (state) => {
     return {
@@ -267,6 +268,23 @@ class Main extends Component {
                     </Route>
                     <Route path="/doctor/appointment/:app_sl_no" component={this.renderDoctorDiagnosisPage} />
                     <Route path="/patient/home">
+                        <PatientHome 
+                            User={this.props.User}
+                        />
+                    </Route>
+
+                    <Route path="/patient/next-surgery">
+                        <PatientHome
+                            User={this.props.User}
+                        />
+                    </Route>
+                    <Route path="/patient/next-appointment">
+                        <UpcomingAppointment
+                            User={this.props.User}
+                        />
+                    </Route>
+                    
+                    <Route path="/patient/test-results">
                         <PatientHome
                             User={this.props.User}
                         />

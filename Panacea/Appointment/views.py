@@ -137,3 +137,21 @@ def getAllDocAppointments(request):
                     'scheduleData': None, 'docData': None}
 
     return Response(response)
+
+
+@api_view(['POST'])
+def getAllPatientAppointment(request):
+    body = request.body.decode('utf-8')
+    data = json.loads(body)
+
+    userID = data['userID']
+    return Response(execution.getPatientAppointments(userID))
+
+
+@api_view(['POST'])
+def getNextAppnt(request):
+    body = request.body.decode('utf-8')
+    data = json.loads(body)
+
+    userID = data['userID'] 
+    return Response(execution.getNextAppointments(userID))
