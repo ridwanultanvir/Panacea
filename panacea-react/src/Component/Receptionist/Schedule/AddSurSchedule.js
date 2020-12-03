@@ -114,8 +114,6 @@ export default function AddSurSchedule(props) {
             let month = selectedDate.getMonth() + 1;
             let dateString = selectedDate.getDate().toString() + '/' + month.toString() + '/' + selectedDate.getFullYear().toString()
 
-            let month = selectedDate.getMonth() + 1;
-            let dateString = selectedDate.getDate().toString() + '/' + month.toString() + '/' + selectedDate.getFullYear().toString()
             if (docID === "") {
 
                 props.handleAddSchedule(time, dateString, props.ScheduleSurgeryTable.appntDocData.id, room);
