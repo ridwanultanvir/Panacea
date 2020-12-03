@@ -107,13 +107,16 @@ export default function AddSurSchedule(props) {
             alert('Please fill all the boxes properly');
         }
         else {
-            if (docID === '') {
-                setDocID(props.ScheduleSurgeryTable.appntDocData.id);
-            }
+            
             let month = selectedDate.getMonth() + 1;
             let dateString = selectedDate.getDate().toString() + '/' + month.toString() + '/' + selectedDate.getFullYear().toString()
+            if (docID === "") {
+                props.handleAddSchedule(time, dateString, props.ScheduleSurgeryTable.appntDocData.id, room);
+            }
+            else {
+                props.handleAddSchedule(time, dateString, docID, room);
+            }
             
-            props.handleAddSchedule(time, dateString, docID, room);
         }
     }
 
