@@ -102,6 +102,7 @@ class Main extends Component {
         this.renderTechnicianTestResultPage = this.renderTechnicianTestResultPage.bind(this);
         this.renderDoctorSurgeryResultPage = this.renderDoctorSurgeryResultPage.bind(this);
         this.renderDocDiagnosisHistoryPage = this.renderDocDiagnosisHistoryPage.bind(this);
+        this.renderSurgerySchedule = this.renderSurgerySchedule.bind(this);
     }
 
     renderDoctorDiagnosisPage({ match }) {
@@ -157,6 +158,26 @@ class Main extends Component {
             <DiagnosisHistory
                 User={this.props.User}
                 app_sl_no={app_sl_no}
+            />
+        );
+    }
+
+    renderSurgerySchedule({ match }) {
+        let diagnosisID = match.params.diagnosisID;
+        let surgery_result_id = match.params.surgery_result_id;
+        console.log(diagnosisID, surgery_result_id);
+
+        return (
+            <ReceptionistSurSchedule
+                User={this.props.User}
+                ScheduleSurgeryTable={this.props.ScheduleSurgeryTable}
+                loadAppointmentData={this.props.loadAppointmentData}
+                loadDocDeptData={this.props.loadDocDeptData}
+                loadRoomData={this.props.loadRoomData}
+                loadFreeSURTimeData={this.props.loadFreeSURTimeData}
+                addSurgerySchedule={this.props.addSurgerySchedule}
+                diagnosisID={diagnosisID}
+                surgery_result_id={surgery_result_id}
             />
         );
     }
@@ -217,7 +238,7 @@ class Main extends Component {
                             loadWardCategory={this.props.loadWardCategory}
                             loadWardTable={this.props.loadWardTable}
                             addSchedule={this.props.addSchedule}
-                            addScheduleRange = {this.props.addScheduleRange}
+                            addScheduleRange={this.props.addScheduleRange}
                         />
                     </Route>
                     <Route path='/admin/add-user'>
@@ -273,17 +294,9 @@ class Main extends Component {
                             acceptReceptionistAppointment={this.props.acceptReceptionistAppointment}
                         />
                     </Route>
-                    <Route path="/receptionist/surgery-schedule">
-                        <ReceptionistSurSchedule
-                            User={this.props.User}
-                            ScheduleSurgeryTable={this.props.ScheduleSurgeryTable}
-                            loadAppointmentData={this.props.loadAppointmentData}
-                            loadDocDeptData={this.props.loadDocDeptData}
-                            loadRoomData={this.props.loadRoomData}
-                            loadFreeSURTimeData={this.props.loadFreeSURTimeData}
-                            addSurgerySchedule={this.props.addSurgerySchedule}
-                        />
-                    </Route>
+                    <Route path="/receptionist/surgery-schedule/:diagnosisID/:surgery_result_id" component={this.renderSurgerySchedule} />
+
+
                     <Route path="/receptionist/patient-admit">
                         <ReceptionistAdmitPatient
                             User={this.props.User}
@@ -292,7 +305,7 @@ class Main extends Component {
                             loadWardCategory={this.props.loadWardCategory}
                             loadWardTable={this.props.loadWardTable}
                             loadRoomTypes={this.props.loadRoomTypes}
-                            loadAdmitRoomData = {this.props.loadAdmitRoomData}
+                            loadAdmitRoomData={this.props.loadAdmitRoomData}
                             patientDetails={this.props.patientDetails}
                             addAdmitPatient={this.props.addAdmitPatient}
                         />

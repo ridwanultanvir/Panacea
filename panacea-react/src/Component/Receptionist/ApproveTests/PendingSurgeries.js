@@ -9,6 +9,7 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import { Button } from '@material-ui/core';
 import { baseUrl } from '../../../Redux/ActionCreator';
+import { Link } from 'react-router-dom';
 
 const useStyles = makeStyles((theme) => ({
     table: {
@@ -106,9 +107,11 @@ export default function PendingSurgeries(props) {
                                 <TableCell align="right">{row.surgery_desc}</TableCell>
                                 <TableCell align="right">{row.department}</TableCell>
                                 <TableCell align="right">
-                                    <Button variant='contained' onClick={() => { handleApprove(row.surgery_result_id) }}>
-                                        Approve
-                                    </Button>
+                                    <Link to={`/receptionist/surgery-schedule/${props.diagnosisID}/${row.surgery_result_id}`} style={{ textDecoration: 'none', color: 'black' }}>
+                                        <Button variant='contained' >
+                                            Schedule
+                                        </Button>
+                                    </Link>
                                 </TableCell>
                             </TableRow>
                         );

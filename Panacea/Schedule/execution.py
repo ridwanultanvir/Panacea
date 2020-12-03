@@ -124,12 +124,11 @@ def getTimeTable():
     return response
 
 
-
 def getWardTable(category):
     connection = connect()
     cursor = connection.cursor()
     # print(category)
-    query = f'select BLOCK_ID from PANACEA.BLOCK where CATEGORY=\'{category}\'' 
+    query = f'select BLOCK_ID from PANACEA.BLOCK where CATEGORY=\'{category}\''
     cursor.execute(query)
     result = cursor.fetchall()
     cursor.close()
@@ -137,7 +136,7 @@ def getWardTable(category):
     response = {}
     if (result):
         for block in result:
-            blockList.append({'block':block[0]})
+            blockList.append({'block': block[0]})
     response['success'] = True
     response['errorMessage'] = ''
     response['blockList'] = blockList
@@ -156,8 +155,8 @@ def getWardCategory():
 
     if (result):
         for category in result:
-            wardCategory.append({'CATEGORY':category[0]})
-    
+            wardCategory.append({'CATEGORY': category[0]})
+
     response['success'] = True
     response['errorMessage'] = ''
     response['wardCategory'] = wardCategory
@@ -200,7 +199,7 @@ def addScheduleRange(userID, userCategory, timeID, days, blockID, scheduleLength
     cursor.execute(query)
     id_pk = cursor.fetchone()
     # print(id_pk[0], userCategory, timeID, days, blockID, scheduleLength)
-    query =  '''BEGIN
+    query = '''BEGIN
 	                SCHEDULE_RANGE(:userID , :timeID, :days, :blockID, :scheduleLength);
                 END;'''
     cursor.execute(query, [id_pk[0], timeID, days, blockID, scheduleLength])
@@ -210,9 +209,17 @@ def addScheduleRange(userID, userCategory, timeID, days, blockID, scheduleLength
     return getScheduleTable(userCategory, userID)
 
 
-def getAppntWithSl(appntSerial):
+def getAppntWithSl(diagnosisID):
     connection = connect()
     cursor = connection.cursor()
+    query = '''
+    SELECT APP_SL_NO FROM CHECKUP WHERE DIAGNOSIS_ID = :diagnosisID
+    '''
+    cursor.execute(query, [diagnosisID])
+    result = cursor.fetchone()
+
+    appntSerial = result[0]
+
     query = '''SELECT * FROM 
             (
             SELECT (FIRST_NAME||' '||LAST_NAME) AS pNAME, EMAIL AS pEMAIL, PHONE_NUM AS pPHONE, GENDER AS pGENDER, 
@@ -226,30 +233,33 @@ def getAppntWithSl(appntSerial):
             DOCTOR D JOIN PERSON P
             ON( D.ID = (SELECT DOCTOR_ID FROM APPOINTMENT WHERE 
             APP_SL_NO = :appntSerial) AND D.ID = P.ID)) D'''
-    cursor.execute(query, appntSerial)
+    cursor.execute(query, [appntSerial, appntSerial])
     resultTemp = cursor.fetchall()
     cursor.close()
 
+    print(appntSerial)
     result = {
         'appointmentData': {
+            'app_sl_no': appntSerial,
             'patientData': {
-            'name': resultTemp[0][0],
-            'email': resultTemp[0][1],
-            'phone': resultTemp[0][2],
-            'gender': "Male" if resultTemp[0][3]=="M" else "Female",
-            'age': resultTemp[0][4],
-            'id': resultTemp[0][5]
+                'name': resultTemp[0][0],
+                'email': resultTemp[0][1],
+                'phone': resultTemp[0][2],
+                'gender': "Male" if resultTemp[0][3] == "M" else "Female",
+                'age': resultTemp[0][4],
+                'id': resultTemp[0][5]
             },
             'appntDocData': {
-            'name': resultTemp[0][6],
-            'department': resultTemp[0][7],
-            'id': resultTemp[0][8]
+                'name': resultTemp[0][6],
+                'department': resultTemp[0][7],
+                'id': resultTemp[0][8]
             },
         },
         'success': True,
         'errorMessage': '',
         'ok': True
     }
+    print(result)
     return result
 
 
@@ -265,7 +275,7 @@ def getFreeDocOnDate(docID, selectDate):
             WHERE E.ID NOT IN 
             (SELECT INCHARGE_DOC FROM SURGERY_SCHEDULE
             WHERE TO_CHAR(SUR_DATE) = :selectDate)'''
-    
+
     cursor.execute(query, [docID, selectDate])
     resultTemp = cursor.fetchall()
     docData = []
@@ -303,23 +313,50 @@ def getRoomList(searchDate, roomType, timeID):
         })
     result = {
         'roomData': roomData,
-        'alertMesage':"Okay",
+        'alertMesage': "Okay",
         'success': True
     }
     return result
 
 
-def addSurSchedule(appnt_serial_no, inchargeDocID, patient_id, 
-                    room_no, timeID, duration, selectedDate):
+def addSurSchedule(appnt_serial_no, inchargeDocID, patient_id,
+                   room_no, timeID, duration, selectedDate, surgery_result_id):
     connection = connect()
     cursor = connection.cursor()
     # perform check if ref appnt id already exists...
     # selectedDate = f"'{selectedDate}'"
     # print(appnt_serial_no, inchargeDocID, patient_id, room_no, timeID, duration, selectedDate)
-    query = '''INSERT INTO SURGERY_SCHEDULE(APP_REF_NO, INCHARGE_DOC, PATIENT_ID, ROOM_NO, TIME_ID, DURATION_HRS, SUR_DATE)
-                VALUES (:appnt_serial_no, :inchargeDocID, :patient_id, :room_no, :timeID, :duration, TO_DATE(:selectedDate, 'DD/MM/YYYY'))'''
+
+    query = f'''
+    SELECT COUNT(*)
+    FROM SURGERY_SCHEDULE 
+    WHERE ROOM_NO = {room_no} AND TIME_ID = {timeID} AND SUR_DATE = TO_DATE('{selectedDate}', 'DD/MM/YYYY')
+    '''
+
+    print(room_no, timeID, selectedDate)
+    cursor.execute(query)
+    result = cursor.fetchone()[0]
+    print(result)
+    if result > 0:
+        return {'success': False, 'errorMessage': 'There is already a surgery scheduled at the time slot. Please select a different one'}
+
+    query = '''
+    DECLARE
+        ID NUMBER;
+    BEGIN
+        INSERT INTO SURGERY_SCHEDULE(APP_REF_NO, INCHARGE_DOC, PATIENT_ID, ROOM_NO, TIME_ID, DURATION_HRS, SUR_DATE)
+        VALUES (:appnt_serial_no, :inchargeDocID, :patient_id, :room_no, :timeID, :duration, TO_DATE(:selectedDate, 'DD/MM/YYYY'));
+
+        SELECT MAX(SUR_SCHE_NO) INTO ID FROM SURGERY_SCHEDULE;
+
+
+        UPDATE SURGERY_RESULTS SET COMPLETED = 'A', SUR_SCHE_NO = ID
+        WHERE SURGERY_RESULT_ID = :surgery_result_id;
+    END;
+    '''
     # try (try-catch) block
-    cursor.execute(query, [appnt_serial_no, inchargeDocID, patient_id, room_no, timeID, duration, selectedDate])
+    cursor.execute(query, [appnt_serial_no, inchargeDocID,
+                           patient_id, room_no, timeID, duration, selectedDate, surgery_result_id])
     connection.commit()
 
     return {'success': True, 'message': "Surgery Schedule Added Successfully"}
@@ -343,10 +380,10 @@ def getPatientDetails(patientID):
             'name': resultTemp[0][0],
             'email': resultTemp[0][1],
             'phone': resultTemp[0][2],
-            'gender': "Male" if resultTemp[0][3]=="M" else "Female",
+            'gender': "Male" if resultTemp[0][3] == "M" else "Female",
             'age': resultTemp[0][4],
             'id': resultTemp[0][5]
-            },
+        },
         'success': True,
     }
 
@@ -379,7 +416,7 @@ def getAdmitRoomList(ward, roomType):
         })
     result = {
         'roomData': roomData,
-        'alertMesage':"Okay",
+        'alertMesage': "Okay",
         'success': True
     }
     return result
@@ -400,10 +437,11 @@ def getRoomTypesForWard(ward):
         })
     result = {
         'roomTypes': roomTypes,
-        'alertMesage':"Okay",
+        'alertMesage': "Okay",
         'success': True
     }
     return result
+
 
 def admitPatient(patientID, room_no, admission_date):
     connection = connect()
@@ -420,7 +458,7 @@ def admitPatient(patientID, room_no, admission_date):
     connection.commit()
     cursor.close()
     return {'success': True, 'alertMessage': "Patient Successfully Admitted"}
-    
+
 
 def getUserDetails(UserID):
     connection = connect()
@@ -432,16 +470,17 @@ def getUserDetails(UserID):
         cursor.execute(query)
         resultTemp = cursor.fetchall()
         cursor.close()
-        return { 'userData' : {
-            {'title':'Name', 'value': resultTemp[0][0]},
-            {'title':'Email', 'value': resultTemp[0][1]},
-            {'title':'Phone Number', 'value': resultTemp[0][2]},
-            {'title':'Gender', 'value': "Male" if resultTemp[0][3] == 'M' else "Female"},
-            {'title':'Address', 'value': resultTemp[0][4]},
-            {'title':'Age', 'value': resultTemp[0][5]},
-            {'title':'Category', 'value': resultTemp[0][6]},
-            {'title':'Training', 'value': resultTemp[0][7]},},
-            'success' : True,   
+        return {'userData': {
+            {'title': 'Name', 'value': resultTemp[0][0]},
+            {'title': 'Email', 'value': resultTemp[0][1]},
+            {'title': 'Phone Number', 'value': resultTemp[0][2]},
+            {'title': 'Gender',
+                'value': "Male" if resultTemp[0][3] == 'M' else "Female"},
+            {'title': 'Address', 'value': resultTemp[0][4]},
+            {'title': 'Age', 'value': resultTemp[0][5]},
+            {'title': 'Category', 'value': resultTemp[0][6]},
+            {'title': 'Training', 'value': resultTemp[0][7]}, },
+            'success': True,
         }
     elif 'D' in UserID:
         query = '''SELECT (P.FIRST_NAME||' '||P.LAST_NAME), P.EMAIL, P.PHONE_NUM, P.GENDER, P.ADDRESS,
@@ -450,20 +489,18 @@ def getUserDetails(UserID):
         cursor.execute(query)
         resultTemp = cursor.fetchall()
         cursor.close()
-        return {{ 'userData' : {
-            {'title':'Name', 'value': resultTemp[0][0]},
-            {'title':'Email', 'value': resultTemp[0][1]},
-            {'title':'Phone Number', 'value': resultTemp[0][2]},
-            {'title':'Gender', 'value': "Male" if resultTemp[0][3] == 'M' else "Female"},
-            {'title':'Address', 'value': resultTemp[0][4]},
-            {'title':'Age', 'value': resultTemp[0][5]},
-            {'title':'Department', 'value': resultTemp[0][6]},
-            {'title':'Qualification', 'value': resultTemp[0][7]},},
-            'success' : True,   
+        return {{'userData': {
+            {'title': 'Name', 'value': resultTemp[0][0]},
+            {'title': 'Email', 'value': resultTemp[0][1]},
+            {'title': 'Phone Number', 'value': resultTemp[0][2]},
+            {'title': 'Gender',
+                'value': "Male" if resultTemp[0][3] == 'M' else "Female"},
+            {'title': 'Address', 'value': resultTemp[0][4]},
+            {'title': 'Age', 'value': resultTemp[0][5]},
+            {'title': 'Department', 'value': resultTemp[0][6]},
+            {'title': 'Qualification', 'value': resultTemp[0][7]}, },
+            'success': True,
         }}
-    else :
+    else:
         cursor.close()
         return {'success': False, 'alertMessage': "User Id does not belong to appropiate category"}
-
-
-    
