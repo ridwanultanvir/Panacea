@@ -59,14 +59,14 @@ export const mainListItems = (
             </ListItemIcon>
             <ListItemText primary="Doctor's schedule" />
         </ListItem> */}
-        <Link to='/receptionist/surgery-schedule' style={{ textDecoration: 'none', color: 'black' }}>
+        {/* <Link to='/receptionist/surgery-schedule' style={{ textDecoration: 'none', color: 'black' }}>
             <ListItem button >
                 <ListItemIcon>
                     <AirlineSeatFlatIcon />
                 </ListItemIcon>
                 <ListItemText primary="Surgery Schedule" />
             </ListItem>
-        </Link>
+        </Link> */}
         <Link to='/receptionist/patient-admit' style={{ textDecoration: 'none', color: 'black' }}>
             <ListItem button >
                 <ListItemIcon>

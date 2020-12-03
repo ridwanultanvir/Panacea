@@ -516,9 +516,11 @@ const appointmentDataLoading = (userID) => {
 }
 
 const appointmentDataSuccess = (appointmentData) => {
+    console.log(appointmentData.app_sl_no)
     return {
         type: ActionTypes.LOAD_APPNT_DATA_SUCCESS,
-        patientData : appointmentData.patientData,
+        app_sl_no: appointmentData.app_sl_no,
+        patientData: appointmentData.patientData,
         appntDocData: appointmentData.appntDocData,
     }
 }
@@ -599,8 +601,7 @@ export const loadDocDeptData = (body) => (dispatch) => {
         })
         .then((response) => response.json())
         .then((response) => {
-            if (response.alertMessage === "Not Okay")
-            {
+            if (response.alertMessage === "Not Okay") {
                 alert("No Doctor available on the selected Day");
             }
             else if (response.success) {
@@ -650,8 +651,7 @@ export const loadRoomData = (body) => (dispatch) => {
         })
         .then((response) => response.json())
         .then((response) => {
-            if (response.success !== true)
-            {
+            if (response.success !== true) {
                 alert(response.alertMessage);
             }
             else if (response.success) {
@@ -697,8 +697,7 @@ export const loadAdmitRoomData = (body) => (dispatch) => {
         })
         .then((response) => response.json())
         .then((response) => {
-            if (response.success !== true)
-            {
+            if (response.success !== true) {
                 alert(response.alertMessage);
             }
             else if (response.success) {
@@ -745,8 +744,7 @@ export const loadRoomTypes = (body) => (dispatch) => {
         })
         .then((response) => response.json())
         .then((response) => {
-            if (response.success !== true)
-            {
+            if (response.success !== true) {
                 alert(response.alertMessage);
             }
             else if (response.success) {
@@ -839,9 +837,8 @@ export const addSurgerySchedule = (body) => (dispatch) => {
         })
         .then((response) => response.json())
         .then((response) => {
-            if (response.success !== true)
-            {
-                alert("Error in Insertion");
+            if (response.success !== true) {
+                alert(response.errorMessage);
             }
             else if (response.success) {
                 alert(response.message);
@@ -879,8 +876,7 @@ export const addAdmitPatient = (body) => (dispatch) => {
         })
         .then((response) => response.json())
         .then((response) => {
-            if (response.success !== true)
-            {
+            if (response.success !== true) {
                 alert(response.alertMessage)
             }
             else if (response.success) {

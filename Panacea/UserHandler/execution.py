@@ -160,10 +160,11 @@ def getPatientData(credentials):
     userId = credentials['userId']
     password = credentials['password']
 
-    query = "SELECT PASSWORD FROM PANACEA.PERSON WHERE USER_ID = :user_id"
-    cursor.execute(query, [userId])
-    result = cursor.fetchone()[0]
-    if result == passwordHash(password):
+    # query = "SELECT PASSWORD FROM PANACEA.PERSON WHERE USER_ID = :user_id"
+    # cursor.execute(query, [userId])
+    # result = cursor.fetchone()[0]
+    # if result == passwordHash(password):
+    if checkPassword(userId, password) == 1:
         print('authentic user')
         response = {}
 
