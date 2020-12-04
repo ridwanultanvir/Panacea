@@ -149,20 +149,25 @@ def getWardCategory():
     connection = connect()
     cursor = connection.cursor()
     query = '''select DISTINCT(CATEGORY) from BLOCK'''
-    cursor.execute(query)
-    result = cursor.fetchall()
-    wardCategory = []
-    response = {}
+    try: 
+        cursor.execute(query)
+        result = cursor.fetchall()
+        wardCategory = []
+        response = {}
 
-    if (result):
-        for category in result:
-            wardCategory.append({'CATEGORY':category[0]})
-    
-    response['success'] = True
-    response['errorMessage'] = ''
-    response['wardCategory'] = wardCategory
+        if (result):
+            for category in result:
+                wardCategory.append({'CATEGORY':category[0]})
+        
+        response['success'] = True
+        response['errorMessage'] = ''
+        response['wardCategory'] = wardCategory
 
-    return response
+        return response
+    except cx_Oracle.Error as error:
+        errorObj, = error.args
+        response = {'success': False, 'errorMessage': errorObj.message}
+        return response
 
 
 def addSchedule(UserID, userCategory, timeID, date, blockID):
@@ -466,4 +471,59 @@ def getUserDetails(UserID):
         return {'success': False, 'alertMessage': "User Id does not belong to appropiate category"}
 
 
+def getBlocksPerCategory(block_category):
+    connection = connect()
+    cursor = connection.cursor()
+    query = '''SELECT BLOCK_ID FROM BLOCK WHERE CATEGORY=(:block_category)'''
+    try:
+        cursor.execute(query, [block_category])
+        resultTemp = cursor.fetchall()
+        cursor.close()
+        roomTypes = []
+        for R in resultTemp:
+            roomTypes.append({
+                'block_id': R[0],
+            })
+        result = {
+            'blocks': roomTypes,
+            'alertMesage':"Okay",
+            'success': True
+        }
+        return result
+    except cx_Oracle.Error as err:
+        result = {
+            'success': False,
+            'alertMessage': err
+        }
+        return result
+
+
+def addIncharge(block_id, inChargeUserID):
+    connection = connect()
+    cursor = connection.cursor()
+    query_pre = '''SELECT ID FROM PERSON WHERE USER_ID=(:inChargeUserID)'''
+    query = '''UPDATE BLOCK SET INCHARGE_ID = (SELECT ID FROM PERSON WHERE USER_ID = (:inChargeUserID)) WHERE BLOCK_ID = (:block_id)'''
+    try:
+        cursor.execute(query_pre, [inChargeUserID])
+        result = cursor.fetchall()
+        if len(result) == 0:
+            return {
+                'success': False,
+                'alertMessage': 'User ID invalid'
+            }
+        else :
+            cursor.execute(query, [inChargeUserID, block_id])
+            connection.commit()
+            cursor.close()
+            result = {
+                'alertMessage':"Incharge for Block Successfully Registered",
+                'success': True
+            }
+            return result
+    except cx_Oracle.Error as err:
+        result = {
+            'success': False,
+            'alertMessage': err
+        }
+        return result
     
