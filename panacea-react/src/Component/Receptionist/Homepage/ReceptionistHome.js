@@ -47,24 +47,7 @@ class ReceptionistHome extends Component {
         }
 
         this.renderProfile = this.renderProfile.bind(this);
-        //this.Copyright = this.Copyright.bind(this);
     }
-
-
-    // Copyright() {
-
-    //     return (
-    //         <Typography variant="body2" color="textSecondary" align="center">
-    //             {'Copyright © '}
-    //             <Link color="inherit" href="https://sadatshahriyar.pythonanywhere.com/">
-    //                 Sadat Shahriyar
-    //             </Link>{' '}
-    //             {'& Jayanta Sadhu. '}
-    //             {new Date().getFullYear()}
-    //             {'.'}
-    //         </Typography>
-    //     );
-    // }
 
     handleLogout() {
         sessionStorage.removeItem('token');

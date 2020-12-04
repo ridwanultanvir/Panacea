@@ -328,11 +328,11 @@ class Main extends Component {
                             addAdmitPatient={this.props.addAdmitPatient}
                         />
                     </Route>
-                    {/* <Route path="/receptionist/put-in-charge">
-                        <PutInCharge>
-
-                        </PutInCharge>
-                    </Route> */}
+                    <Route path="/receptionist/put-in-charge">
+                        <PutInCharge
+                            User={this.props.User}
+                        />
+                    </Route>
                     <Route exact path='/receptionist/approve-service'>
                         <ApproveTest
                             User={this.props.User}

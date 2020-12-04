@@ -291,3 +291,20 @@ def getUserdetails(request):
     data = json.loads(body)
     userID = data['userID']
     return Response(execution.getUserDetails(userID))
+
+@api_view(['POST'])
+def getBlockForCats(request):
+    body = request.body.decode('utf-8')
+    data = json.loads(body)
+    block_category = data['block-category']
+    return Response(execution.getBlocksPerCategory(block_category))
+    
+
+@api_view(['POST'])
+def addIncharge(request):
+    body = request.body.decode('utf-8')
+    data = json.loads(body)
+    block_id = data['block_id']
+    inChargeUserID = data['inChargeID']
+    return Response(execution.addIncharge(block_id, inChargeUserID))
+

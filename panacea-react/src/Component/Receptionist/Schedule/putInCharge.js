@@ -9,13 +9,14 @@ import List from '@material-ui/core/List';
 import Typography from '@material-ui/core/Typography';
 import Divider from '@material-ui/core/Divider';
 import Container from '@material-ui/core/Container';
+import {FormControl, InputLabel, MenuItem, Select} from '@material-ui/core';
 import Link from '@material-ui/core/Link';
-import MenuItem from '@material-ui/core/MenuItem';
 import { mainListItems, secondaryListItems } from '../Homepage/listItems';
 import { Redirect } from 'react-router-dom';
 import { Form } from 'react-redux-form';
 import { TextField, Button, CardContent, Card } from '@material-ui/core';
-
+import CopyRight from '../../Copyright';
+import SelectIncharge from './InchargeSelectorTable'
 
 const drawerWidth = 240;
 
@@ -61,6 +62,12 @@ const styles = (theme) => ({
     selectEmpty: {
         marginTop: theme.spacing(2),
     },
+
+    formControl: {
+        margin: theme.spacing(1),
+        minWidth: 120,
+        width: 560
+    },
 });
 
 
@@ -74,36 +81,114 @@ class PutInCharge extends Component {
             userData: null,
             wardTypeSelected: null,
             wardTypeList: null,
+            ward: null,
         };
 
-        this.Copyright = this.Copyright.bind(this);
         this.renderPutInCharge = this.renderPutInCharge.bind(this);
         this.setUserID = this.setUserID.bind(this);
         this.fetchRoomList = this.fetchRoomList.bind(this);
-        this.loadWardList = this.loadWardList.bind(this);
+        //this.loadWardList = this.loadWardList.bind(this);
         this.handleUserIDSubmit = this.handleUserIDSubmit.bind(this);
         this.handleAdmitPatient = this.handleAdmitPatient.bind(this);
+        this.loadWardCategory = this.loadWardCategory.bind(this);
+        this.handleSelectWard = this.handleSelectWard.bind(this);
     }
 
-    Copyright() {
-        return (
-            <Typography variant="body2" color="textSecondary" align="center">
-                {'Copyright © '}
-                <Link color="inherit" href="https://sadatshahriyar.pythonanywhere.com/">
-                    Sadat Shahriyar
-                </Link>{' '}
-                {new Date().getFullYear()}
-                {'.'}
-            </Typography>
-        );
-    }
 
 
     componentDidMount() {
         let creds = JSON.parse(this.props.User.creds);
-        //this.props.loadTimeTable({ 'userID': creds.userId, 'token': this.props.User.token });
-        this.props.loadWardCategory({'userID': creds.userId, 'token': this.props.User.token, 
-                                    'bypass': true, 'admission': true});
+        this.loadWardCategory(creds.userId);
+    }
+
+    loadWardCategory(userID) {
+        let body = {
+            'userID': userID,
+            'token': "token",
+        }
+        let baseUrl = 'http://localhost:8000/';
+        fetch(baseUrl + 'schedule/ward-category/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(body)
+        })
+            .then((response) => {
+                
+                if (response.ok) {
+                    return response;
+                }
+                else {
+                    let err = new Error('Error ' + response.status + ': ' + response.statusText);
+                    err.response = response;
+                    throw err;
+                }
+            })
+            .then((response) => response.json())
+            .then((response) => {
+                if (response.success) {
+                    //alert(response.alertMessage);
+                    let wardTypeListTemp = response.wardCategory;
+                    wardTypeListTemp = response.wardCategory.map((block) => {
+                        return (<MenuItem value={block.CATEGORY}>{block.CATEGORY}</MenuItem>)
+                    })
+                    this.setState({wardTypeList: wardTypeListTemp});
+                }
+                else {
+                    let err = new Error(response.errorMessage);
+                    err.response = response;
+                    throw err;
+                }
+            })
+            .catch((err) => {
+                alert(err.message);
+            });
+    }
+
+    handleSelectWard(event) {
+        this.setState({wardTypeSelected: event.target.value});
+        let body = {
+            'block-category': event.target.value, 
+        }
+        let baseUrl = 'http://localhost:8000/';
+        fetch(baseUrl + 'schedule/block-ids-per-category/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(body)
+        })
+            .then((response) => {
+                
+                if (response.ok) {
+                    return response;
+                }
+                else {
+                    let err = new Error('Error ' + response.status + ': ' + response.statusText);
+                    err.response = response;
+                    throw err;
+                }
+            })
+            .then((response) => response.json())
+            .then((response) => {
+                if (response.success) {
+                    //alert(response.alertMessage);
+                    let wardListTemp = null;
+                    wardListTemp = response.blocks.map((block) => {
+                        return (<MenuItem value={block.block_id}>{block.block_id}</MenuItem>)
+                    })
+                    this.setState({wardList: wardListTemp});
+                }
+                else {
+                    let err = new Error(response.errorMessage);
+                    err.response = response;
+                    throw err;
+                }
+            })
+            .catch((err) => {
+                alert(err.message);
+            });
     }
 
     setUserID(patID) {
@@ -119,15 +204,15 @@ class PutInCharge extends Component {
         this.props.loadRoomTypes({'category': category})
     }
 
-    loadWardList() {
-        let wardCatTemp = null;
+    // loadWardList() {
+    //     let wardCatTemp = null;
         
-        wardCatTemp = this.props.WardTable.wardCategory.map((block) => {
-            return (<MenuItem value={block.CATEGORY}>{block.CATEGORY}</MenuItem>);
-        });
-        this.setState({wardCategory:wardCatTemp });
+    //     wardCatTemp = this.props.WardTable.wardCategory.map((block) => {
+    //         return (<MenuItem value={block.CATEGORY}>{block.CATEGORY}</MenuItem>);
+    //     });
+    //     this.setState({wardCategory:wardCatTemp });
         
-    }
+    // }
 
     handleUserIDSubmit() {
         let body = {
@@ -220,7 +305,7 @@ class PutInCharge extends Component {
 
     renderPutInCharge() {
         const { classes } = this.props;
-        const copyRight = this.Copyright();
+
         if (this.props.User.isAuthenticated && this.props.User.category === 'RECEPTIONIST') {
             return (
                 <div className={classes.root}>
@@ -250,32 +335,42 @@ class PutInCharge extends Component {
                         <Toolbar />
                         <div />
                         <Container maxWidth="lg" >
-                            <Typography variant="h5">
-                                User ID:
-                            </Typography>
-                            <Form model='AdminScheduleUserID' onSubmit={() => this.handleUserIDSubmit()}>
-                                <TextField
-                                    variant="outlined"
-                                    margin="normal"
-                                    required
-                                    fullWidth
-                                    id="User ID"
-                                    label="User ID"
-                                    name="User ID"
-                                    autoComplete="User ID"
-                                    autoFocus
-                                    onChange={(event) => this.setUserID(event.target.value)}
-                                />
-                                <Button
-                                    type="submit"
-                                    fullWidth
-                                    variant="contained"
-                                    color="primary"
-                                    className={classes.submit}
-                                >
-                                    View Details
-                                </Button>
-                            </Form>
+                            
+                            {this.state.wardTypeList !== null &&
+                                <div>
+                                    <Card style={{ padding: 20 }}>
+                                    <FormControl className={classes.formControl}>
+                                        {/* <InputLabel shrink id="demo-simple-select-placeholder-label-label">
+                                            Select Ward Category:
+                                        </InputLabel> */}
+                                        <Typography variant="h6" noWrap>
+                                            Select Ward Category:
+                                        </Typography>
+                                        <Select
+                                            labelId="demo-simple-select-placeholder-label-label"
+                                            id="demo-simple-select-placeholder-label"
+                                            value={this.state.wardTypeSelected}
+                                            onChange={(event) => this.handleSelectWard(event)}
+                                            displayEmpty
+                                            className={classes.selectEmpty}
+                                        >
+                                            <MenuItem value="">
+                                                <em>None</em>
+                                            </MenuItem>
+                                            {this.state.wardTypeList} 
+                                        </Select>
+                                    </FormControl>
+                                    </Card>
+                                </div>
+                            }
+
+                            {this.state.wardList !== null &&
+                                <div>
+                                    <SelectIncharge
+                                        wardList = {this.state.wardList}
+                                    />
+                                </div>
+                            }
 
                             {/* {this.props.AdmitPatientTable.patientData !== null ?
                                 (<div><Card style={{ marginBottom: 20 }}>
@@ -301,7 +396,7 @@ class PutInCharge extends Component {
 
 
                             <Box pt={4}>
-                                {copyRight}
+                                {CopyRight}
                             </Box>
                         </Container>
                     </main>

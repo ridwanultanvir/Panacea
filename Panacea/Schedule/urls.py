@@ -17,5 +17,7 @@ urlpatterns = [
     path('patient-details/', views.getPatientDetails, name='getPatientDetails'),
     path('room-types-for-categories/', views.roomTypesforCats, name='roomTypesforCats'),
     path('admit-patient/', views.admitPatientReq, name= 'admitPatientReq'),
-    path('user-details', views.getUserdetails, name='getUserdetails'),
+    path('user-details/', views.getUserdetails, name='getUserdetails'),
+    path('block-ids-per-category/', views.getBlockForCats, name='getBlockForCats'),
+    path('add-incharge/', views.addIncharge, name='addIncharge'),
 ]
