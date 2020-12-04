@@ -51,7 +51,7 @@ def deleteSchedule(request):
         if data['userCategory'] == "employee":
             searchID = data['empUserID']
         elif data['userCategory'] == "doctor":
-            searchID = data['docUserID'] 
+            searchID = data['docUserID']
 
     if(verifyToken(userID, token)):
         response = execution.deleteSchedule(
@@ -137,7 +137,7 @@ def addSchedule(request):
         if data['userCategory'] == "employee":
             searchID = data['empUserID']
         elif data['userCategory'] == "doctor":
-            searchID = data['docUserID'] 
+            searchID = data['docUserID']
 
     if(verifyToken(userID, token)):
         response = execution.addSchedule(
@@ -162,7 +162,7 @@ def addScheduleRange(request):
         if data['userCategory'] == "employee":
             targetID = data['empUserID']
         elif data['userCategory'] == "doctor":
-            targetID = data['docUserID'] 
+            targetID = data['docUserID']
 
     if(verifyToken(userID, token)):
         response = execution.addScheduleRange(
@@ -177,11 +177,15 @@ def addScheduleRange(request):
 def getAppointmentData(request):
     body = request.body.decode('utf-8')
     data = json.loads(body)
-    
-    if 'appointment-serial' in data:
-        appntSerial = data['appointment-serial']
-    
-    response = execution.getAppntWithSl(appntSerial)
+    diagnosisID = None
+    if 'diagnosis-id' in data:
+        diagnosisID = data['diagnosis-id']
+
+    print(diagnosisID)
+    if diagnosisID == None:
+        response = {'success': False, 'errorMessage': 'Invalid request'}
+    else:
+        response = execution.getAppntWithSl(diagnosisID)
     if response == None:
         response = {'success': False, 'errorMessage': 'Invalid request'}
     return Response(response)
@@ -196,7 +200,7 @@ def getDocListDept(request):
         docID = data['docID']
     if 'date' in data:
         searchDate = data['date']
-    response = execution.getFreeDocOnDate(docID, searchDate) 
+    response = execution.getFreeDocOnDate(docID, searchDate)
     if response['docData'] == []:
         response = {'success': False, 'alertMessage': "Not Okay"}
     return Response(response)
@@ -214,7 +218,8 @@ def getRoomList(request):
         timeID = data['time']
     response = execution.getRoomList(searchDate, roomType, timeID)
     if response['roomData'] == []:
-        response = {'success': False, 'alertMessage': "No Room Available For This Date On That Time"}
+        response = {'success': False,
+                    'alertMessage': "No Room Available For This Date On That Time"}
     return Response(response)
 
 
@@ -236,10 +241,13 @@ def addSurSchedule(request):
         duration = data['duration']
     if 'patient_id' in data:
         patient_id = data['patient_id']
-    # print(inchargeDocID, room_no, appnt_serial_no, timeID, selectedDate, duration, patient_id)
+    if 'surgery_result_id' in data:
+        surgery_result_id = data['surgery_result_id']
+    print(inchargeDocID, room_no, appnt_serial_no, timeID,
+          selectedDate, duration, patient_id, surgery_result_id)
 
-    response = execution.addSurSchedule(appnt_serial_no, inchargeDocID, patient_id, 
-                                        room_no, timeID, duration, selectedDate)
+    response = execution.addSurSchedule(appnt_serial_no, inchargeDocID, patient_id,
+                                        room_no, timeID, duration, selectedDate, surgery_result_id)
     # response = {'success':False}
     return Response(response)
 
@@ -284,7 +292,6 @@ def getUserdetails(request):
     userID = data['userID']
     return Response(execution.getUserDetails(userID))
 
-
 @api_view(['POST'])
 def getBlockForCats(request):
     body = request.body.decode('utf-8')
@@ -300,3 +307,4 @@ def addIncharge(request):
     block_id = data['block_id']
     inChargeUserID = data['inChargeID']
     return Response(execution.addIncharge(block_id, inChargeUserID))
+

@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, { useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -43,33 +43,33 @@ export default function AddSurSchedule(props) {
 
 
     useEffect(() => {
-        
+
         let docListTemp = null;
         setDocList([]);
         setDocID("");
         if (props.ScheduleSurgeryTable.docData !== null) {
-            
+
             docListTemp = props.ScheduleSurgeryTable.docData.map((block) => {
                 //console.log(block.block);
                 return (<MenuItem value={block.id}>{block.name}</MenuItem>)
             });
         }
-        
+
         setDocList(docListTemp);
     }, [props.ScheduleSurgeryTable.docData]);
 
     useEffect(() => {
-        
+
         let roomListTemp = null;
         setRoomList([]);
         setRoom("");
         if (props.ScheduleSurgeryTable.roomData !== null) {
-            
+
             roomListTemp = props.ScheduleSurgeryTable.roomData.map((block) => {
-            return (<MenuItem value={block.room_no}>{block.room_no}-{block.room_name}</MenuItem>)
+                return (<MenuItem value={block.room_no}>{block.room_no}-{block.room_name}</MenuItem>)
             });
         }
-        
+
         setRoomList(roomListTemp);
     }, [props.ScheduleSurgeryTable.roomData]);
 
@@ -98,25 +98,30 @@ export default function AddSurSchedule(props) {
             let month = selectedDate.getMonth() + 1;
             let dateString = selectedDate.getDate().toString() + '/' + month.toString() + '/' + selectedDate.getFullYear().toString()
             props.fetchDocList(dateString);
-        }  
+        }
     };
 
     const handleSubmit = () => {
 
-        if (time === ''|| room === "") {
+        if (time === '' || room === "") {
             alert('Please fill all the boxes properly');
         }
         else {
-            
+
+            // if (docID === '') {
+            //     setDocID(props.ScheduleSurgeryTable.appntDocData.id);
+            // }
             let month = selectedDate.getMonth() + 1;
             let dateString = selectedDate.getDate().toString() + '/' + month.toString() + '/' + selectedDate.getFullYear().toString()
+
             if (docID === "") {
+
                 props.handleAddSchedule(time, dateString, props.ScheduleSurgeryTable.appntDocData.id, room);
             }
             else {
                 props.handleAddSchedule(time, dateString, docID, room);
             }
-            
+
         }
     }
 
@@ -161,58 +166,58 @@ export default function AddSurSchedule(props) {
                                 <MenuItem value="10">
                                     <em>Operation Theatre(N) 21:00 - 23:00</em>
                                 </MenuItem>
-                                
+
                             </Select>
                         </FormControl>
                     </div>
                     {
-                        (props.docSelectionOpt1 === false)?
-                        (<div>
-                            <FormControl className={classes.formControl}>
-                            <InputLabel shrink id="demo-simple-select-placeholder-label-label">
-                                Select Doctor
-                            </InputLabel>
-                            <Select
-                                labelId="demo-simple-select-placeholder-label-label"
-                                id="demo-simple-select-placeholder-label"
-                                value={docID}
-                                onChange={handleSelectDoc}
-                                displayEmpty
-                                className={classes.selectEmpty}
-                            >
-                                <MenuItem value="">
-                                    <em>None</em>
-                                </MenuItem>
-                                {docList}
-                            </Select>
-                        </FormControl>
-                        </div>):null
+                        (props.docSelectionOpt1 === false) ?
+                            (<div>
+                                <FormControl className={classes.formControl}>
+                                    <InputLabel shrink id="demo-simple-select-placeholder-label-label">
+                                        Select Doctor
+                                    </InputLabel>
+                                    <Select
+                                        labelId="demo-simple-select-placeholder-label-label"
+                                        id="demo-simple-select-placeholder-label"
+                                        value={docID}
+                                        onChange={handleSelectDoc}
+                                        displayEmpty
+                                        className={classes.selectEmpty}
+                                    >
+                                        <MenuItem value="">
+                                            <em>None</em>
+                                        </MenuItem>
+                                        {docList}
+                                    </Select>
+                                </FormControl>
+                            </div>) : null
                     }
 
                     {
                         (time !== '') &&
                         <div>
                             <FormControl className={classes.formControl}>
-                            <InputLabel shrink id="demo-simple-select-placeholder-label-label">
-                                Select Room
+                                <InputLabel shrink id="demo-simple-select-placeholder-label-label">
+                                    Select Room
                             </InputLabel>
-                            <Select
-                                labelId="demo-simple-select-placeholder-label-label"
-                                id="demo-simple-select-placeholder-label"
-                                value={room}
-                                onChange={handleSelectRoom}
-                                displayEmpty
-                                className={classes.selectEmpty}
-                            >
-                                <MenuItem value="">
-                                    <em>None</em>
-                                </MenuItem>
-                                {roomList}
-                            </Select>
-                        </FormControl>
+                                <Select
+                                    labelId="demo-simple-select-placeholder-label-label"
+                                    id="demo-simple-select-placeholder-label"
+                                    value={room}
+                                    onChange={handleSelectRoom}
+                                    displayEmpty
+                                    className={classes.selectEmpty}
+                                >
+                                    <MenuItem value="">
+                                        <em>None</em>
+                                    </MenuItem>
+                                    {roomList}
+                                </Select>
+                            </FormControl>
                         </div>
                     }
-                    
+
 
 
                 </Grid>

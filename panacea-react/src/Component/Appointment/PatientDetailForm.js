@@ -364,12 +364,12 @@ export default function PatientDetailForm(props) {
                         </Grid>
                     </MuiPickersUtilsProvider>
 
-                    {/* <Grid item xs={12}>
+                    <Grid item xs={12}>
                         <FormControlLabel
                             control={<Checkbox color="secondary" name="patientBeforeCheck" value="yes" onClick={handleCheck} />}
                             label="Has been a patient before"
                         />
-                    </Grid> */}
+                    </Grid>
                 </Grid>
             </React.Fragment>
         );

@@ -16,6 +16,8 @@ import { Redirect } from 'react-router-dom';
 import { Form } from 'react-redux-form';
 import AddSurSchedule from './AddSurSchedule'
 import { TextField, Button, CardContent, Card } from '@material-ui/core';
+import CopyRight from '../../Copyright';
+import { baseUrl } from '../../../Redux/ActionCreator';
 
 
 const drawerWidth = 240;
@@ -27,7 +29,7 @@ const styles = (theme) => ({
     button: {
         '& > *': {
             margin: theme.spacing(3),
-          },
+        },
     },
     appBar: {
         zIndex: theme.zIndex.drawer + 1,
@@ -71,9 +73,10 @@ class ReceptionistSurSchedule extends Component {
             docID: null,
             date: null,
             docSelectionOpt1: null,
+            redirect: false,
         };
 
-        this.Copyright = this.Copyright.bind(this);
+        //this.Copyright = this.Copyright.bind(this);
         this.renderReceptionistSurSchedule = this.renderReceptionistSurSchedule.bind(this);
         this.handleAppntSlSubmit = this.handleAppntSlSubmit.bind(this);
         this.setAppntSlNo = this.setAppntSlNo.bind(this);
@@ -81,43 +84,54 @@ class ReceptionistSurSchedule extends Component {
         this.setDocPrev = this.setDocPrev.bind(this);
         this.setDocNew = this.setDocNew.bind(this);
         this.fetchRoomList = this.fetchRoomList.bind(this);
+        this.addSurgerySchedule = this.addSurgerySchedule.bind(this);
     }
 
-    Copyright() {
-        return (
-            <Typography variant="body2" color="textSecondary" align="center">
-                {'Copyright © '}
-                <Link color="inherit" href="https://sadatshahriyar.pythonanywhere.com/">
-                    Sadat Shahriyar
-                </Link>{' '}
-                {new Date().getFullYear()}
-                {'.'}
-            </Typography>
-        );
-    }
+    // Copyright() {
+    //     return (
+    //         <Typography variant="body2" color="textSecondary" align="center">
+    //             {'Copyright © '}
+    //             <Link color="inherit" href="https://sadatshahriyar.pythonanywhere.com/">
+    //                 Sadat Shahriyar
+    //             </Link>{' '}
+    //             {new Date().getFullYear()}
+    //             {'.'}
+    //         </Typography>
+    //     );
+    // }
 
     setAppntSlNo(appnt_sl_no) {
         this.setState({ appnt_sl_no: appnt_sl_no });
     }
 
     setDocPrev() {
-        this.setState({docID: this.props.ScheduleSurgeryTable.appntDocData.id});
-        this.setState({docSelectionOpt1: true});
+        this.setState({ docID: this.props.ScheduleSurgeryTable.appntDocData.id });
+        this.setState({ docSelectionOpt1: true });
     }
 
     setDocNew() {
-        
-        this.setState({docSelectionOpt1: false});
+
+        this.setState({ docSelectionOpt1: false });
     }
 
     fetchDocList(date) {
-        this.props.loadDocDeptData({'docID': this.props.ScheduleSurgeryTable.appntDocData.id,
-                                    'date': date});
+        this.props.loadDocDeptData({
+            'docID': this.props.ScheduleSurgeryTable.appntDocData.id,
+            'date': date
+        });
+    }
+
+    componentDidMount() {
+        let creds = JSON.parse(this.props.User.creds);
+        this.props.loadAppointmentData({
+            'userID': creds.userId, 'token': this.props.User.token,
+            'diagnosis-id': this.props.diagnosisID
+        })
     }
 
     fetchRoomList(date, time) {
         console.log(date, time);
-        this.props.loadRoomData({'date': date, 'time': time, 'type': "surgery"});
+        this.props.loadRoomData({ 'date': date, 'time': time, 'type': "surgery" });
     }
 
     handleAppntSlSubmit() {
@@ -126,24 +140,80 @@ class ReceptionistSurSchedule extends Component {
         }
         else {
             let creds = JSON.parse(this.props.User.creds);
-            this.props.loadAppointmentData({ 'userID': creds.userId, 'token': this.props.User.token, 
-                                        'appointment-serial': this.state.appnt_sl_no })
+            this.props.loadAppointmentData({
+                'userID': creds.userId, 'token': this.props.User.token,
+                'appointment-serial': this.state.appnt_sl_no
+            })
         }
+    }
+
+    addSurgerySchedule(body) {
+        fetch(baseUrl + 'schedule/add-sur-schedule/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(body)
+        })
+            .then((response) => {
+                if (response.ok) {
+                    return response;
+                }
+                else {
+                    let err = new Error('Error ' + response.status + ': ' + response.statusText);
+                    err.response = response;
+                    throw err;
+                }
+            })
+            .then((response) => response.json())
+            .then((response) => {
+                if (response.success !== true) {
+                    alert(response.errorMessage);
+                }
+                else if (response.success) {
+                    alert(response.message);
+                    this.setState({ redirect: true })
+                }
+                else {
+                    let err = new Error(response.errorMessage);
+                    err.response = response;
+                    throw err;
+                }
+            })
+            .catch((err) => {
+                alert(err.message);
+                //dispatch(scheduleFailure(err.message));
+            });
     }
 
 
     handleAddSchedule(timeID, dateString, docID, room_no) {
         let creds = JSON.parse(this.props.User.creds);
-        this.props.addSurgerySchedule({ 'userID': creds.userId, 'token': this.props.User.token, 
-                                'inchargeDocID': docID, 'room_no': room_no, 'appnt_serial_no': this.state.appnt_sl_no, 
-                                'timeID': timeID, 'selectedDate': dateString, 'duration': 2,
-                                'patient_id': this.props.ScheduleSurgeryTable.patientData.id  })
+        console.log(docID);
+        // this.props.addSurgerySchedule({
+        //     'userID': creds.userId, 'token': this.props.User.token,
+        //     'inchargeDocID': docID, 'room_no': room_no, 'appnt_serial_no': this.props.ScheduleSurgeryTable.app_sl_no,
+        //     'timeID': timeID, 'selectedDate': dateString, 'duration': 2,
+        //     'patient_id': this.props.ScheduleSurgeryTable.patientData.id,
+        //     'surgery_result_id': this.props.surgery_result_id
+        // })
+
+        this.addSurgerySchedule({
+            'userID': creds.userId, 'token': this.props.User.token,
+            'inchargeDocID': docID, 'room_no': room_no, 'appnt_serial_no': this.props.ScheduleSurgeryTable.app_sl_no,
+            'timeID': timeID, 'selectedDate': dateString, 'duration': 2,
+            'patient_id': this.props.ScheduleSurgeryTable.patientData.id,
+            'surgery_result_id': this.props.surgery_result_id
+        })
     }
 
     renderReceptionistSurSchedule() {
         const { classes } = this.props;
-        const copyRight = this.Copyright();
+        //const copyRight = this.Copyright();
         if (this.props.User.isAuthenticated && this.props.User.category === 'RECEPTIONIST') {
+            if (this.state.redirect) {
+                return (<Redirect to={`/receptionist/approve-service/${this.props.diagnosisID}`} />);
+            }
             return (
                 <div className={classes.root}>
                     <CssBaseline />
@@ -172,10 +242,10 @@ class ReceptionistSurSchedule extends Component {
                         <Toolbar />
                         <div />
                         <Container maxWidth="lg" >
-                            <Typography variant="h5">
+                            {/* <Typography variant="h5">
                                 Reference Appointment Serial Number:
-                            </Typography>
-                            <Form model='AdminScheduleUserID' onSubmit={() => this.handleAppntSlSubmit()}>
+                            </Typography> */}
+                            {/* <Form model='AdminScheduleUserID' onSubmit={() => this.handleAppntSlSubmit()}>
                                 <TextField
                                     variant="outlined"
                                     margin="normal"
@@ -197,7 +267,7 @@ class ReceptionistSurSchedule extends Component {
                                 >
                                     View Appointment
                                 </Button>
-                            </Form>
+                            </Form> */}
 
                             {this.props.ScheduleSurgeryTable.patientData !== null ?
                                 <Card style={{ marginBottom: 20 }}>
@@ -224,25 +294,27 @@ class ReceptionistSurSchedule extends Component {
 
                             {this.props.ScheduleSurgeryTable.appntDocData !== null ?
                                 <div className={classes.button}>
-                                    <Button variant="outlined" color="primary" onClick={() => this.setDocPrev()}>Select Appointment Doctor in Charge of Surgery</Button>
-                                    <Button variant="outlined" color="primary" onClick={() => this.setDocNew()}>Assign New Doctor For Surgery</Button>
-                                </div> :null
+                                    <Button variant="outlined" color="primary" onClick={() => this.setDocPrev()}>Select schedule</Button>
+
+                                    {/* <Button variant="outlined" color="primary" onClick={() => this.setDocPrev()}>Select Appointment Doctor in Charge of Surgery</Button> */}
+                                    {/* <Button variant="outlined" color="primary" onClick={() => this.setDocNew()}>Assign New Doctor For Surgery</Button> */}
+                                </div> : null
                             }
 
-                            { (this.state.docSelectionOpt1 !== null) && 
+                            {(this.state.docSelectionOpt1 !== null) &&
                                 <Card style={{ padding: 20 }}>
                                     <AddSurSchedule
-                                        docSelectionOpt1 = {this.state.docSelectionOpt1}
-                                        fetchDocList = {(date)=>this.fetchDocList(date)}
-                                        fetchRoomList = {(date, time) => this.fetchRoomList(date, time)}
-                                        handleAddSchedule = {(timeID, dateString, docID, room_no) => this.handleAddSchedule(timeID, dateString, docID, room_no)}
-                                        ScheduleSurgeryTable = {this.props.ScheduleSurgeryTable}
+                                        docSelectionOpt1={this.state.docSelectionOpt1}
+                                        fetchDocList={(date) => this.fetchDocList(date)}
+                                        fetchRoomList={(date, time) => this.fetchRoomList(date, time)}
+                                        handleAddSchedule={(timeID, dateString, docID, room_no) => this.handleAddSchedule(timeID, dateString, docID, room_no)}
+                                        ScheduleSurgeryTable={this.props.ScheduleSurgeryTable}
                                     />
                                 </Card>
                             }
 
                             <Box pt={4}>
-                                {copyRight}
+                                <CopyRight />
                             </Box>
                         </Container>
                     </main>
