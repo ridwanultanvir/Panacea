@@ -361,12 +361,12 @@ def updateTestResult(data):
     print(data)
     try:
         query = '''
-        UPDATE TEST_RESULTS SET SAMPLE_NO = :sample_no, TEST_DATE = TO_DATE(:test_date,'DD-MM-YYYY'), RESULT = :result, COMPLETED = 'T'
+        UPDATE TEST_RESULTS SET SAMPLE_NO = :sample_no, TEST_DATE = TO_DATE(:test_date,'DD-MM-YYYY'), RESULT = :result, COMPLETED = 'T', STATUS = :status
         WHERE TEST_RESULT_ID = :test_result_id
         '''
 
         cursor.execute(query, [data['sample_no'], data['date'],
-                               f"{data['test_result']}", data['test_result_id']])
+                               data['test_result'],  data['status'], data['test_result_id']])
         connection.commit()
 
         response = {'success': True, 'errorMessage': ''}
