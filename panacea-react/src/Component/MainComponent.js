@@ -53,6 +53,8 @@ import TechnicianHome from './Technician/Homepage/TechnicianHome';
 import PendingTests from './Technician/PendingTests/PendingTests';
 import TestResult from './Technician/PendingTests/TestResult';
 import UpcomingAppointment from './Patient/Homepage/UpcomingAppointment';
+import Notification from './Patient/Notification/Notification';
+import NotificationDoctor from './Doctor/Notification/Notification';
 
 const mapStateToProps = (state) => {
     return {
@@ -268,7 +270,7 @@ class Main extends Component {
                     </Route>
                     <Route path="/doctor/appointment/:app_sl_no" component={this.renderDoctorDiagnosisPage} />
                     <Route path="/patient/home">
-                        <PatientHome 
+                        <PatientHome
                             User={this.props.User}
                         />
                     </Route>
@@ -283,14 +285,25 @@ class Main extends Component {
                             User={this.props.User}
                         />
                     </Route>
-                    
+
                     <Route path="/patient/test-results">
                         <PatientHome
                             User={this.props.User}
                         />
                     </Route>
+
+                    <Route path="/patient/notification">
+                        <Notification
+                            User={this.props.User}
+                        />
+                    </Route>
                     <Route exact path='/doctor/surgery'>
                         <DoctorSurgery
+                            User={this.props.User}
+                        />
+                    </Route>
+                    <Route path="/doctor/notification">
+                        <NotificationDoctor
                             User={this.props.User}
                         />
                     </Route>

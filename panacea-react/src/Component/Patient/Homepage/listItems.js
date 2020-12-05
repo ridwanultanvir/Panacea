@@ -8,7 +8,7 @@ import PeopleIcon from '@material-ui/icons/People';
 import AirlineSeatFlatIcon from '@material-ui/icons/AirlineSeatFlat';
 import LayersIcon from '@material-ui/icons/Layers';
 import { Link } from 'react-router-dom';
-import { } from '@material-ui/icons';
+import { NotificationImportant } from '@material-ui/icons';
 
 export const mainListItems = (
     <div>
@@ -28,7 +28,7 @@ export const mainListItems = (
                 <ListItemText primary="Upcoming Appointments" />
             </ListItem>
         </Link>
-        
+
         <Link to="/patient/next-surgery" style={{ textDecoration: 'none', color: 'black' }}>
             <ListItem button>
                 <ListItemIcon>
@@ -43,6 +43,14 @@ export const mainListItems = (
                     <LayersIcon />
                 </ListItemIcon>
                 <ListItemText primary="Test Results" />
+            </ListItem>
+        </Link>
+        <Link to="/patient/notification" style={{ textDecoration: 'none', color: 'black' }}>
+            <ListItem button>
+                <ListItemIcon>
+                    <NotificationImportant />
+                </ListItemIcon>
+                <ListItemText primary="Notifications" />
             </ListItem>
         </Link>
     </div>

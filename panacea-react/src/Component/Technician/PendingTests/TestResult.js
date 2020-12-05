@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import {
     withStyles, AppBar, Drawer, Toolbar, List, Divider, TextField,
-    CssBaseline, Typography, Card, Container, Grid, Box, Link, Button
+    CssBaseline, Typography, Card, Container, Grid, Box, Link, Button,
+    FormControl, NativeSelect, InputLabel
 } from '@material-ui/core';
 import { mainListItems, secondaryListItems } from '../Homepage/listItems';
 import { Redirect } from 'react-router-dom';
@@ -61,12 +62,15 @@ class TestResult extends Component {
             date: new Date(),
             sampleNo: null,
             testResult: null,
-            redirect: false
+            redirect: false,
+            status: 'NORMAL'
         }
 
         this.renderTestResult = this.renderTestResult.bind(this);
         this.handleDateChange = this.handleDateChange.bind(this);
         this.handleSubmission = this.handleSubmission.bind(this);
+
+        this.selectInput = React.createRef()
     }
 
     handleDateChange(date) {
@@ -82,6 +86,7 @@ class TestResult extends Component {
             let body = {
                 'userID': creds.userId, 'token': this.props.User.token, 'test_result_id': this.props.test_result_id,
                 'sample_no': this.state.sampleNo, 'test_result': this.state.testResult,
+                'status': this.state.status,
                 'date': this.state.date.getDate().toString() + '-' + this.state.date.getMonth().toString() + '-' + this.state.date.getFullYear().toString()
 
             };
@@ -173,9 +178,27 @@ class TestResult extends Component {
                                                 required
                                                 id="standard-basic"
                                                 label="Sample no"
-                                                style={{ width: 350 }}
+                                                style={{ width: 230 }}
                                                 onChange={(event) => { this.setState({ sampleNo: event.target.value }) }}
                                             />
+                                            <FormControl style={{ width: 230, marginLeft: 10 }}>
+                                                <InputLabel shrink id="demo-simple-select-placeholder-label-label">
+                                                    Status
+                                                </InputLabel>
+                                                <NativeSelect
+                                                    inputRef={this.selectInput}
+                                                    defaultValue={'NORMAL'}
+                                                    inputProps={{
+                                                        name: 'name',
+                                                        id: 'uncontrolled-native',
+                                                    }}
+                                                    onChange={(event) => { this.setState({ status: event.target.value }) }}
+
+                                                >
+                                                    <option value={'NORMAL'}>Normal</option>
+                                                    <option value={'CRITICAL'}>Critical</option>
+                                                </NativeSelect>
+                                            </FormControl>
                                             <MuiPickersUtilsProvider utils={DateFnsUtils}>
                                                 <KeyboardDatePicker
                                                     required
@@ -187,7 +210,7 @@ class TestResult extends Component {
                                                     KeyboardButtonProps={{
                                                         'aria-label': 'change date',
                                                     }}
-                                                    style={{ width: 350, marginLeft: 20 }}
+                                                    style={{ width: 230, marginLeft: 10 }}
                                                 />
                                             </MuiPickersUtilsProvider>
 

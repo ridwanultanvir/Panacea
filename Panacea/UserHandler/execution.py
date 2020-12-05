@@ -3,6 +3,7 @@ import cx_Oracle
 import hashlib
 
 from django.http import response
+from django.shortcuts import resolve_url
 
 
 def connect(user_n='PANACEA', pass_n='panacea', host='localhost', port='1521', service_n='ORCL'):
@@ -390,3 +391,66 @@ def adminAddUser(data):
             response = {'success': False, 'errorMessage': errorObj.message}
             print(response)
             return response
+
+
+def getNotification(data):
+    connection = connect()
+    cursor = connection.cursor()
+    response = {}
+
+    try:
+        query = '''
+        SELECT * FROM NOTIFICATION
+        WHERE USER_ID = (SELECT ID FROM PERSON WHERE USER_ID = :userID)
+        ORDER BY NOTIFICATION_ID DESC
+        '''
+
+        cursor.execute(query, [data['userID']])
+        result = cursor.fetchall()
+
+        notifications = []
+
+        for notification in result:
+            notifications.append({'notification_id': notification[0], 'user_id': notification[1], 'status': notification[2],
+                                  'message': notification[3]})
+        response['notifications'] = notifications
+        response['success'] = True
+        response['errorMessage'] = ''
+
+        return response
+
+    except cx_Oracle.Error as error:
+        errorObj, = error.args
+        response = {'success': False, 'errorMessage': errorObj.message}
+        print(response)
+        return response
+
+
+def markNotificationAsRead(data):
+    connection = connect()
+    cursor = connection.cursor()
+    response = {}
+
+    try:
+        if data['allmarked']:
+            query = '''
+            UPDATE NOTIFICATION SET STATUS = 'R'
+            WHERE USER_ID = (SELECT ID FROM PERSON WHERE USER_ID = :userID)
+            '''
+
+            cursor.execute(query, [data['userID']])
+            connection.commit()
+        else:
+            query = '''
+            UPDATE NOTIFICATION SET STATUS = 'R'
+            WHERE NOTIFICATION_ID = :notification_id
+            '''
+            cursor.execute(query, [data['notification_id']])
+            connection.commit()
+
+        return getNotification(data)
+    except cx_Oracle.Error as error:
+        errorObj, = error.args
+        response = {'success': False, 'errorMessage': errorObj.message}
+        print(response)
+        return response
