@@ -20,4 +20,6 @@ urlpatterns = [
     path('user-details/', views.getUserdetails, name='getUserdetails'),
     path('block-ids-per-category/', views.getBlockForCats, name='getBlockForCats'),
     path('add-incharge/', views.addIncharge, name='addIncharge'),
+    path('get-schedule-for-employee/', views.scheduleHistory, name='scheduleHistory'),
+    path('schedule-on-date/', views.scheduleOnDate, name='scheduleOnDate'),
 ]

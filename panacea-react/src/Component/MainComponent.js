@@ -53,6 +53,8 @@ import TechnicianHome from './Technician/Homepage/TechnicianHome';
 import PendingTests from './Technician/PendingTests/PendingTests';
 import TestResult from './Technician/PendingTests/TestResult';
 import UpcomingAppointment from './Patient/Homepage/UpcomingAppointment';
+import DataExtractor from './Admin/DataExtractor/DataExtractor';
+import DataExtractorInput from './Admin/DataExtractor/DataExtractorInput';
 
 const mapStateToProps = (state) => {
     return {
@@ -99,6 +101,7 @@ class Main extends Component {
     constructor(props) {
         super(props);
         this.renderDoctorDiagnosisPage = this.renderDoctorDiagnosisPage.bind(this);
+        this.renderDataExtractorInput = this.renderDataExtractorInput.bind(this);
         this.renderReceptionistServicesPage = this.renderReceptionistServicesPage.bind(this);
         this.renderTechnicianTestResultPage = this.renderTechnicianTestResultPage.bind(this);
         this.renderDoctorSurgeryResultPage = this.renderDoctorSurgeryResultPage.bind(this);
@@ -116,6 +119,17 @@ class Main extends Component {
                 app_sl_no={app_sl_no}
             />
         );
+    }
+
+    renderDataExtractorInput({match}) {
+        let serial = match.params.serial;
+        //console.log(serial);
+        return (
+            <DataExtractorInput
+                User={this.props.User}
+                serial={serial}
+            /> 
+        )
     }
 
     renderReceptionistServicesPage({ match }) {
@@ -247,6 +261,13 @@ class Main extends Component {
                             User={this.props.User}
                         />
                     </Route>
+                    <Route path='/admin/data-extractor'>
+                        <DataExtractor
+                            User={this.props.User}
+
+                        />
+                    </Route>
+                    <Route path="/admin/in-data-for-extraction/:serial" component={this.renderDataExtractorInput}/>
                     <Route path="/doctor/home">
                         <DoctorHome
                             User={this.props.User}

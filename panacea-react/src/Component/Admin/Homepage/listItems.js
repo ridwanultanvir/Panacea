@@ -6,9 +6,11 @@ import ListSubheader from '@material-ui/core/ListSubheader';
 import DashboardIcon from '@material-ui/icons/Dashboard';
 import ShoppingCartIcon from '@material-ui/icons/ShoppingCart';
 import PeopleIcon from '@material-ui/icons/People';
-import BarChartIcon from '@material-ui/icons/BarChart';
-import LayersIcon from '@material-ui/icons/Layers';
-import AssignmentIcon from '@material-ui/icons/Assignment';
+import ListAltIcon from '@material-ui/icons/ListAlt';
+import NoteAddIcon from '@material-ui/icons/NoteAdd';
+// import BarChartIcon from '@material-ui/icons/BarChart';
+// import LayersIcon from '@material-ui/icons/Layers';
+// import AssignmentIcon from '@material-ui/icons/Assignment';
 import { Link } from 'react-router-dom';
 
 export const mainListItems = (
@@ -40,9 +42,17 @@ export const mainListItems = (
         <Link to='/admin/add-user' style={{ textDecoration: 'none', color: 'black' }}>
             <ListItem button>
                 <ListItemIcon>
-                    <ShoppingCartIcon />
+                    <NoteAddIcon />
                 </ListItemIcon>
                 <ListItemText primary="Add user" />
+            </ListItem>
+        </Link>
+        <Link to='/admin/data-extractor' style={{ textDecoration: 'none', color: 'black' }}>
+            <ListItem button>
+                <ListItemIcon>
+                    <ListAltIcon />
+                </ListItemIcon>
+                <ListItemText primary="Data Extractor" />
             </ListItem>
         </Link>
         {/* <ListItem button>

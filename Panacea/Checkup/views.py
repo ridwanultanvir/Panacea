@@ -226,3 +226,24 @@ def getDiagnosisHistory(request):
                     'scheduleData': None, 'docData': None}
 
     return Response(response)
+
+
+@api_view(['POST'])
+def getTestUnderDoc(request):
+    body = request.body.decode('utf-8')
+    data = json.loads(body)
+
+    userID = None
+    token = None
+
+    if 'userID' in data:
+        userID = data['userID']
+    if 'token' in data:
+        token = data['token']
+    if 'docID' in data:
+        docID = data['docID']
+    if(verifyToken(userID, token)):
+        return Response(execution.getAllTestsUnderDoc(docID))
+    else:
+        return Response({'success': False, 'alertMessage': 'Verification Failed',
+                    'scheduleData': None, 'docData': None})

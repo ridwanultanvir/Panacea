@@ -17,4 +17,7 @@ urlpatterns = [
           name='getAllDocAppointments'),
      path('get-patient-all-appnt/', views.getAllPatientAppointment, name='getAllPatientAppointment'),
      path('get-next-patient-appnt/', views.getNextAppnt, name='getNextAppnt'),
+     path('get-appnt-for-patient/', views.getAppntPatient, name='getAppntPatient'),
+     path('get-appnt-under-doc/', views.getAppntUnderDoc, name='getAppntUnderDoc'),
+
 ]

@@ -602,3 +602,34 @@ def getDiagnosisHistory(data):
             response = {'success': False, 'errorMessage': errorObj.message}
             print(response)
             return response
+
+
+def getAllTestsUnderDoc(docID):
+    connection = connect()
+    cursor = connection.cursor()
+
+    response = {}
+    query = '''SELECT * FROM TABLE(RETURN_DOC_ALL_TEST_TABLE((:docID)))'''
+
+    try:
+        cursor.execute(query, [docID])
+        resultTemp = cursor.fetchall()
+        cursor.close()
+
+        headers = [["Test Result ID", "Patient Name", "Appointment Serial No", "Service Name", 
+                    "Test Completed On", "Test Result", "Completion Status"]]
+        result = []
+        for R in resultTemp:
+            result_row = []
+            for elements in R:
+                result_row.append(elements)
+            result.append(result_row)
+        
+        response['tableData'] = result
+        response['tableHeader'] = headers
+        response['success'] = True
+        return response
+    except cx_Oracle.Error as error:
+        errorObj, = error.args
+        response = {'success': False, 'alertMessage': errorObj.message}
+        return response

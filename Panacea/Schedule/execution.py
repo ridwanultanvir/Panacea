@@ -569,3 +569,75 @@ def addIncharge(block_id, inChargeUserID):
         }
         return result
 
+
+def scheduleHisEmp(employeeID):
+    connection = connect()
+    cursor = connection.cursor()
+
+    response = {}
+    query = '''SELECT TO_CHAR(SCH.SCHEDULE_DATE, 'DD/MM/YYYY') AS WORKING_DAY, T.SHIFT_TITLE AS CATEGORY, 
+                T.START_TIME, T.END_TIME, B.CATEGORY AS WARD
+                FROM SCHEDULE SCH JOIN TIME_TABLE T ON (SCH.TIME_ID = T.TIME_ID 
+                AND SCH.ID = (SELECT ID FROM PERSON WHERE USER_ID = (:employeeID))
+                AND SCH.SCHEDULE_DATE<SYSDATE)
+                JOIN BLOCK B ON B.BLOCK_ID =SCH.BLOCK_ID
+                ORDER BY SCH.SCHEDULE_DATE DESC'''
+
+    try:
+        cursor.execute(query, [employeeID])
+        resultTemp = cursor.fetchall()
+        cursor.close()
+
+        headers = [["Working Date", "Time Shift", "Start Time(24 H)", "End Time(24 H)", "Ward"]]
+        result = []
+        for R in resultTemp:
+            result_row = []
+            for elements in R:
+                result_row.append(elements)
+            result.append(result_row)
+        
+        response['tableData'] = result
+        response['tableHeader'] = headers
+        response['success'] = True
+        return response
+    except cx_Oracle.Error as error:
+        errorObj, = error.args
+        response = {'success': False, 'alertMessage': errorObj.message}
+        return response
+
+
+def scheduleOnWardDate(wardCategory, sch_on_date):
+    connection = connect()
+    cursor = connection.cursor()
+    response = {}
+    query = '''SELECT SCH.SCHEDULE_ID, (P.FIRST_NAME||' '||P.LAST_NAME) AS NAME, EMPLOYEE_TYPE(P.USER_ID) AS ROLE, 
+                (SELECT SHIFT_TITLE FROM TIME_TABLE WHERE TIME_ID = SCH.TIME_ID) AS SHIFT, SCH.BLOCK_ID
+                FROM PERSON P JOIN SCHEDULE SCH ON (
+                SCH.SCHEDULE_DATE = TO_DATE(:sch_on_date, 'DD/MM/YYYY') AND
+                P.ID = SCH.ID AND 
+                SCH.BLOCK_ID IN (SELECT BLOCK_ID FROM BLOCK WHERE CATEGORY=(:wardCategory)))
+                ORDER BY SCH.SCHEDULE_ID DESC'''
+
+    try:
+        # cursor.execute(query, [sch_on_date, wardCategory])
+        cursor.execute(query, [sch_on_date, wardCategory])
+        resultTemp = cursor.fetchall()
+        cursor.close()
+
+        headers = [["Schedule ID", "Name", "Category", "Shift", "Block ID"]]
+        result = []
+        for R in resultTemp:
+            result_row = []
+            for elements in R:
+                result_row.append(elements)
+            result.append(result_row)
+        
+        response['tableData'] = result
+        response['tableHeader'] = headers
+        response['success'] = True
+        return response
+    except cx_Oracle.Error as error:
+        errorObj, = error.args
+        print(error)
+        response = {'success': False, 'alertMessage': "Failed"}
+        return response

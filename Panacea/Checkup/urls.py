@@ -20,4 +20,5 @@ urlpatterns = [
          views.updateSurgeryResult, name='update-surgery-result'),
     path('doctor/get-diagnosis-history/',
          views.getDiagnosisHistory, name='getDIagnosisHistory'),
+     path('get-tests-under-doc/', views.getTestUnderDoc, name='getTestUnderDoc'),
 ]
