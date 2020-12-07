@@ -454,3 +454,85 @@ def markNotificationAsRead(data):
         response = {'success': False, 'errorMessage': errorObj.message}
         print(response)
         return response
+
+
+def updateUser(data):
+    connection = connect()
+    cursor = connection.cursor()
+    response = {}
+    try:
+        success = cursor.callfunc("UPDATE_USER", int, [data["userID"], data["first_name"], data["last_name"],
+                                                       data["email"], data["address"], data["phoneNumber"],
+                                                       data["doc_qualification"], data["pat_bio"], data["emp_education"],
+                                                       data["emp_training"]])
+
+        connection.commit()
+        userId = data["userID"]
+
+        if success == 1:
+            if userId[:3] == 'D21':
+                query = '''SELECT (P.FIRST_NAME || ' ' || P.LAST_NAME) AS NAME, P.EMAIL,P.PHONE_NUM, P.IMAGE, P.GENDER, P.ADDRESS, 
+                            P.DATE_OF_BIRTH, D.DEPARTMENT, D.DESIGNATION, D.QUALIFICATION
+                            FROM PERSON P JOIN DOCTOR D ON(P.ID = D.ID)
+                            WHERE P.USER_ID = :user_id
+                            '''
+                cursor.execute(query, [userId])
+                result = cursor.fetchone()
+                docInfo = {}
+                userInfo = getUserInfoDict(result)
+                docInfo.update(userInfo.copy())
+                docInfo['department'] = result[7]
+                docInfo['designation'] = result[8]
+                docInfo['qualification'] = result[9]
+
+                response['userData'] = docInfo
+                response['success'] = True
+                response['errorMessage'] = ''
+                return response
+
+            elif userId[:3] == 'E28':
+                query = '''SELECT (P.FIRST_NAME || ' ' || P.LAST_NAME) AS NAME, P.EMAIL,P.PHONE_NUM, P.IMAGE, P.GENDER, P.ADDRESS, 
+                            P.DATE_OF_BIRTH, E.CATEGORY, E.EDUCATION, E.TRAINING, E.SALARY
+                            FROM PERSON P JOIN EMPLOYEE E ON(P.ID = E.ID)
+                            WHERE P.USER_ID = :user_id
+                            '''
+                cursor.execute(query, [userId])
+                result = cursor.fetchone()
+                empInfo = {}
+                userInfo = getUserInfoDict(result)
+                empInfo.update(userInfo.copy())
+                empInfo['category'] = result[7]
+                empInfo['education'] = result[8]
+                empInfo['training'] = result[9]
+                empInfo['salary'] = result[10]
+
+                response['userData'] = empInfo
+                response['success'] = True
+                response['errorMessage'] = ''
+                return response
+
+            elif userId[:3] == 'P25':
+                query = '''SELECT (P.FIRST_NAME || ' ' || P.LAST_NAME) AS NAME, P.EMAIL,P.PHONE_NUM, P.IMAGE, P.GENDER, P.ADDRESS, 
+                            P.DATE_OF_BIRTH,PT.BIO
+                            FROM PERSON P JOIN PATIENT PT ON(P.ID = PT.ID)
+                            WHERE P.USER_ID = :user_id
+                            '''
+                cursor.execute(query, [userId])
+                result = cursor.fetchone()
+                patientInfo = {}
+                userInfo = getUserInfoDict(result)
+                patientInfo.update(userInfo.copy())
+                patientInfo['bio'] = result[7]
+
+                response['userData'] = patientInfo
+                response['success'] = True
+                response['errorMessage'] = ''
+                return response
+        elif success == 0:
+            return {'success': False, 'errorMessage': "Couldn't update your info"}
+
+    except cx_Oracle.Error as error:
+        errorObj, = error.args
+        response = {'success': False, 'errorMessage': errorObj.message}
+        print(response)
+        return response

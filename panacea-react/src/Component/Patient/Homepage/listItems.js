@@ -29,12 +29,12 @@ export const mainListItems = (
             </ListItem>
         </Link>
 
-        <Link to="/patient/next-surgery" style={{ textDecoration: 'none', color: 'black' }}>
+        <Link to="/patient/surgeries" style={{ textDecoration: 'none', color: 'black' }}>
             <ListItem button>
                 <ListItemIcon>
                     <AirlineSeatFlatIcon />
                 </ListItemIcon>
-                <ListItemText primary="Upcoming Surgery" />
+                <ListItemText primary="Surgeries" />
             </ListItem>
         </Link>
         <Link to="/patient/test-results" style={{ textDecoration: 'none', color: 'black' }}>

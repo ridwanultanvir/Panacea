@@ -44,7 +44,6 @@ export const loginUser = (creds) => (dispatch) => {
                 return response;
             }
             else {
-                console.log('ulala1')
                 let err = new Error('Error ' + response.status + ': ' + response.statusText);
                 err.response = response;
                 throw err;
@@ -54,7 +53,6 @@ export const loginUser = (creds) => (dispatch) => {
         .then((response) => {
             //alert(JSON.stringify(response));
             if (response.success) {
-                console.log('ulala2')
                 sessionStorage.setItem('token', response.token);
                 sessionStorage.setItem('userData', JSON.stringify(response.userData));
                 sessionStorage.setItem('userCategory', response.category);
@@ -67,12 +65,63 @@ export const loginUser = (creds) => (dispatch) => {
             }
         })
         .catch((err) => {
-            console.log('ulala3')
             alert(err.message);
             dispatch(userLoginFailure(err.message))
         });
 
     // alert(JSON.stringify(creds))
+}
+
+const updateUserSuccess = (userData) => {
+    return {
+        type: ActionTypes.UPDATE_USER_SUCCESS,
+        userData: userData,
+    }
+}
+
+const updateUserFailure = (message) => {
+    return {
+        type: ActionTypes.UPDATE_USER_FAILURE,
+        message: message
+    }
+}
+
+export const updateUser = (body) => (dispatch) => {
+    fetch(baseUrl + 'user/update-user/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body)
+    })
+        .then((response) => {
+            console.log(response);
+            if (response.ok) {
+                return response;
+            }
+            else {
+                let err = new Error('Error ' + response.status + ': ' + response.statusText);
+                err.response = response;
+                throw err;
+            }
+        })
+        .then((response) => response.json())
+        .then((response) => {
+            if (response.success) {
+                console.log(response);
+                sessionStorage.setItem('userData', JSON.stringify(response.userData));
+                dispatch(updateUserSuccess(response.userData))
+            }
+            else {
+                let err = new Error(response.errorMessage);
+                err.response = response;
+                throw err;
+            }
+        })
+        .catch((err) => {
+            dispatch(updateUserFailure(err.message));
+        });
+
 }
 
 const scheduleLoading = (userID) => {

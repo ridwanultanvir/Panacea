@@ -11,7 +11,7 @@ import LayersIcon from '@material-ui/icons/Layers';
 import AssignmentIcon from '@material-ui/icons/Assignment';
 import AirlineSeatFlatIcon from '@material-ui/icons/AirlineSeatFlat';
 import { Link } from 'react-router-dom';
-import { } from '@material-ui/icons';
+import { NotificationImportant } from '@material-ui/icons';
 
 export const mainListItems = (
     <div>
@@ -45,6 +45,14 @@ export const mainListItems = (
                     <BarChartIcon />
                 </ListItemIcon>
                 <ListItemText primary="Put In Charge" />
+            </ListItem>
+        </Link>
+        <Link to="/receptionist/notification" style={{ textDecoration: 'none', color: 'black' }}>
+            <ListItem button>
+                <ListItemIcon>
+                    <NotificationImportant />
+                </ListItemIcon>
+                <ListItemText primary="Notifications" />
             </ListItem>
         </Link>
         {/* <ListItem button>

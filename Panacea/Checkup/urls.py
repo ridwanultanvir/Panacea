@@ -20,4 +20,8 @@ urlpatterns = [
          views.updateSurgeryResult, name='update-surgery-result'),
     path('doctor/get-diagnosis-history/',
          views.getDiagnosisHistory, name='getDIagnosisHistory'),
+    path('patient/get-test-results/', views.getPatienttestResults,
+         name='getPatientTestResults'),
+    path('patient/get-patient-surgery-result/',
+         views.getPatientSurgeryResult, name='getPatientSurgeryResult')
 ]
