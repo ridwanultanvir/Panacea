@@ -1,10 +1,14 @@
 import React, { Component } from 'react';
 import { Redirect } from 'react-router-dom';
-import { withStyles, AppBar, Drawer, Toolbar, List, Divider, CssBaseline, Typography,
-         Card, Container, Grid, Box, Link } from '@material-ui/core';
+import {
+    withStyles, AppBar, Drawer, Toolbar, List, Divider, CssBaseline, Typography,
+    Card, Container, Grid, Box, Link
+} from '@material-ui/core';
 import { mainListItems, secondaryListItems } from './listItems';
 import CopyRight from '../../Copyright';
 import AppointmentDetailsTable from './AllAppntDataTable';
+import EditProfile from './EditProfile';
+
 const drawerWidth = 240;
 
 const styles = (theme) => ({
@@ -12,7 +16,7 @@ const styles = (theme) => ({
         display: 'flex',
         '& > *': {
             borderBottom: 'unset',
-          },
+        },
     },
     appBar: {
         zIndex: theme.zIndex.drawer + 1,
@@ -58,7 +62,7 @@ class PatientHome extends Component {
         this.handleAppntDataProcess = this.handleAppntDataProcess.bind(this);
     }
 
-    
+
     handlePatientAppntDataLoad(userID) {
         let body = {
             'userID': userID
@@ -72,7 +76,7 @@ class PatientHome extends Component {
             body: JSON.stringify(body)
         })
             .then((response) => {
-                
+
                 if (response.ok) {
                     return response;
                 }
@@ -88,7 +92,7 @@ class PatientHome extends Component {
                 if (response.success) {
                     //alert(response.alertMessage);
                     // console.log('data', response.appointment_data);
-                    this.setState({appointmentData: response.appointment_data})
+                    this.setState({ appointmentData: response.appointment_data })
                 }
                 else {
                     let err = new Error(response.errorMessage);
@@ -103,7 +107,7 @@ class PatientHome extends Component {
     }
 
 
-    handleAppntDataProcess(appointment_data){
+    handleAppntDataProcess(appointment_data) {
         //console.log(appointment_data);
     }
 
@@ -111,10 +115,10 @@ class PatientHome extends Component {
         let birthDay = new Date(dateString);
         var ageDifMs = Date.now() - birthDay.getTime();
         var ageDate = new Date(ageDifMs);
-        return Math.abs(ageDate.getUTCFullYear() - 1970); 
+        return Math.abs(ageDate.getUTCFullYear() - 1970);
     }
 
-    componentDidMount(){
+    componentDidMount() {
         let creds = JSON.parse(this.props.User.creds);
         let userData = JSON.parse(this.props.User.userData);
         this.handlePatientAppntDataLoad(creds.userId);
@@ -178,21 +182,27 @@ class PatientHome extends Component {
                                         <Typography variant='body1'>Phone number: {userData.phoneNum}</Typography>
                                         <Typography variant='body1'>Age: {this.calculateAge(userData.date_of_birth)} years </Typography>
                                         <Typography variant='body1'>Bio Data: {userData.bio}</Typography>
-                                        <Typography variant='body1'>Gender: {userData.gender === 'M'? "Male" : "Female"}</Typography>
+                                        <Typography variant='body1'>Gender: {userData.gender === 'M' ? "Male" : "Female"}</Typography>
                                     </Card>
+
+                                    <EditProfile
+                                        userData={userData}
+                                        User={this.props.User}
+                                        updateUser={this.props.updateUser}
+                                    />
                                 </Grid>
                             </Grid>
                             {(this.state.appointmentData !== null) &&
                                 <Grid container spacing={3}>
                                     <Grid item xs={12}>
                                         <Typography variant='h6'>Appointment History and Details</Typography>
-                                            <AppointmentDetailsTable
-                                                appointment_data = {this.state.appointmentData}
-                                            />
+                                        <AppointmentDetailsTable
+                                            appointment_data={this.state.appointmentData}
+                                        />
                                     </Grid>
                                 </Grid>
                             }
-                            
+
                             <Box pt={4}>
                                 {CopyRight}
                             </Box>

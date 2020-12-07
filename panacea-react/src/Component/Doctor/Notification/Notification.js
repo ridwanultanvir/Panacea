@@ -54,6 +54,7 @@ const styles = (theme) => ({
 });
 
 class NotificationDoctor extends Component {
+    timeOutId;
     constructor(props) {
         super(props);
 
@@ -66,6 +67,7 @@ class NotificationDoctor extends Component {
         this.fetchMarked = this.fetchMarked.bind(this);
         this.handleMarkread = this.handleMarkread.bind(this);
         this.fetchData = this.fetchData.bind(this);
+        this.refreshNotifications = this.refreshNotifications.bind(this);
     }
 
     fetchData(body) {
@@ -91,6 +93,7 @@ class NotificationDoctor extends Component {
             .then((response) => {
                 if (response.success) {
                     this.setState({ notifications: response.notifications });
+                    this.timeOutId = setTimeout(this.refreshNotifications.bind(this), 3000);
                 }
                 else {
                     let err = new Error(response.errorMessage);
@@ -103,10 +106,20 @@ class NotificationDoctor extends Component {
             });
     }
 
+    refreshNotifications() {
+        let creds = JSON.parse(this.props.User.creds);
+        let body = { 'userID': creds.userId, 'token': this.props.User.token };
+        this.fetchData(body);
+    }
+
     componentDidMount() {
         let creds = JSON.parse(this.props.User.creds);
         let body = { 'userID': creds.userId, 'token': this.props.User.token };
         this.fetchData(body);
+    }
+
+    componentWillUnmount() {
+        clearTimeout(this.timeOutId);
     }
 
     handleLogout() {
@@ -209,8 +222,6 @@ class NotificationDoctor extends Component {
                                             Mark all as read
                                         </Button>
                                     </div>
-                                </Grid>
-                                <Grid item xs={12}>
                                     {this.state.notifications === null ? null :
                                         <List>
                                             {this.state.notifications.map((notification) => {

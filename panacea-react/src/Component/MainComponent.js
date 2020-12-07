@@ -23,6 +23,7 @@ import {
     addSurgerySchedule,
     loadRoomTypes,
     addAdmitPatient,
+    updateUser,
 } from '../Redux/ActionCreator';
 
 import Home from './HomeComponent';
@@ -55,6 +56,10 @@ import TestResult from './Technician/PendingTests/TestResult';
 import UpcomingAppointment from './Patient/Homepage/UpcomingAppointment';
 import Notification from './Patient/Notification/Notification';
 import NotificationDoctor from './Doctor/Notification/Notification';
+import TechnicianNotification from './Technician/Notification/Notification';
+import ReceptionistNotification from './Receptionist/Notification/Notification';
+import PatientTestResults from './Patient/TestResults/TestResult';
+import PatientSurgeryResult from './Patient/SurgeryResult/SurgeryResult';
 
 const mapStateToProps = (state) => {
     return {
@@ -93,6 +98,7 @@ const mapDispatchToProps = (dispatch) => {
         getReceptionistAppointments: (body) => (dispatch(getReceptionistAppointments(body))),
         acceptReceptionistAppointment: (body) => (dispatch(acceptReceptionistAppointment(body))),
         getDoctorsAppointment: (body) => (dispatch(getDoctorsAppointment(body))),
+        updateUser: (body) => (dispatch(updateUser(body))),
     };
 }
 
@@ -252,6 +258,7 @@ class Main extends Component {
                     <Route path="/doctor/home">
                         <DoctorHome
                             User={this.props.User}
+                            updateUser={this.props.updateUser}
                         />
                     </Route>
                     <Route exact path="/doctor/appointment">
@@ -272,11 +279,12 @@ class Main extends Component {
                     <Route path="/patient/home">
                         <PatientHome
                             User={this.props.User}
+                            updateUser={this.props.updateUser}
                         />
                     </Route>
 
-                    <Route path="/patient/next-surgery">
-                        <PatientHome
+                    <Route path="/patient/surgeries">
+                        <PatientSurgeryResult
                             User={this.props.User}
                         />
                     </Route>
@@ -286,14 +294,13 @@ class Main extends Component {
                         />
                     </Route>
 
-                    <Route path="/patient/test-results">
-                        <PatientHome
+                    <Route path="/patient/notification">
+                        <Notification
                             User={this.props.User}
                         />
                     </Route>
-
-                    <Route path="/patient/notification">
-                        <Notification
+                    <Route path='/patient/test-results'>
+                        <PatientTestResults
                             User={this.props.User}
                         />
                     </Route>
@@ -315,6 +322,7 @@ class Main extends Component {
                     <Route path='/receptionist/home'>
                         <ReceptionistHome
                             User={this.props.User}
+                            updateUser={this.props.updateUser}
                         />
                     </Route>
                     <Route path='/receptionist/appointments'>
@@ -355,6 +363,12 @@ class Main extends Component {
                     <Route path='/technician/home'>
                         <TechnicianHome
                             User={this.props.User}
+                            updateUser={this.props.updateUser}
+                        />
+                    </Route>
+                    <Route path='/receptionist/notification'>
+                        <ReceptionistNotification
+                            User={this.props.User}
                         />
                     </Route>
                     <Route exact path='/technician/pending-tests'>
@@ -363,7 +377,11 @@ class Main extends Component {
                         />
                     </Route>
                     <Route path='/technician/pending-tests/:test_result_id' component={this.renderTechnicianTestResultPage} />
-
+                    <Route path='/technician/notification'>
+                        <TechnicianNotification
+                            User={this.props.User}
+                        />
+                    </Route>
                     <Redirect to="/home" />
                 </Switch>
             </React.Fragment>

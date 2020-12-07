@@ -11,4 +11,5 @@ urlpatterns = [
     path('get-notifications/', views.getNotification, name='getNotification'),
     path('notifications/mark-as-read/',
          views.markNotificationAsRead, name='markNotificationRead'),
+    path('update-user/', views.updateUser, name='updateUser'),
 ]

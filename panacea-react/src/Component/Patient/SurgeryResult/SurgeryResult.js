@@ -1,15 +1,23 @@
 import React, { Component } from 'react';
-import { withStyles, AppBar, Drawer, Toolbar, List, Divider, CssBaseline, Typography, Card, Container, Grid, Box, Link } from '@material-ui/core';
-import { mainListItems, secondaryListItems } from './listItems';
 import { Redirect } from 'react-router-dom';
+import {
+    withStyles, AppBar, Drawer, Toolbar, List, Divider, CssBaseline, Typography,
+    Card, Container, Grid, Box, Link
+} from '@material-ui/core';
+import { mainListItems, secondaryListItems } from '../Homepage/listItems';
 import CopyRight from '../../Copyright';
-import EditProfile from './EditProfile';
+import { baseUrl } from '../../../Redux/ActionCreator';
+import SurgeryResultTable from './SurgeryResultTable';
+
 
 const drawerWidth = 240;
 
 const styles = (theme) => ({
     root: {
         display: 'flex',
+        '& > *': {
+            borderBottom: 'unset',
+        },
     },
     appBar: {
         zIndex: theme.zIndex.drawer + 1,
@@ -39,16 +47,15 @@ const styles = (theme) => ({
     },
 });
 
-class TechnicianHome extends Component {
+class PatientSurgeryResult extends Component {
     constructor(props) {
         super(props);
-
         this.state = {
-
+            surgery: null
         }
 
-        this.renderProfile = this.renderProfile.bind(this);
-        //this.Copyright = this.Copyright.bind(this);
+        this.handleLogout = this.handleLogout.bind(this);
+        this.renderPage = this.renderPage.bind(this);
     }
 
     handleLogout() {
@@ -58,20 +65,63 @@ class TechnicianHome extends Component {
         sessionStorage.removeItem('userCategory');
     }
 
+    fetchData(body) {
+        fetch(baseUrl + 'checkup/patient/get-patient-surgery-result/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(body)
+        })
+            .then((response) => {
+                console.log(response);
+                if (response.ok) {
+                    return response;
+                }
+                else {
+                    let err = new Error('Error ' + response.status + ': ' + response.statusText);
+                    err.response = response;
+                    throw err;
+                }
+            })
+            .then((response) => response.json())
+            .then((response) => {
+                if (response.success) {
+                    this.setState({ surgery: response.surgery_result })
+                }
+                else {
+                    let err = new Error(response.errorMessage);
+                    err.response = response;
+                    throw err;
+                }
+            })
+            .catch((err) => {
+                alert(err.message);
+            });
+    }
 
-    renderProfile() {
+    componentDidMount() {
+        let creds = JSON.parse(this.props.User.creds);
+        let body = {
+            'userID': creds.userId, 'token': this.props.User.token,
+            'allSurgery': false, 'pendingSurgery': false,
+            'completedSurgery': true, 'app_sl_no': null
+        };
+        this.fetchData(body);
+    }
+
+    renderPage() {
         const { classes } = this.props;
 
-        if (this.props.User.isAuthenticated && this.props.User.category === 'TECHNICIAN') {
+        if (this.props.User.isAuthenticated && this.props.User.category === 'patient') {
             let userData = JSON.parse(this.props.User.userData);
-            //let copyRight = this.Copyright();
             return (
                 <div className={classes.root}>
                     <CssBaseline />
                     <AppBar position="fixed" className={classes.appBar}>
                         <Toolbar>
                             <Typography variant="h6" noWrap>
-                                Technician
+                                Patient
                             </Typography>
                             <Link color='inherit' href='http://localhost:3000/home' onClick={() => { this.handleLogout() }} style={{ marginLeft: 'auto' }}>
                                 Logout
@@ -100,25 +150,15 @@ class TechnicianHome extends Component {
                         <Container maxWidth="lg" >
                             <Grid container spacing={3}>
                                 <Grid item xs={12}>
-                                    <Card style={{ padding: 20 }}>
-                                        <Typography variant='h6'>{userData.name}</Typography>
-                                        <Typography variant='body1'>Email: {userData.email}</Typography>
-                                        <Typography variant='body1'>Address: {userData.address}</Typography>
-                                        <Typography variant='body1'>Phone number: {userData.phoneNum}</Typography>
-                                        <Typography variant='body1'>Date of birth: {userData.date_of_birth}</Typography>
-                                        <Typography variant='body1'>Education: {userData.education}</Typography>
-                                        <Typography variant='body1'>Training: {userData.training}</Typography>
-                                        <Typography variant='body1'>Salary: {userData.salary}</Typography>
-                                        <Typography variant='body1'>Gender: {userData.gender}</Typography>
-                                    </Card>
-
-                                    <EditProfile
-                                        userData={userData}
+                                    <SurgeryResultTable
                                         User={this.props.User}
-                                        updateUser={this.props.updateUser}
+                                        fetchData={(body) => { this.fetchData(body) }}
+                                        surgery={this.state.surgery}
                                     />
+
                                 </Grid>
                             </Grid>
+
                             <Box pt={4}>
                                 {CopyRight}
                             </Box>
@@ -131,16 +171,15 @@ class TechnicianHome extends Component {
             return (<Redirect to='/sign-in' />);
         }
     }
-    render() {
-        const { classes } = this.props;
 
-        const profile = this.renderProfile();
+    render() {
+        const page = this.renderPage();
         return (
             <React.Fragment>
-                {profile}
+                {page}
             </React.Fragment>
         );
     }
 }
 
-export default withStyles(styles)(TechnicianHome);
+export default withStyles(styles)(PatientSurgeryResult);

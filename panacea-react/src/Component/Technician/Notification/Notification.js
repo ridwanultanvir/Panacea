@@ -53,7 +53,7 @@ const styles = (theme) => ({
 
 });
 
-class Notification extends Component {
+class TechnicianNotification extends Component {
     timeOutId;
     constructor(props) {
         super(props);
@@ -175,7 +175,7 @@ class Notification extends Component {
 
         const { classes } = this.props;
 
-        if (this.props.User.isAuthenticated && this.props.User.category === 'patient') {
+        if (this.props.User.isAuthenticated && this.props.User.category === 'TECHNICIAN') {
             let userData = JSON.parse(this.props.User.userData);
             return (
                 <div className={classes.root}>
@@ -183,7 +183,7 @@ class Notification extends Component {
                     <AppBar position="fixed" className={classes.appBar}>
                         <Toolbar>
                             <Typography variant="h6" noWrap>
-                                Patient
+                                Technician
                             </Typography>
                             <Link color='inherit' href='http://localhost:3000/home' onClick={() => { this.handleLogout() }} style={{ marginLeft: 'auto' }}>
                                 Logout
@@ -279,4 +279,4 @@ class Notification extends Component {
     }
 }
 
-export default withStyles(styles)(Notification);
+export default withStyles(styles)(TechnicianNotification);

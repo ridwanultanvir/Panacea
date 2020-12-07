@@ -3,6 +3,7 @@ import { withStyles, AppBar, Drawer, Toolbar, List, Divider, CssBaseline, Typogr
 import { mainListItems, secondaryListItems } from './listItems';
 import { Redirect } from 'react-router-dom';
 import CopyRight from '../../Copyright';
+import EditProfile from './EditProfile';
 
 const drawerWidth = 240;
 
@@ -108,6 +109,12 @@ class ReceptionistHome extends Component {
                                         <Typography variant='body1'>Salary: {userData.salary}</Typography>
                                         <Typography variant='body1'>Gender: {userData.gender}</Typography>
                                     </Card>
+
+                                    <EditProfile
+                                        userData={userData}
+                                        User={this.props.User}
+                                        updateUser={this.props.updateUser}
+                                    />
                                 </Grid>
                             </Grid>
                             <Box pt={4}>
