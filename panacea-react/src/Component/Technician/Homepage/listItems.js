@@ -10,7 +10,7 @@ import BarChartIcon from '@material-ui/icons/BarChart';
 import LayersIcon from '@material-ui/icons/Layers';
 import AssignmentIcon from '@material-ui/icons/Assignment';
 import { Link } from 'react-router-dom';
-import { NotificationImportant } from '@material-ui/icons';
+import { NotificationImportant, Schedule } from '@material-ui/icons';
 
 export const mainListItems = (
     <div>
@@ -28,6 +28,14 @@ export const mainListItems = (
                     <DashboardIcon />
                 </ListItemIcon>
                 <ListItemText primary="Pending tests" />
+            </ListItem>
+        </Link>
+        <Link to="/technician/schedule" style={{ textDecoration: 'none', color: 'black' }}>
+            <ListItem button>
+                <ListItemIcon>
+                    <Schedule />
+                </ListItemIcon>
+                <ListItemText primary="Schedule" />
             </ListItem>
         </Link>
         <Link to="/technician/notification" style={{ textDecoration: 'none', color: 'black' }}>

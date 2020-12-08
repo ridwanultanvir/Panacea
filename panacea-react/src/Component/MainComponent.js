@@ -62,6 +62,9 @@ import PatientTestResults from './Patient/TestResults/TestResult';
 import PatientSurgeryResult from './Patient/SurgeryResult/SurgeryResult';
 import MonitorPatient from './Doctor/MonitorPatient/MonitorPatient';
 import PatientMonitorDetail from './Doctor/MonitorPatient/PatientMonitorDetails';
+import DoctorSchedule from './Doctor/Schedule/Schedule';
+import ReceptionistSchedule from './Receptionist/ReceptionistSchedule/Schedule';
+import TechnicianSchedule from './Technician/Schedule/Schedule';
 
 const mapStateToProps = (state) => {
     return {
@@ -333,6 +336,11 @@ class Main extends Component {
                             User={this.props.User}
                         />
                     </Route>
+                    <Route path='/doctor/schedule'>
+                        <DoctorSchedule
+                            User={this.props.User}
+                        />
+                    </Route>
                     <Route path="/doctor/notification">
                         <NotificationDoctor
                             User={this.props.User}
@@ -383,6 +391,11 @@ class Main extends Component {
                             User={this.props.User}
                         />
                     </Route>
+                    <Route path='/receptionist/schedule-receptionist'>
+                        <ReceptionistSchedule
+                            User={this.props.User}
+                        />
+                    </Route>
                     <Route path='/receptionist/approve-service/:diagnosisID' component={this.renderReceptionistServicesPage} />
                     <Route path='/technician/home'>
                         <TechnicianHome
@@ -403,6 +416,11 @@ class Main extends Component {
                     <Route path='/technician/pending-tests/:test_result_id' component={this.renderTechnicianTestResultPage} />
                     <Route path='/technician/notification'>
                         <TechnicianNotification
+                            User={this.props.User}
+                        />
+                    </Route>
+                    <Route path='/technician/schedule'>
+                        <TechnicianSchedule
                             User={this.props.User}
                         />
                     </Route>

@@ -148,17 +148,16 @@ def getWardCategory():
     connection = connect()
     cursor = connection.cursor()
     query = '''select DISTINCT(CATEGORY) from BLOCK'''
-    try: 
+    try:
         cursor.execute(query)
         result = cursor.fetchall()
         wardCategory = []
         response = {}
 
-
         if (result):
             for category in result:
-                wardCategory.append({'CATEGORY':category[0]})
-        
+                wardCategory.append({'CATEGORY': category[0]})
+
         response['success'] = True
         response['errorMessage'] = ''
         response['wardCategory'] = wardCategory
@@ -512,7 +511,6 @@ def getUserDetails(UserID):
         return {'success': False, 'alertMessage': "User Id does not belong to appropiate category"}
 
 
-
 def getBlocksPerCategory(block_category):
     connection = connect()
     cursor = connection.cursor()
@@ -528,7 +526,7 @@ def getBlocksPerCategory(block_category):
             })
         result = {
             'blocks': roomTypes,
-            'alertMesage':"Okay",
+            'alertMesage': "Okay",
             'success': True
         }
         return result
@@ -553,12 +551,12 @@ def addIncharge(block_id, inChargeUserID):
                 'success': False,
                 'alertMessage': 'User ID invalid'
             }
-        else :
+        else:
             cursor.execute(query, [inChargeUserID, block_id])
             connection.commit()
             cursor.close()
             result = {
-                'alertMessage':"Incharge for Block Successfully Registered",
+                'alertMessage': "Incharge for Block Successfully Registered",
                 'success': True
             }
             return result
@@ -569,3 +567,34 @@ def addIncharge(block_id, inChargeUserID):
         }
         return result
 
+
+def getUserSchedule(data):
+    connection = connect()
+    cursor = connection.cursor()
+    print('ulalalala')
+    try:
+        query = '''
+        SELECT S.SCHEDULE_ID, TO_CHAR(S.SCHEDULE_DATE), T.START_TIME, T.END_TIME, T.SHIFT_TITLE 
+        FROM SCHEDULE S JOIN TIME_TABLE T ON(S.TIME_ID = T.TIME_ID)
+        WHERE S.ID = (SELECT ID FROM PERSON WHERE USER_ID = :userID)
+        AND S.SCHEDULE_DATE >= SYSDATE
+        '''
+
+        cursor.execute(query, [data['userID']])
+        result = cursor.fetchall()
+
+        schedules = []
+
+        for schedule in result:
+            schedules.append({'schedule_id': schedule[0], 'schedule_date': schedule[1], 'start_time': schedule[2],
+                              'end_time': schedule[3], 'shift_title': schedule[4]})
+        response = {'success': True,
+                    'errorMessage': '', 'schedules': schedules}
+        print(response)
+        return response
+
+    except cx_Oracle.Error as error:
+        errorObj, = error.args
+        response = {'success': False, 'errorMessage': errorObj.message}
+        print(response)
+        return response

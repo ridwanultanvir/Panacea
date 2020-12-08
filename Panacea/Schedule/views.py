@@ -292,13 +292,14 @@ def getUserdetails(request):
     userID = data['userID']
     return Response(execution.getUserDetails(userID))
 
+
 @api_view(['POST'])
 def getBlockForCats(request):
     body = request.body.decode('utf-8')
     data = json.loads(body)
     block_category = data['block-category']
     return Response(execution.getBlocksPerCategory(block_category))
-    
+
 
 @api_view(['POST'])
 def addIncharge(request):
@@ -308,3 +309,23 @@ def addIncharge(request):
     inChargeUserID = data['inChargeID']
     return Response(execution.addIncharge(block_id, inChargeUserID))
 
+
+@api_view(['POST'])
+def getUserSchedule(request):
+    body = request.body.decode('utf-8')
+    data = json.loads(body)
+
+    userID = None
+    token = None
+
+    if 'userID' in data:
+        userID = data['userID']
+    if 'token' in data:
+        token = data['token']
+
+    if(verifyToken(userID, token)):
+        response = execution.getUserSchedule(data)
+    else:
+        response = {'success': False, 'errorMessage': 'Invalid request'}
+
+    return Response(response)
