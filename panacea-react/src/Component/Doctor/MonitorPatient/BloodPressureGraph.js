@@ -20,13 +20,13 @@ export default function BloodPressureGraph(props) {
         let length = monitor_data.length;
         if (length > 50) {
             for (let i = length - 1; i >= length - 50; i--) {
-                data.push(createData(monitor_data[i].hours_past + '-' + monitor_data[i].minutes_past,
+                data.push(createData(monitor_data[i].hours_past * 60 + monitor_data[i].minutes_past,
                     monitor_data[i].sys_bp, monitor_data[i].dias_bp));
             }
         }
         else {
             for (let i = length - 1; i >= 0; i--) {
-                data.push(createData(monitor_data[i].hours_past + 'H-' + monitor_data[i].minutes_past + 'M',
+                data.push(createData(monitor_data[i].hours_past * 60 + monitor_data[i].minutes_past,
                     monitor_data[i].sys_bp, monitor_data[i].dias_bp));
             }
         }
