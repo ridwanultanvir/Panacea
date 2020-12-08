@@ -46,6 +46,16 @@ export const mainListItems = (
                 <ListItemText primary="Surgery" />
             </ListItem>
         </Link>
+
+        <Link to="/doctor/monitor-patient" style={{ textDecoration: 'none', color: 'black' }}>
+            <ListItem button>
+                <ListItemIcon>
+                    <NotificationImportant />
+                </ListItemIcon>
+                <ListItemText primary="Monitor Patient" />
+            </ListItem>
+        </Link>
+
         <Link to="/doctor/notification" style={{ textDecoration: 'none', color: 'black' }}>
             <ListItem button>
                 <ListItemIcon>
@@ -54,6 +64,7 @@ export const mainListItems = (
                 <ListItemText primary="Notification" />
             </ListItem>
         </Link>
+
     </div>
 );
 

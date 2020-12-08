@@ -60,6 +60,8 @@ import TechnicianNotification from './Technician/Notification/Notification';
 import ReceptionistNotification from './Receptionist/Notification/Notification';
 import PatientTestResults from './Patient/TestResults/TestResult';
 import PatientSurgeryResult from './Patient/SurgeryResult/SurgeryResult';
+import MonitorPatient from './Doctor/MonitorPatient/MonitorPatient';
+import PatientMonitorDetail from './Doctor/MonitorPatient/PatientMonitorDetails';
 
 const mapStateToProps = (state) => {
     return {
@@ -112,6 +114,7 @@ class Main extends Component {
         this.renderDoctorSurgeryResultPage = this.renderDoctorSurgeryResultPage.bind(this);
         this.renderDocDiagnosisHistoryPage = this.renderDocDiagnosisHistoryPage.bind(this);
         this.renderSurgerySchedule = this.renderSurgerySchedule.bind(this);
+        this.renderPatientMonitroDetail = this.renderPatientMonitroDetail.bind(this);
     }
 
     renderDoctorDiagnosisPage({ match }) {
@@ -187,6 +190,18 @@ class Main extends Component {
                 addSurgerySchedule={this.props.addSurgerySchedule}
                 diagnosisID={diagnosisID}
                 surgery_result_id={surgery_result_id}
+            />
+        );
+    }
+
+    renderPatientMonitroDetail({ match }) {
+        let patient_id = match.params.patient_id
+        console.log(patient_id);
+
+        return (
+            <PatientMonitorDetail
+                User={this.props.User}
+                patient_id={patient_id}
             />
         );
     }
@@ -276,6 +291,15 @@ class Main extends Component {
                         />
                     </Route>
                     <Route path="/doctor/appointment/:app_sl_no" component={this.renderDoctorDiagnosisPage} />
+
+                    <Route exact path="/doctor/monitor-patient">
+                        <MonitorPatient
+                            User={this.props.User}
+                        />
+                    </Route>
+
+                    <Route path="/doctor/monitor-patient/:patient_id" component={this.renderPatientMonitroDetail} />
+
                     <Route path="/patient/home">
                         <PatientHome
                             User={this.props.User}
