@@ -748,3 +748,101 @@ def getPatientSurgeryResult(data):
         response = {'success': False, 'errorMessage': errorObj.message}
         print(response)
         return response
+
+
+def getAdmittedPatient(data):
+    connection = connect()
+    cursor = connection.cursor()
+
+    response = {}
+    try:
+        query = '''
+        SELECT R.ROOM_NO, R.BLOCK_ID,B.CATEGORY
+        FROM ROOM R JOIN BLOCK B ON(R.BLOCK_ID = B.BLOCK_ID)
+        WHERE B.INCHARGE_ID = (SELECT ID FROM PERSON WHERE USER_ID = :doc_id)
+        ORDER BY R.ROOM_NO
+        '''
+
+        cursor.execute(query, [data['userID']])
+        result = cursor.fetchall()
+
+        rooms = []
+
+        for room in result:
+            query = '''
+            SELECT (SELECT USER_ID FROM PERSON WHERE ID = RA.PATIENT_ID),
+            (SELECT (FIRST_NAME|| ' ' || LAST_NAME) AS NAME FROM PERSON WHERE ID = RA.PATIENT_ID) AS "NAME",
+            RA.ADMISSION_DATE, RA.ADMISSION_SL
+            FROM ROOM_ADMISSION RA
+            WHERE RA.ROOM_NO = :room_no AND RA.RELEASE_DATE IS NULL
+            '''
+
+            cursor.execute(query, [room[0]])
+            pat_result = cursor.fetchall()
+            patients = []
+            for pat in pat_result:
+                patients.append(
+                    {'patient_id': pat[0], 'patient_name': pat[1], 'admission_date': pat[2], 'admission_sl': pat[3]})
+
+            rooms.append({'room_no': room[0], 'block_id': room[1],
+                          'block_category': room[2], 'patients': patients})
+
+        response['rooms'] = rooms
+        response['success'] = True
+        response['errorMessage'] = ''
+        return response
+
+    except cx_Oracle.Error as error:
+        errorObj, = error.args
+        response = {'success': False, 'errorMessage': errorObj.message}
+        print(response)
+        return response
+
+
+def getPatientMonitorData(data):
+    connection = connect()
+    cursor = connection.cursor()
+
+    response = {}
+    try:
+        query = '''
+        SELECT HEARTBEAT, SYS_BP,DIAS_BP,TEMPERATURE, OXY_LEVEL,BREATHING_RATE,  FLOOR((SYSDATE - CAST(TIME AS DATE))*24) AS "HOUR",
+        (ROUND((SYSDATE - CAST(TIME AS DATE))*24,2)-FLOOR((SYSDATE - CAST(TIME AS DATE))*24))*60 AS "MINUTE", TO_CHAR(CAST(TIME AS DATE),'MM/DD/YYYY HH:MI:SS') AS "TIME"
+        FROM MONITORING_DATA
+        WHERE PATIENT_ID = (SELECT ID FROM PERSON WHERE USER_ID = :pat_id)
+        ORDER BY HOUR, MINUTE
+        '''
+
+        cursor.execute(query, [data['patient_id']])
+        result = cursor.fetchall()
+
+        monitroData = []
+        for dat in result:
+            monitroData.append({'heart_beat': dat[0], 'sys_bp': dat[1], 'dias_bp': dat[2],
+                                'temperature': dat[3], 'oxygen_level': dat[4], 'breathing_rate': dat[5], 'hours_past': dat[6],
+                                'minutes_past': dat[7], 'time_of_data': dat[8]})
+
+        query = '''
+        SELECT (SELECT USER_ID FROM PERSON WHERE ID = RA.PATIENT_ID),
+        (SELECT (FIRST_NAME|| ' ' || LAST_NAME) AS NAME FROM PERSON WHERE ID = RA.PATIENT_ID) AS "NAME",
+        TO_CHAR(RA.ADMISSION_DATE) AS "ADMISSION_DATE", RA.ADMISSION_SL
+        FROM ROOM_ADMISSION RA
+        WHERE RA.PATIENT_ID = (SELECT ID FROM PERSON WHERE USER_ID = :pat_id)
+        '''
+
+        cursor.execute(query, [data['patient_id']])
+        pat_result = cursor.fetchone()
+
+        response['monitor_data'] = monitroData
+        response['patient_info'] = {'patient_id': pat_result[0], 'patient_name': pat_result[1], 'admission_date': pat_result[2],
+                                    'admission_sl': pat_result[3]}
+
+        response['success'] = True
+        response['errorMessage'] = ''
+        return response
+
+    except cx_Oracle.Error as error:
+        errorObj, = error.args
+        response = {'success': False, 'errorMessage': errorObj.message}
+        print(response)
+        return response
