@@ -13,9 +13,7 @@ from . import execution
 def loginUser(request):
     body = request.body.decode('utf-8')
     credentials = json.loads(body)
-    print(credentials)
     response = execution.login(credentials)
-    print(response)
     return Response(response)
 
 

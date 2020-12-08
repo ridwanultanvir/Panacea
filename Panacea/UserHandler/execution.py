@@ -4,6 +4,10 @@ import hashlib
 
 from django.http import response
 from django.shortcuts import resolve_url
+import datetime
+
+
+salt = 'sjbhvksjnfklnewrglkdfkjgnergjdfnvjhbfgjndfjvdf2985734jnr98j/74werf*/4'
 
 
 def connect(user_n='PANACEA', pass_n='panacea', host='localhost', port='1521', service_n='ORCL'):
@@ -13,8 +17,8 @@ def connect(user_n='PANACEA', pass_n='panacea', host='localhost', port='1521', s
     return conn
 
 
-def passwordHash(password):
-    result = hashlib.md5(password.encode())
+def tokenHash(str):
+    result = hashlib.md5(str.encode())
     return result.hexdigest()
 
 
@@ -31,14 +35,41 @@ def checkPassword(userId, password):
 
 
 def verifyToken(userID, token):
+    connection = connect()
+    cursor = connection.cursor()
     if userID != None and token != None:
-        return True
+        query = '''
+            SELECT ROUND((SYSDATE - DATE_CREATED)*24,3) AS "HOUR" FROM SESSION_TOKEN 
+            WHERE USER_ID = :userID
+            AND TOKEN = :token
+        '''
+        cursor.execute(query, [userID, token])
+        result = cursor.fetchone()
+        if result[0] < 12:
+            return True
+        else:
+            return False
     else:
         return False
 
 
 def generateToken(userID):
-    return 'token'
+    connection = connect()
+    cursor = connection.cursor()
+    datetime_object = datetime.datetime.now()
+    date_time_string = datetime_object.strftime("%m/%d/%Y, %H:%M:%S")
+    token = tokenHash(userID + salt + date_time_string)
+    print(token)
+
+    query = '''
+    INSERT INTO SESSION_TOKEN
+    VALUES((SELECT MAX(SESSION_ID) FROM SESSION_TOKEN)+1, :userID, :token, SYSDATE)
+    '''
+
+    cursor.execute(query, [userID, token])
+    connection.commit()
+
+    return token
 
 
 def getUserInfoDict(result):
@@ -71,7 +102,6 @@ def login(credentials):
         response = {}
         response['errorMessage'] = ''
         response['token'] = generateToken(userId)
-        print(response)
         if userId[:3] == 'D21':
             query = '''SELECT (P.FIRST_NAME || ' ' || P.LAST_NAME) AS NAME, P.EMAIL,P.PHONE_NUM, P.IMAGE, P.GENDER, P.ADDRESS, 
                         P.DATE_OF_BIRTH, D.DEPARTMENT, D.DESIGNATION, D.QUALIFICATION
