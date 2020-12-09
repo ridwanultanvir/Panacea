@@ -10,23 +10,35 @@ import BarChartIcon from '@material-ui/icons/BarChart';
 import LayersIcon from '@material-ui/icons/Layers';
 import AssignmentIcon from '@material-ui/icons/Assignment';
 import AirlineSeatFlatIcon from '@material-ui/icons/AirlineSeatFlat';
+import CheckCircleIcon from '@material-ui/icons/CheckCircle';
+import AssignmentIndIcon from '@material-ui/icons/AssignmentInd';
+import LocalHospitalIcon from '@material-ui/icons/LocalHospital';
 import { Link } from 'react-router-dom';
-import { NotificationImportant, Schedule } from '@material-ui/icons';
+import { NotificationImportant, Schedule, Home, AccountCircle, Ballot } from '@material-ui/icons';
 
 export const mainListItems = (
     <div>
+
         <Link to='/receptionist/home' style={{ textDecoration: 'none', color: 'black' }}>
             <ListItem button>
                 <ListItemIcon>
-                    <DashboardIcon />
+                    <AccountCircle />
                 </ListItemIcon>
                 <ListItemText primary="Profile" />
+            </ListItem>
+        </Link>
+        <Link to='/home' style={{ textDecoration: 'none', color: 'black' }}>
+            <ListItem button>
+                <ListItemIcon>
+                    <Home />
+                </ListItemIcon>
+                <ListItemText primary="Home" />
             </ListItem>
         </Link>
         <Link to='/receptionist/appointments' style={{ textDecoration: 'none', color: 'black' }}>
             <ListItem button >
                 <ListItemIcon>
-                    <PeopleIcon />
+                    <Ballot />
                 </ListItemIcon>
                 <ListItemText primary="Appointments" />
             </ListItem>
@@ -34,7 +46,7 @@ export const mainListItems = (
         <Link to='/receptionist/approve-service' style={{ textDecoration: 'none', color: 'black' }}>
             <ListItem button>
                 <ListItemIcon>
-                    <ShoppingCartIcon />
+                    <CheckCircleIcon />
                 </ListItemIcon>
                 <ListItemText primary="Approve service" />
             </ListItem>
@@ -42,7 +54,7 @@ export const mainListItems = (
         <Link to='/receptionist/put-in-charge' style={{ textDecoration: 'none', color: 'black' }}>
             <ListItem button>
                 <ListItemIcon>
-                    <BarChartIcon />
+                    <AssignmentIndIcon />
                 </ListItemIcon>
                 <ListItemText primary="Put In Charge" />
             </ListItem>
@@ -56,27 +68,6 @@ export const mainListItems = (
                 <ListItemText primary="Schedule" />
             </ListItem>
         </Link>
-
-        <Link to="/receptionist/notification" style={{ textDecoration: 'none', color: 'black' }}>
-            <ListItem button>
-                <ListItemIcon>
-                    <NotificationImportant />
-                </ListItemIcon>
-                <ListItemText primary="Notifications" />
-            </ListItem>
-        </Link>
-        {/* <ListItem button>
-            <ListItemIcon>
-                <BarChartIcon />
-            </ListItemIcon>
-            <ListItemText primary="Service report" />
-        </ListItem>
-        <ListItem button>
-            <ListItemIcon>
-                <LayersIcon />
-            </ListItemIcon>
-            <ListItemText primary="Doctor's schedule" />
-        </ListItem> */}
         {/* <Link to='/receptionist/surgery-schedule' style={{ textDecoration: 'none', color: 'black' }}>
             <ListItem button >
                 <ListItemIcon>
@@ -88,9 +79,17 @@ export const mainListItems = (
         <Link to='/receptionist/patient-admit' style={{ textDecoration: 'none', color: 'black' }}>
             <ListItem button >
                 <ListItemIcon>
-                    <AirlineSeatFlatIcon />
+                    <LocalHospitalIcon />
                 </ListItemIcon>
                 <ListItemText primary="Admit Patient" />
+            </ListItem>
+        </Link>
+        <Link to="/receptionist/notification" style={{ textDecoration: 'none', color: 'black' }}>
+            <ListItem button>
+                <ListItemIcon>
+                    <NotificationImportant />
+                </ListItemIcon>
+                <ListItemText primary="Notifications" />
             </ListItem>
         </Link>
     </div>

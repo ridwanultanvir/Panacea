@@ -9,23 +9,33 @@ import PeopleIcon from '@material-ui/icons/People';
 import BarChartIcon from '@material-ui/icons/BarChart';
 import LayersIcon from '@material-ui/icons/Layers';
 import AssignmentIcon from '@material-ui/icons/Assignment';
+import NotesIcon from '@material-ui/icons/Note'
 import { Link } from 'react-router-dom';
-import { NotificationImportant, Schedule, Tv } from '@material-ui/icons';
+import { NotificationImportant, Schedule, Tv, Home, AccountCircle, Ballot, LocalHospital } from '@material-ui/icons';
 
 export const mainListItems = (
     <div>
+
         <Link to='/doctor/home' style={{ textDecoration: 'none', color: 'black' }}>
             <ListItem button>
                 <ListItemIcon>
-                    <DashboardIcon />
+                    <AccountCircle />
                 </ListItemIcon>
                 <ListItemText primary="Profile" />
+            </ListItem>
+        </Link>
+        <Link to='/home' style={{ textDecoration: 'none', color: 'black' }}>
+            <ListItem button>
+                <ListItemIcon>
+                    <Home />
+                </ListItemIcon>
+                <ListItemText primary="Home" />
             </ListItem>
         </Link>
         <Link to='/doctor/appointment' style={{ textDecoration: 'none', color: 'black' }}>
             <ListItem button >
                 <ListItemIcon>
-                    <PeopleIcon />
+                    <Ballot />
                 </ListItemIcon>
                 <ListItemText primary="Appointments" />
             </ListItem>
@@ -33,7 +43,7 @@ export const mainListItems = (
         <Link to="/doctor/appointment/all" style={{ textDecoration: 'none', color: 'black' }}>
             <ListItem button>
                 <ListItemIcon>
-                    <ShoppingCartIcon />
+                    <NotesIcon />
                 </ListItemIcon>
                 <ListItemText primary="All appointments" />
             </ListItem>
@@ -41,7 +51,7 @@ export const mainListItems = (
         <Link to="/doctor/surgery" style={{ textDecoration: 'none', color: 'black' }}>
             <ListItem button>
                 <ListItemIcon>
-                    <BarChartIcon />
+                    <LocalHospital />
                 </ListItemIcon>
                 <ListItemText primary="Surgery" />
             </ListItem>
