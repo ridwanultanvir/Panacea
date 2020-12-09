@@ -247,3 +247,65 @@ def getTestUnderDoc(request):
     else:
         return Response({'success': False, 'alertMessage': 'Verification Failed',
                     'scheduleData': None, 'docData': None})
+
+
+@api_view(['POST'])
+def getMedicineData(request):
+    body = request.body.decode('utf-8')
+    data = json.loads(body)
+
+    userID = None
+    token = None
+
+    if 'userID' in data:
+        userID = data['userID']
+    if 'token' in data:
+        token = data['token']
+    med_id = data['med_id']
+    med_name = data['med_name']
+    if(verifyToken(userID, token)):
+        return Response(execution.getMedicineData(med_id, med_name))
+    else:
+        return Response({'success': False, 'alertMessage': 'Verification Failed',})
+
+
+@api_view(['POST'])
+def sellMedicine(request):
+    body = request.body.decode('utf-8')
+    data = json.loads(body)
+
+    userID = None
+    token = None
+
+    if 'userID' in data:
+        userID = data['userID']
+    if 'token' in data:
+        token = data['token']
+    patientID = data['patientID']
+    quantity = data['quantity']
+    medID = data['medID']
+    if(verifyToken(userID, token)):
+        return Response(execution.sellMedicine(patientID, quantity, medID))
+    else:
+        return Response({'success': False, 'alertMessage': 'Verification Failed',})
+
+
+@api_view(['POST'])
+def addStock(request):
+    body = request.body.decode('utf-8')
+    data = json.loads(body)
+    userID = None
+    token = None
+
+    if 'userID' in data:
+        userID = data['userID']
+    if 'token' in data:
+        token = data['token']
+    new_price = data['new_price']
+    amount = data['amount']
+    medID = data['medID']
+    if(verifyToken(userID, token)):
+        return Response(execution.addStock(new_price, amount, medID))
+    else:
+        return Response({'success': False, 'alertMessage': 'Verification Failed',})
+

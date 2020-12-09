@@ -242,32 +242,6 @@ class ReceptionistSurSchedule extends Component {
                         <Toolbar />
                         <div />
                         <Container maxWidth="lg" >
-                            {/* <Typography variant="h5">
-                                Reference Appointment Serial Number:
-                            </Typography> */}
-                            {/* <Form model='AdminScheduleUserID' onSubmit={() => this.handleAppntSlSubmit()}>
-                                <TextField
-                                    variant="outlined"
-                                    margin="normal"
-                                    required
-                                    fullWidth
-                                    id="appnt-sl-no"
-                                    label="appnt-sl-no"
-                                    name="appnt-sl-no"
-                                    autoComplete="appnt-sl-no"
-                                    autoFocus
-                                    onChange={(event) => this.setAppntSlNo(event.target.value)}
-                                />
-                                <Button
-                                    type="submit"
-                                    fullWidth
-                                    variant="contained"
-                                    color="primary"
-                                    className={classes.submit}
-                                >
-                                    View Appointment
-                                </Button>
-                            </Form> */}
 
                             {this.props.ScheduleSurgeryTable.patientData !== null ?
                                 <Card style={{ marginBottom: 20 }}>

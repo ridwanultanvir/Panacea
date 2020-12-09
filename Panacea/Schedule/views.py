@@ -281,7 +281,6 @@ def roomTypesforCats(request):
 def admitPatientReq(request):
     body = request.body.decode('utf-8')
     data = json.loads(body)
-    print(data)
     return Response(execution.admitPatient(data['patientID'], data['room_no'], data['date']))
 
 

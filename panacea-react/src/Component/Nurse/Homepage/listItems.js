@@ -15,7 +15,7 @@ import { } from '@material-ui/icons';
 
 export const mainListItems = (
     <div>
-        <Link to='/receptionist/home' style={{ textDecoration: 'none', color: 'black' }}>
+        <Link to='/nurse/home' style={{ textDecoration: 'none', color: 'black' }}>
             <ListItem button>
                 <ListItemIcon>
                     <DashboardIcon />
@@ -23,30 +23,23 @@ export const mainListItems = (
                 <ListItemText primary="Profile" />
             </ListItem>
         </Link>
-        <Link to='/receptionist/appointments' style={{ textDecoration: 'none', color: 'black' }}>
+        {/* <Link to='/receptionist/appointments' style={{ textDecoration: 'none', color: 'black' }}> */}
             <ListItem button >
                 <ListItemIcon>
                     <PeopleIcon />
                 </ListItemIcon>
-                <ListItemText primary="Appointments" />
+                <ListItemText primary="My Schedule" />
             </ListItem>
-        </Link>
-        <Link to='/receptionist/approve-service' style={{ textDecoration: 'none', color: 'black' }}>
+        {/* </Link> */}
+        <Link to='/nurse/dispensary' style={{ textDecoration: 'none', color: 'black' }}>
             <ListItem button>
                 <ListItemIcon>
                     <ShoppingCartIcon />
                 </ListItemIcon>
-                <ListItemText primary="Approve service" />
+                <ListItemText primary="Dispensary" />
             </ListItem>
         </Link>
-        <Link to='/receptionist/put-in-charge' style={{ textDecoration: 'none', color: 'black' }}>
-            <ListItem button>
-                <ListItemIcon>
-                    <BarChartIcon />
-                </ListItemIcon>
-                <ListItemText primary="Put In Charge" />
-            </ListItem>
-        </Link>
+        
         {/* <ListItem button>
             <ListItemIcon>
                 <BarChartIcon />
@@ -67,7 +60,7 @@ export const mainListItems = (
                 <ListItemText primary="Surgery Schedule" />
             </ListItem>
         </Link> */}
-        <Link to='/receptionist/patient-admit' style={{ textDecoration: 'none', color: 'black' }}>
+        {/* <Link to='/receptionist/patient-admit' style={{ textDecoration: 'none', color: 'black' }}>
             <ListItem button >
                 <ListItemIcon>
                     <AirlineSeatFlatIcon />
@@ -83,7 +76,7 @@ export const mainListItems = (
                 </ListItemIcon>
                 <ListItemText primary="Prepare Bill" />
             </ListItem>
-        </Link>
+        </Link> */}
     </div>
 );
 

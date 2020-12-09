@@ -55,6 +55,10 @@ import TestResult from './Technician/PendingTests/TestResult';
 import UpcomingAppointment from './Patient/Homepage/UpcomingAppointment';
 import DataExtractor from './Admin/DataExtractor/DataExtractor';
 import DataExtractorInput from './Admin/DataExtractor/DataExtractorInput';
+import PrepareBill from './Receptionist/Payment/PrepareBill';
+import NurseHome from './Nurse/Homepage/NurseHome';
+import Dispensary from './Nurse/Dispensary/Dispensary'
+
 
 const mapStateToProps = (state) => {
     return {
@@ -288,6 +292,16 @@ class Main extends Component {
                         />
                     </Route>
                     <Route path="/doctor/appointment/:app_sl_no" component={this.renderDoctorDiagnosisPage} />
+                    <Route path="/nurse/home">
+                        <NurseHome
+                            User={this.props.User}
+                        />
+                    </Route>
+                    <Route path='/nurse/dispensary'>
+                        <Dispensary
+                            User = {this.props.User}
+                        />
+                    </Route>
                     <Route path="/patient/home">
                         <PatientHome 
                             User={this.props.User}
@@ -371,7 +385,11 @@ class Main extends Component {
                         />
                     </Route>
                     <Route path='/technician/pending-tests/:test_result_id' component={this.renderTechnicianTestResultPage} />
-
+                    <Route path='/receptionist/prepare-bill'>
+                        <PrepareBill
+                            User={this.props.User}
+                        />
+                    </Route>
                     <Redirect to="/home" />
                 </Switch>
             </React.Fragment>

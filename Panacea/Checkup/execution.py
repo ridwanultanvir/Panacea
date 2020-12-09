@@ -633,3 +633,72 @@ def getAllTestsUnderDoc(docID):
         errorObj, = error.args
         response = {'success': False, 'alertMessage': errorObj.message}
         return response
+
+
+def getMedicineData(med_id, med_name):
+    connection = connect()
+    cursor = connection.cursor()
+
+    response = {}
+    query = '''SELECT * FROM MEDICINE WHERE MED_ID = (:med_id)'''
+    try:
+        cursor.execute(query, [med_id])
+        resultTemp = cursor.fetchall()
+        cursor.close()
+        result = {
+            'med_id': resultTemp[0][0],
+            'med_name': resultTemp[0][1],
+            'genre': resultTemp[0][2],
+            'stock': resultTemp[0][3],
+            'price_per_piece': resultTemp[0][4]
+        }
+        response['med_data'] = result
+        response['success'] = True
+        return response 
+    except cx_Oracle.Error as error:
+        response = {'success': False, 'alertMessage': 'Data Base Failure'}
+        return response
+
+
+def sellMedicine(patientID, quantity, medID):
+    connection = connect()
+    cursor = connection.cursor()
+    quantity = int(quantity)
+    response = {}
+    query = '''INSERT INTO DISPENSARY(MED_ID, ASSIGNED_TO, QUANTITY_PCS) 
+                VALUES(:medID, (SELECT ID FROM PERSON WHERE USER_ID = (:patientID)), :quantity)'''
+    try:
+        cursor.execute(query, [medID, patientID, quantity])
+        connection.commit()
+        response['success'] = True
+        response['Message'] = "Successfully Saved"
+        return response
+    except cx_Oracle.Error:
+        response = {'success': False, 'alertMessage': 'DataBase Failure'}
+        return response
+
+
+def addStock(new_price, amount, medID):
+    connection = connect()
+    cursor = connection.cursor()
+    if float(new_price) == 0.0:
+        update_price = False
+    else:
+        update_price = True
+    response = {}
+    query1 = '''UPDATE MEDICINE SET STOCK = (SELECT STOCK FROM MEDICINE WHERE MED_ID = (:medID)) + (:amount)
+             WHERE MED_ID = (:medID)'''
+    
+    query2 = '''UPDATE MEDICINE SET PRICE_PIECE = (:new_price)
+             WHERE MED_ID = (:medID)'''
+    try:
+        cursor.execute(query1, [medID, amount, medID])
+        if update_price:
+            cursor.execute(query2, [float(new_price), medID])
+        connection.commit()
+        response['success'] = True
+        response['Message'] = "Successfully Saved"
+        return response
+    except cx_Oracle.Error:
+        response = {'success': False, 'alertMessage': 'DataBase Failure'}
+        return response

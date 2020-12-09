@@ -17,6 +17,8 @@ import { Form } from 'react-redux-form';
 import { TextField, Button, CardContent, Card } from '@material-ui/core';
 import { loadWardCategory } from '../../../Redux/ActionCreator';
 import AddPatRoom from './AdmitPatSelect'
+import CopyRight from '../../Copyright';
+
 
 const drawerWidth = 240;
 
@@ -82,18 +84,6 @@ class ReceptionistAdmitPatient extends Component {
         this.handleAdmitPatient = this.handleAdmitPatient.bind(this);
     }
 
-    Copyright() {
-        return (
-            <Typography variant="body2" color="textSecondary" align="center">
-                {'Copyright © '}
-                <Link color="inherit" href="https://sadatshahriyar.pythonanywhere.com/">
-                    Sadat Shahriyar
-                </Link>{' '}
-                {new Date().getFullYear()}
-                {'.'}
-            </Typography>
-        );
-    }
 
 
     componentDidMount() {
@@ -137,48 +127,6 @@ class ReceptionistAdmitPatient extends Component {
     handleAdmitPatient(room_no, dateString) {
         //console.log(this.state.patientID, dateString, room_no);
         this.props.addAdmitPatient({'patientID': this.state.patientID, 'date': dateString, 'room_no': room_no});
-        // let body = {
-        //     'patientID': this.state.patientID,
-        //     'date': dateString,
-        //     'room_no': room_no
-        // };
-        // let baseUrl = 'http://localhost:8000/';
-        // fetch(baseUrl + 'schedule/time-table/', {
-        //     method: 'POST',
-        //     headers: {
-        //         'Content-Type': 'application/json'
-        //     },
-        //     body: JSON.stringify(body)
-        // })
-        //     .then((response) => {
-                
-        //         if (response.ok) {
-        //             console.log('1st part')
-        //             return response;
-        //         }
-        //         else {
-        //             let err = new Error('Error ' + response.status + ': ' + response.statusText);
-        //             err.response = response;
-        //             console.log('throwing ')
-        //             throw err;
-        //         }
-        //     })
-        //     .then((response) => response.json())
-        //     .then((response) => {
-        //         console.log('2nd part')
-        //         if (response.success) {
-        //             alert(response.alertMessage);
-        //         }
-        //         else {
-        //             let err = new Error(response.errorMessage);
-        //             err.response = response;
-        //             throw err;
-        //         }
-        //     })
-        //     .catch((err) => {
-        //         console.log("printing error");
-        //         alert(err.message);
-        //     });
     }
 
     renderReceptionistAdmitPatient() {
@@ -284,7 +232,7 @@ class ReceptionistAdmitPatient extends Component {
                             } */}
 
                             <Box pt={4}>
-                                {copyRight}
+                                {CopyRight}
                             </Box>
                         </Container>
                     </main>

@@ -21,4 +21,7 @@ urlpatterns = [
     path('doctor/get-diagnosis-history/',
          views.getDiagnosisHistory, name='getDIagnosisHistory'),
      path('get-tests-under-doc/', views.getTestUnderDoc, name='getTestUnderDoc'),
+     path('get_med_details/', views.getMedicineData, name='get_med_details'),
+     path('sell-medicine/', views.sellMedicine, name='sellMedicine'),
+     path('add_to_stock/', views.addStock, name='addStock'),
 ]

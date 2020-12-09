@@ -23,6 +23,9 @@ class Profile extends Component {
             else if (this.props.User.category === 'TECHNICIAN') {
                 return (<Redirect to='/technician/home' />);
             }
+            else if (this.props.User.category === 'NURSE') {
+                return (<Redirect to='/nurse/home'/>)
+            }
         }
         else {
             return <Redirect to='/sign-in' />
