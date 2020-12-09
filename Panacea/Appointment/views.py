@@ -155,3 +155,32 @@ def getNextAppnt(request):
 
     userID = data['userID'] 
     return Response(execution.getNextAppointments(userID))
+
+
+@api_view(['POST'])
+def getAppntPatient(request):
+    body = request.body.decode('utf-8')
+    data = json.loads(body)
+
+    userID = data['userID']
+    token = data['token']
+    patientID = data['patientID']
+    date_range = data['date_range']
+    if verifyToken(userID, token):
+        return Response(execution.getAppointmentsOfPatient(patientID, date_range))
+    else:
+        return Response({'success': False, 'alertMessage': "verification failed"})
+
+
+@api_view(['POST'])
+def getAppntUnderDoc(request):
+    body = request.body.decode('utf-8')
+    data = json.loads(body)
+
+    userID = data['userID']
+    token = data['token']
+    docID = data['docID']
+    if verifyToken(userID, token):
+        return Response(execution.getAppointsUnderDoc(docID))
+    else:
+        return Response({'success': False, 'alertMessage': "verification failed"})

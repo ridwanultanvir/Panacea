@@ -54,6 +54,12 @@ import TechnicianHome from './Technician/Homepage/TechnicianHome';
 import PendingTests from './Technician/PendingTests/PendingTests';
 import TestResult from './Technician/PendingTests/TestResult';
 import UpcomingAppointment from './Patient/Homepage/UpcomingAppointment';
+import DataExtractor from './Admin/DataExtractor/DataExtractor';
+import DataExtractorInput from './Admin/DataExtractor/DataExtractorInput';
+import PrepareBill from './Receptionist/Payment/PrepareBill';
+import NurseHome from './Nurse/Homepage/NurseHome';
+import Dispensary from './Nurse/Dispensary/Dispensary'
+
 import Notification from './Patient/Notification/Notification';
 import NotificationDoctor from './Doctor/Notification/Notification';
 import TechnicianNotification from './Technician/Notification/Notification';
@@ -112,6 +118,7 @@ class Main extends Component {
     constructor(props) {
         super(props);
         this.renderDoctorDiagnosisPage = this.renderDoctorDiagnosisPage.bind(this);
+        this.renderDataExtractorInput = this.renderDataExtractorInput.bind(this);
         this.renderReceptionistServicesPage = this.renderReceptionistServicesPage.bind(this);
         this.renderTechnicianTestResultPage = this.renderTechnicianTestResultPage.bind(this);
         this.renderDoctorSurgeryResultPage = this.renderDoctorSurgeryResultPage.bind(this);
@@ -130,6 +137,17 @@ class Main extends Component {
                 app_sl_no={app_sl_no}
             />
         );
+    }
+
+    renderDataExtractorInput({match}) {
+        let serial = match.params.serial;
+        //console.log(serial);
+        return (
+            <DataExtractorInput
+                User={this.props.User}
+                serial={serial}
+            /> 
+        )
     }
 
     renderReceptionistServicesPage({ match }) {
@@ -273,6 +291,13 @@ class Main extends Component {
                             User={this.props.User}
                         />
                     </Route>
+                    <Route path='/admin/data-extractor'>
+                        <DataExtractor
+                            User={this.props.User}
+
+                        />
+                    </Route>
+                    <Route path="/admin/in-data-for-extraction/:serial" component={this.renderDataExtractorInput}/>
                     <Route path="/doctor/home">
                         <DoctorHome
                             User={this.props.User}
@@ -294,12 +319,24 @@ class Main extends Component {
                         />
                     </Route>
                     <Route path="/doctor/appointment/:app_sl_no" component={this.renderDoctorDiagnosisPage} />
-
+          
                     <Route exact path="/doctor/monitor-patient">
                         <MonitorPatient
                             User={this.props.User}
                         />
                     </Route>
+          
+                    <Route path="/nurse/home">
+                        <NurseHome
+                            User={this.props.User}
+                        />
+                    </Route>
+                    <Route path='/nurse/dispensary'>
+                        <Dispensary
+                            User = {this.props.User}
+                        />
+                    </Route>
+                    
 
                     <Route path="/doctor/monitor-patient/:patient_id" component={this.renderPatientMonitroDetail} />
 
@@ -414,6 +451,11 @@ class Main extends Component {
                         />
                     </Route>
                     <Route path='/technician/pending-tests/:test_result_id' component={this.renderTechnicianTestResultPage} />
+                    <Route path='/receptionist/prepare-bill'>
+                        <PrepareBill 
+                            User={this.props.User}
+                        />
+                    </Route>
                     <Route path='/technician/notification'>
                         <TechnicianNotification
                             User={this.props.User}

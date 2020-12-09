@@ -6,84 +6,77 @@ import ListSubheader from '@material-ui/core/ListSubheader';
 import DashboardIcon from '@material-ui/icons/Dashboard';
 import ShoppingCartIcon from '@material-ui/icons/ShoppingCart';
 import PeopleIcon from '@material-ui/icons/People';
-import ListAltIcon from '@material-ui/icons/ListAlt';
-import NoteAddIcon from '@material-ui/icons/NoteAdd';
-// import BarChartIcon from '@material-ui/icons/BarChart';
-// import LayersIcon from '@material-ui/icons/Layers';
-// import AssignmentIcon from '@material-ui/icons/Assignment';
 import BarChartIcon from '@material-ui/icons/BarChart';
 import LayersIcon from '@material-ui/icons/Layers';
 import AssignmentIcon from '@material-ui/icons/Assignment';
-import AddCircleIcon from '@material-ui/icons/AddCircle';
-import QueueIcon from '@material-ui/icons/Queue';
+import AirlineSeatFlatIcon from '@material-ui/icons/AirlineSeatFlat';
 import { Link } from 'react-router-dom';
-import { Home } from '@material-ui/icons';
+import { } from '@material-ui/icons';
 
 export const mainListItems = (
     <div>
-
-        <Link to='/admin/home' style={{ textDecoration: 'none', color: 'black' }}>
+        <Link to='/nurse/home' style={{ textDecoration: 'none', color: 'black' }}>
             <ListItem button>
                 <ListItemIcon>
                     <DashboardIcon />
                 </ListItemIcon>
-                <ListItemText primary="Dashboard" />
+                <ListItemText primary="Profile" />
             </ListItem>
         </Link>
-        <Link to='/home' style={{ textDecoration: 'none', color: 'black' }}>
-            <ListItem button>
-                <ListItemIcon>
-                    <Home />
-                </ListItemIcon>
-                <ListItemText primary="Home" />
-            </ListItem>
-        </Link>
-        <Link to='/admin/schedule' style={{ textDecoration: 'none', color: 'black' }}>
+        {/* <Link to='/receptionist/appointments' style={{ textDecoration: 'none', color: 'black' }}> */}
             <ListItem button >
-                <ListItemIcon>
-                    <AddCircleIcon />
-                </ListItemIcon>
-                <ListItemText primary="Make Doctor Schedule" />
-            </ListItem>
-        </Link>
-        <Link to='/admin/schedule_emp' style={{ textDecoration: 'none', color: 'black' }}>
-            <ListItem button >
-                <ListItemIcon>
-                    <QueueIcon />
-                </ListItemIcon>
-                <ListItemText primary="Make Employee Schedule" />
-            </ListItem>
-        </Link>
-        <Link to='/admin/add-user' style={{ textDecoration: 'none', color: 'black' }}>
-            <ListItem button>
                 <ListItemIcon>
                     <PeopleIcon />
                 </ListItemIcon>
-                <ListItemText primary="Add user" />
+                <ListItemText primary="My Schedule" />
             </ListItem>
-        </Link>
-
-        <Link to='/admin/data-extractor' style={{ textDecoration: 'none', color: 'black' }}>
+        {/* </Link> */}
+        <Link to='/nurse/dispensary' style={{ textDecoration: 'none', color: 'black' }}>
             <ListItem button>
                 <ListItemIcon>
-                    <ListAltIcon />
+                    <ShoppingCartIcon />
                 </ListItemIcon>
-                <ListItemText primary="Data Extractor" />
+                <ListItemText primary="Dispensary" />
             </ListItem>
         </Link>
+        
         {/* <ListItem button>
             <ListItemIcon>
                 <BarChartIcon />
             </ListItemIcon>
-            <ListItemText primary="Reports" />
+            <ListItemText primary="Service report" />
         </ListItem>
         <ListItem button>
             <ListItemIcon>
                 <LayersIcon />
             </ListItemIcon>
-            <ListItemText primary="Integrations" />
+            <ListItemText primary="Doctor's schedule" />
         </ListItem> */}
+        {/* <Link to='/receptionist/surgery-schedule' style={{ textDecoration: 'none', color: 'black' }}>
+            <ListItem button >
+                <ListItemIcon>
+                    <AirlineSeatFlatIcon />
+                </ListItemIcon>
+                <ListItemText primary="Surgery Schedule" />
+            </ListItem>
+        </Link> */}
+        {/* <Link to='/receptionist/patient-admit' style={{ textDecoration: 'none', color: 'black' }}>
+            <ListItem button >
+                <ListItemIcon>
+                    <AirlineSeatFlatIcon />
+                </ListItemIcon>
+                <ListItemText primary="Admit Patient" />
+            </ListItem>
+        </Link>
 
+        <Link to='/receptionist/prepare-bill' style={{ textDecoration: 'none', color: 'black' }}>
+            <ListItem button >
+                <ListItemIcon>
+                    <AirlineSeatFlatIcon />
+                </ListItemIcon>
+                <ListItemText primary="Prepare Bill" />
+            </ListItem>
+        </Link> */}
     </div>
 );
 

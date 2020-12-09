@@ -281,7 +281,6 @@ def roomTypesforCats(request):
 def admitPatientReq(request):
     body = request.body.decode('utf-8')
     data = json.loads(body)
-    print(data)
     return Response(execution.admitPatient(data['patientID'], data['room_no'], data['date']))
 
 
@@ -310,6 +309,32 @@ def addIncharge(request):
     return Response(execution.addIncharge(block_id, inChargeUserID))
 
 
+@api_view(['POST'])
+def scheduleHistory(request):
+    body = request.body.decode('utf-8')
+    data = json.loads(body)
+    userID = data['userID']
+    token = data['token']
+    employeeID = data['employeeID']
+    if verifyToken(userID, token):
+        return Response(execution.scheduleHisEmp(employeeID))
+    else:
+        return Response({'success': False, 'alertMessage': "Verification Failed"})
+    
+
+@api_view(['POST'])
+def scheduleOnDate(request):
+    body = request.body.decode('utf-8')
+    data = json.loads(body)
+    userID = data['userID']
+    token = data['token']
+    wardCategory = data['wardCategory']
+    sch_on_date = data['sch_on_date']
+    if verifyToken(userID, token):
+        return Response(execution.scheduleOnWardDate(wardCategory, sch_on_date))
+    else:
+        return Response({'success': False, 'alertMessage': "Verification Failed"})
+   
 @api_view(['POST'])
 def getUserSchedule(request):
     body = request.body.decode('utf-8')

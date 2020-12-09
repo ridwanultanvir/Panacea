@@ -84,6 +84,15 @@ export const mainListItems = (
                 <ListItemText primary="Admit Patient" />
             </ListItem>
         </Link>
+
+        <Link to='/receptionist/prepare-bill' style={{ textDecoration: 'none', color: 'black' }}>
+            <ListItem button >
+                <ListItemIcon>
+                    <AirlineSeatFlatIcon />
+                </ListItemIcon>
+                <ListItemText primary="Prepare Bill" />
+            </ListItem>
+        </Link>
         <Link to="/receptionist/notification" style={{ textDecoration: 'none', color: 'black' }}>
             <ListItem button>
                 <ListItemIcon>

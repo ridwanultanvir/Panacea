@@ -427,3 +427,94 @@ def getNextAppointments(userID):
         errorObj, = error.args
         response = {'success': False, 'alertMessage': errorObj.message}
         return response
+
+
+def getAppointmentsOfPatient(patientID, dateRange):
+    connection = connect()
+    cursor = connection.cursor()
+
+    response = {}
+    if dateRange == -1:
+        query = '''SELECT A.APP_SL_NO,(P.FIRST_NAME||' '||P.LAST_NAME) AS PATIENT_NAME, (D.FIRST_NAME||' '||D.LAST_NAME) AS DOCTOR_NAME,
+                TO_CHAR(A.APPNT_DATE,'DD/MM/YYYY') AS APPNT_DATE, TO_CHAR(SCH.SCHEDULE_DATE, 'DD/MM/YYYY') AS VISITING_DATE, A.STATUS
+                FROM APPOINTMENT A JOIN PERSON P 
+                ON (A.PATIENT_ID= P.ID AND P.ID =(SELECT ID FROM PERSON WHERE USER_ID = (:patientID)) 
+                    AND A.APPNT_DATE<(SYSDATE))
+                JOIN PERSON D 
+                ON (A.DOCTOR_ID = D.ID) 
+                JOIN SCHEDULE SCH ON
+                (A.SCHEDULE_ID = SCH.SCHEDULE_ID) ORDER BY A.APP_SL_NO DESC'''
+
+    else:
+        query = '''SELECT A.APP_SL_NO,(P.FIRST_NAME||' '||P.LAST_NAME) AS PATIENT_NAME, (D.FIRST_NAME||' '||D.LAST_NAME) AS DOCTOR_NAME,
+                    TO_CHAR(A.APPNT_DATE,'DD/MM/YYYY') AS APPNT_DATE, TO_CHAR(SCH.SCHEDULE_DATE, 'DD/MM/YYYY') AS VISITING_DATE, A.STATUS
+                    FROM APPOINTMENT A JOIN PERSON P 
+                    ON (A.PATIENT_ID= P.ID AND P.ID =(SELECT ID FROM PERSON WHERE USER_ID = (:patientID)) 
+                        AND A.APPNT_DATE>(SYSDATE-(:dateRange)))
+                    JOIN PERSON D 
+                    ON (A.DOCTOR_ID = D.ID) 
+                    JOIN SCHEDULE SCH ON
+                    (A.SCHEDULE_ID = SCH.SCHEDULE_ID) ORDER BY A.APP_SL_NO DESC'''
+
+    try:
+        if dateRange == -1:
+            cursor.execute(query, [patientID])
+        else:
+            cursor.execute(query, [patientID, dateRange])
+        
+        resultTemp = cursor.fetchall()
+        cursor.close()
+
+        headers = [["Appointment Serial No", "Patient Name", "Doctor Name", 
+                    "Appointment Made On", "Visiting Date", "Status"]]
+        result = []
+        for R in resultTemp:
+            result_row = []
+            for elements in R:
+                result_row.append(elements)
+            result.append(result_row)
+        
+        response['tableData'] = result
+        response['tableHeader'] = headers
+        response['success'] = True
+        return response
+    except cx_Oracle.Error as error:
+        errorObj, = error.args
+        response = {'success': False, 'alertMessage': errorObj.message}
+        return response
+
+
+def getAppointsUnderDoc(docID):
+    connection = connect()
+    cursor = connection.cursor()
+
+    response = {}
+    query = '''SELECT A.APP_SL_NO,(P.FIRST_NAME||' '||P.LAST_NAME) AS PATIENT_NAME, 
+                TO_CHAR(A.APPNT_DATE,'DD/MM/YYYY') AS APPNT_DATE, TO_CHAR(SCH.SCHEDULE_DATE, 'DD/MM/YYYY') AS VISITING_DATE, A.STATUS
+                FROM APPOINTMENT A JOIN PERSON P 
+                ON A.PATIENT_ID = P.ID AND A.DOCTOR_ID = (SELECT ID FROM PERSON WHERE USER_ID = (:docID))
+                JOIN SCHEDULE SCH ON (A.SCHEDULE_ID = SCH.SCHEDULE_ID)
+                ORDER BY A.APP_SL_NO DESC'''
+
+    try:
+        cursor.execute(query, [docID])
+        resultTemp = cursor.fetchall()
+        cursor.close()
+
+        headers = [["Appointment Serial No", "Patient Name",  
+                    "Appointment Made On", "Visiting Date", "Status"]]
+        result = []
+        for R in resultTemp:
+            result_row = []
+            for elements in R:
+                result_row.append(elements)
+            result.append(result_row)
+        
+        response['tableData'] = result
+        response['tableHeader'] = headers
+        response['success'] = True
+        return response
+    except cx_Oracle.Error as error:
+        errorObj, = error.args
+        response = {'success': False, 'alertMessage': errorObj.message}
+        return response
