@@ -361,12 +361,12 @@ def updateTestResult(data):
     print(data)
     try:
         query = '''
-        UPDATE TEST_RESULTS SET SAMPLE_NO = :sample_no, TEST_DATE = TO_DATE(:test_date,'DD-MM-YYYY'), RESULT = :result, COMPLETED = 'T'
+        UPDATE TEST_RESULTS SET SAMPLE_NO = :sample_no, TEST_DATE = TO_DATE(:test_date,'DD-MM-YYYY'), RESULT = :result, COMPLETED = 'T', STATUS = :status
         WHERE TEST_RESULT_ID = :test_result_id
         '''
 
         cursor.execute(query, [data['sample_no'], data['date'],
-                               f"{data['test_result']}", data['test_result_id']])
+                               data['test_result'],  data['status'], data['test_result_id']])
         connection.commit()
 
         response = {'success': True, 'errorMessage': ''}
@@ -609,6 +609,7 @@ def getAllTestsUnderDoc(docID):
     cursor = connection.cursor()
 
     response = {}
+
     query = '''SELECT * FROM TABLE(RETURN_DOC_ALL_TEST_TABLE((:docID)))'''
 
     try:
@@ -632,6 +633,79 @@ def getAllTestsUnderDoc(docID):
     except cx_Oracle.Error as error:
         errorObj, = error.args
         response = {'success': False, 'alertMessage': errorObj.message}
+        return response
+
+
+
+def getPatienttestResults(data):
+    connection = connect()
+    cursor = connection.cursor()
+
+    response = {}
+    try:
+        result = []
+        if data['allTests']:
+            query = '''
+            SELECT T.APP_SL_NO, T.TEST_RESULT_ID, T.SERVICE_NAME,TO_CHAR(T.TEST_COMPLETE_DATE), T.TEST_RESULT, T.COMPLETED,
+            (P.FIRST_NAME || ' ' || P.LAST_NAME) AS "DOCTORS NAME"
+            FROM TABLE(RETURN_TEST_RESULT_TABLE(:pat_id)) T JOIN APPOINTMENT A ON(T.APP_SL_NO = A.APP_SL_NO)
+            JOIN PERSON P ON(A.DOCTOR_ID = P.ID)
+            WHERE T.COMPLETED = 'T' OR T.COMPLETED = 'A'
+            ORDER BY T.TEST_RESULT_ID DESC
+            '''
+
+            cursor.execute(query, [data['userID']])
+            result = cursor.fetchall()
+
+        elif data['pendingTests']:
+            query = '''
+            SELECT T.APP_SL_NO, T.TEST_RESULT_ID, T.SERVICE_NAME,TO_CHAR(T.TEST_COMPLETE_DATE), T.TEST_RESULT, T.COMPLETED,
+            (P.FIRST_NAME || ' ' || P.LAST_NAME) AS "DOCTORS NAME"
+            FROM TABLE(RETURN_TEST_RESULT_TABLE(:pat_id)) T JOIN APPOINTMENT A ON(T.APP_SL_NO = A.APP_SL_NO)
+            JOIN PERSON P ON(A.DOCTOR_ID = P.ID)
+            WHERE T.COMPLETED = 'A'
+            ORDER BY T.TEST_RESULT_ID DESC
+            '''
+            cursor.execute(query, [data['userID']])
+            result = cursor.fetchall()
+        elif data['completedTests']:
+            query = '''
+            SELECT T.APP_SL_NO, T.TEST_RESULT_ID, T.SERVICE_NAME,TO_CHAR(T.TEST_COMPLETE_DATE), T.TEST_RESULT, T.COMPLETED,
+            (P.FIRST_NAME || ' ' || P.LAST_NAME) AS "DOCTORS NAME"
+            FROM TABLE(RETURN_TEST_RESULT_TABLE(:pat_id)) T JOIN APPOINTMENT A ON(T.APP_SL_NO = A.APP_SL_NO)
+            JOIN PERSON P ON(A.DOCTOR_ID = P.ID)
+            WHERE COMPLETED = 'T'
+            ORDER BY T.TEST_COMPLETE_DATE DESC
+            '''
+            cursor.execute(query, [data['userID']])
+            result = cursor.fetchall()
+        elif data['app_sl_no'] != None:
+            query = '''
+            SELECT T.APP_SL_NO, T.TEST_RESULT_ID, T.SERVICE_NAME,TO_CHAR(T.TEST_COMPLETE_DATE), T.TEST_RESULT, T.COMPLETED,
+            (P.FIRST_NAME || ' ' || P.LAST_NAME) AS "DOCTORS NAME"
+            FROM TABLE(RETURN_TEST_RESULT_TABLE(:pat_id)) T JOIN APPOINTMENT A ON(T.APP_SL_NO = A.APP_SL_NO)
+            JOIN PERSON P ON(A.DOCTOR_ID = P.ID)
+            WHERE T.APP_SL_NO = :app_sl_no AND (T.COMPLETED = 'T' OR T.COMPLETED = 'A')
+            ORDER BY T.TEST_RESULT_ID DESC
+            '''
+            cursor.execute(query, [data['userID'], data['app_sl_no']])
+            result = cursor.fetchall()
+
+        test_results = []
+        if len(result) != 0:
+            for test in result:
+                test_results.append({'app_sl_no': test[0], 'test_result_id': test[1], 'service_name': test[2],
+                                     'test_complete_date': test[3], 'test_Rresult': test[4], 'completed': test[5], 'doctor_name': test[6]})
+
+        response['test_results'] = test_results
+        response['success'] = True
+        response['errorMessage'] = ''
+        return response
+
+    except cx_Oracle.Error as error:
+        errorObj, = error.args
+        response = {'success': False, 'errorMessage': errorObj.message}
+        print(response)
         return response
 
 
@@ -701,4 +775,174 @@ def addStock(new_price, amount, medID):
         return response
     except cx_Oracle.Error:
         response = {'success': False, 'alertMessage': 'DataBase Failure'}
+        return response
+                         
+def getPatientSurgeryResult(data):
+    connection = connect()
+    cursor = connection.cursor()
+
+    response = {}
+    try:
+        result = []
+        if data['allSurgery']:
+            query = '''
+            SELECT T.APP_SL_NO, T.SURGERY_RESULT_ID, TO_CHAR(T.SURGERY_DATE), T.SURGERY_DESC, T.COMPLETED, T.STATUS, T.RESULT,
+            (P.FIRST_NAME || ' ' || P.LAST_NAME) AS "DOCTOR NAME"
+            FROM TABLE(RETURN_SURGERY_RESULT_PATIENT(:pat_id)) T JOIN APPOINTMENT A ON(T.APP_SL_NO = A.APP_SL_NO)
+            JOIN PERSON P ON(A.DOCTOR_ID = P.ID)
+            WHERE T.COMPLETED = 'T' OR T.COMPLETED = 'A'
+            ORDER BY T.SURGERY_RESULT_ID DESC
+            '''
+            cursor.execute(query, [data['userID']])
+            result = cursor.fetchall()
+
+        elif data['pendingSurgery']:
+            query = '''
+            SELECT T.APP_SL_NO, T.SURGERY_RESULT_ID, TO_CHAR(T.SURGERY_DATE), T.SURGERY_DESC, T.COMPLETED, T.STATUS, T.RESULT,
+            (P.FIRST_NAME || ' ' || P.LAST_NAME) AS "DOCTOR NAME"
+            FROM TABLE(RETURN_SURGERY_RESULT_PATIENT(:pat_id)) T JOIN APPOINTMENT A ON(T.APP_SL_NO = A.APP_SL_NO)
+            JOIN PERSON P ON(A.DOCTOR_ID = P.ID)
+            WHERE T.COMPLETED = 'A'
+            ORDER BY T.SURGERY_RESULT_ID DESC
+            '''
+            cursor.execute(query, [data['userID']])
+            result = cursor.fetchall()
+
+        elif data['completedSurgery']:
+            query = '''
+            SELECT T.APP_SL_NO, T.SURGERY_RESULT_ID, TO_CHAR(T.SURGERY_DATE), T.SURGERY_DESC, T.COMPLETED, T.STATUS, T.RESULT,
+            (P.FIRST_NAME || ' ' || P.LAST_NAME) AS "DOCTOR NAME"
+            FROM TABLE(RETURN_SURGERY_RESULT_PATIENT(:pat_id)) T JOIN APPOINTMENT A ON(T.APP_SL_NO = A.APP_SL_NO)
+            JOIN PERSON P ON(A.DOCTOR_ID = P.ID)
+            WHERE T.COMPLETED = 'T'
+            ORDER BY T.SURGERY_DATE DESC, T.SURGERY_RESULT_ID DESC
+            '''
+            cursor.execute(query, [data['userID']])
+            result = cursor.fetchall()
+
+        elif data['app_sl_no'] != None:
+            query = '''
+            SELECT T.APP_SL_NO, T.SURGERY_RESULT_ID, TO_CHAR(T.SURGERY_DATE), T.SURGERY_DESC, T.COMPLETED, T.STATUS, T.RESULT,
+            (P.FIRST_NAME || ' ' || P.LAST_NAME) AS "DOCTOR NAME"
+            FROM TABLE(RETURN_SURGERY_RESULT_PATIENT(:pat_id)) T JOIN APPOINTMENT A ON(T.APP_SL_NO = A.APP_SL_NO)
+            JOIN PERSON P ON(A.DOCTOR_ID = P.ID)
+            WHERE T.APP_SL_NO = :app_sl_no AND  (T.COMPLETED = 'T' OR T.COMPLETED = 'A')
+            ORDER BY  T.SURGERY_RESULT_ID DESC
+            '''
+            cursor.execute(query, [data['userID'],  data['app_sl_no']])
+            result = cursor.fetchall()
+
+        surgery_result = []
+        if len(result) != 0:
+            for surg in result:
+                surgery_result.append({'app_sl_no': surg[0], 'surgery_result_id': surg[1], 'surgery_date': surg[2],
+                                       'surgery_desc': surg[3], 'completed': surg[4], 'status': surg[5], 'result': surg[6],
+                                       'doctor_name': surg[7]})
+        response['surgery_result'] = surgery_result
+        response['success'] = True
+        response['errorMessage'] = ''
+        return response
+
+    except cx_Oracle.Error as error:
+        errorObj, = error.args
+        response = {'success': False, 'errorMessage': errorObj.message}
+        print(response)
+        return response
+
+
+def getAdmittedPatient(data):
+    connection = connect()
+    cursor = connection.cursor()
+
+    response = {}
+    try:
+        query = '''
+        SELECT R.ROOM_NO, R.BLOCK_ID,B.CATEGORY
+        FROM ROOM R JOIN BLOCK B ON(R.BLOCK_ID = B.BLOCK_ID)
+        WHERE B.INCHARGE_ID = (SELECT ID FROM PERSON WHERE USER_ID = :doc_id)
+        ORDER BY R.ROOM_NO
+        '''
+
+        cursor.execute(query, [data['userID']])
+        result = cursor.fetchall()
+
+        rooms = []
+
+        for room in result:
+            query = '''
+            SELECT (SELECT USER_ID FROM PERSON WHERE ID = RA.PATIENT_ID),
+            (SELECT (FIRST_NAME|| ' ' || LAST_NAME) AS NAME FROM PERSON WHERE ID = RA.PATIENT_ID) AS "NAME",
+            RA.ADMISSION_DATE, RA.ADMISSION_SL
+            FROM ROOM_ADMISSION RA
+            WHERE RA.ROOM_NO = :room_no AND RA.RELEASE_DATE IS NULL
+            '''
+
+            cursor.execute(query, [room[0]])
+            pat_result = cursor.fetchall()
+            patients = []
+            for pat in pat_result:
+                patients.append(
+                    {'patient_id': pat[0], 'patient_name': pat[1], 'admission_date': pat[2], 'admission_sl': pat[3]})
+
+            rooms.append({'room_no': room[0], 'block_id': room[1],
+                          'block_category': room[2], 'patients': patients})
+
+        response['rooms'] = rooms
+        response['success'] = True
+        response['errorMessage'] = ''
+        return response
+
+    except cx_Oracle.Error as error:
+        errorObj, = error.args
+        response = {'success': False, 'errorMessage': errorObj.message}
+        print(response)
+        return response
+
+
+def getPatientMonitorData(data):
+    connection = connect()
+    cursor = connection.cursor()
+
+    response = {}
+    try:
+        query = '''
+        SELECT HEARTBEAT, SYS_BP,DIAS_BP,TEMPERATURE, OXY_LEVEL,BREATHING_RATE,  FLOOR((SYSDATE - CAST(TIME AS DATE))*24) AS "HOUR",
+        (ROUND((SYSDATE - CAST(TIME AS DATE))*24,2)-FLOOR((SYSDATE - CAST(TIME AS DATE))*24))*60 AS "MINUTE", TO_CHAR(CAST(TIME AS DATE),'MM/DD/YYYY HH:MI:SS') AS "TIME"
+        FROM MONITORING_DATA
+        WHERE PATIENT_ID = (SELECT ID FROM PERSON WHERE USER_ID = :pat_id)
+        ORDER BY HOUR, MINUTE
+        '''
+
+        cursor.execute(query, [data['patient_id']])
+        result = cursor.fetchall()
+
+        monitroData = []
+        for dat in result:
+            monitroData.append({'heart_beat': dat[0], 'sys_bp': dat[1], 'dias_bp': dat[2],
+                                'temperature': dat[3], 'oxygen_level': dat[4], 'breathing_rate': dat[5], 'hours_past': dat[6],
+                                'minutes_past': dat[7], 'time_of_data': dat[8]})
+
+        query = '''
+        SELECT (SELECT USER_ID FROM PERSON WHERE ID = RA.PATIENT_ID),
+        (SELECT (FIRST_NAME|| ' ' || LAST_NAME) AS NAME FROM PERSON WHERE ID = RA.PATIENT_ID) AS "NAME",
+        TO_CHAR(RA.ADMISSION_DATE) AS "ADMISSION_DATE", RA.ADMISSION_SL
+        FROM ROOM_ADMISSION RA
+        WHERE RA.PATIENT_ID = (SELECT ID FROM PERSON WHERE USER_ID = :pat_id)
+        '''
+
+        cursor.execute(query, [data['patient_id']])
+        pat_result = cursor.fetchone()
+
+        response['monitor_data'] = monitroData
+        response['patient_info'] = {'patient_id': pat_result[0], 'patient_name': pat_result[1], 'admission_date': pat_result[2],
+                                    'admission_sl': pat_result[3]}
+
+        response['success'] = True
+        response['errorMessage'] = ''
+        return response
+
+    except cx_Oracle.Error as error:
+        errorObj, = error.args
+        response = {'success': False, 'errorMessage': errorObj.message}
+        print(response)
         return response

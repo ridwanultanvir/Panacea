@@ -3,6 +3,11 @@ import cx_Oracle
 import hashlib
 
 from django.http import response
+from django.shortcuts import resolve_url
+import datetime
+
+
+salt = 'sjbhvksjnfklnewrglkdfkjgnergjdfnvjhbfgjndfjvdf2985734jnr98j/74werf*/4'
 
 
 def connect(user_n='PANACEA', pass_n='panacea', host='localhost', port='1521', service_n='ORCL'):
@@ -12,8 +17,8 @@ def connect(user_n='PANACEA', pass_n='panacea', host='localhost', port='1521', s
     return conn
 
 
-def passwordHash(password):
-    result = hashlib.md5(password.encode())
+def tokenHash(str):
+    result = hashlib.md5(str.encode())
     return result.hexdigest()
 
 
@@ -30,14 +35,41 @@ def checkPassword(userId, password):
 
 
 def verifyToken(userID, token):
+    connection = connect()
+    cursor = connection.cursor()
     if userID != None and token != None:
-        return True
+        query = '''
+            SELECT ROUND((SYSDATE - DATE_CREATED)*24,3) AS "HOUR" FROM SESSION_TOKEN 
+            WHERE USER_ID = :userID
+            AND TOKEN = :token
+        '''
+        cursor.execute(query, [userID, token])
+        result = cursor.fetchone()
+        if result[0] < 12:
+            return True
+        else:
+            return False
     else:
         return False
 
 
 def generateToken(userID):
-    return 'token'
+    connection = connect()
+    cursor = connection.cursor()
+    datetime_object = datetime.datetime.now()
+    date_time_string = datetime_object.strftime("%m/%d/%Y, %H:%M:%S")
+    token = tokenHash(userID + salt + date_time_string)
+    print(token)
+
+    query = '''
+    INSERT INTO SESSION_TOKEN
+    VALUES((SELECT MAX(SESSION_ID) FROM SESSION_TOKEN)+1, :userID, :token, SYSDATE)
+    '''
+
+    cursor.execute(query, [userID, token])
+    connection.commit()
+
+    return token
 
 
 def getUserInfoDict(result):
@@ -70,7 +102,6 @@ def login(credentials):
         response = {}
         response['errorMessage'] = ''
         response['token'] = generateToken(userId)
-        print(response)
         if userId[:3] == 'D21':
             query = '''SELECT (P.FIRST_NAME || ' ' || P.LAST_NAME) AS NAME, P.EMAIL,P.PHONE_NUM, P.IMAGE, P.GENDER, P.ADDRESS, 
                         P.DATE_OF_BIRTH, D.DEPARTMENT, D.DESIGNATION, D.QUALIFICATION
@@ -390,3 +421,148 @@ def adminAddUser(data):
             response = {'success': False, 'errorMessage': errorObj.message}
             print(response)
             return response
+
+
+def getNotification(data):
+    connection = connect()
+    cursor = connection.cursor()
+    response = {}
+
+    try:
+        query = '''
+        SELECT * FROM NOTIFICATION
+        WHERE USER_ID = (SELECT ID FROM PERSON WHERE USER_ID = :userID)
+        ORDER BY NOTIFICATION_ID DESC
+        '''
+
+        cursor.execute(query, [data['userID']])
+        result = cursor.fetchall()
+
+        notifications = []
+
+        for notification in result:
+            notifications.append({'notification_id': notification[0], 'user_id': notification[1], 'status': notification[2],
+                                  'message': notification[3]})
+        response['notifications'] = notifications
+        response['success'] = True
+        response['errorMessage'] = ''
+
+        return response
+
+    except cx_Oracle.Error as error:
+        errorObj, = error.args
+        response = {'success': False, 'errorMessage': errorObj.message}
+        print(response)
+        return response
+
+
+def markNotificationAsRead(data):
+    connection = connect()
+    cursor = connection.cursor()
+    response = {}
+
+    try:
+        if data['allmarked']:
+            query = '''
+            UPDATE NOTIFICATION SET STATUS = 'R'
+            WHERE USER_ID = (SELECT ID FROM PERSON WHERE USER_ID = :userID)
+            '''
+
+            cursor.execute(query, [data['userID']])
+            connection.commit()
+        else:
+            query = '''
+            UPDATE NOTIFICATION SET STATUS = 'R'
+            WHERE NOTIFICATION_ID = :notification_id
+            '''
+            cursor.execute(query, [data['notification_id']])
+            connection.commit()
+
+        return getNotification(data)
+    except cx_Oracle.Error as error:
+        errorObj, = error.args
+        response = {'success': False, 'errorMessage': errorObj.message}
+        print(response)
+        return response
+
+
+def updateUser(data):
+    connection = connect()
+    cursor = connection.cursor()
+    response = {}
+    try:
+        success = cursor.callfunc("UPDATE_USER", int, [data["userID"], data["first_name"], data["last_name"],
+                                                       data["email"], data["address"], data["phoneNumber"],
+                                                       data["doc_qualification"], data["pat_bio"], data["emp_education"],
+                                                       data["emp_training"]])
+
+        connection.commit()
+        userId = data["userID"]
+
+        if success == 1:
+            if userId[:3] == 'D21':
+                query = '''SELECT (P.FIRST_NAME || ' ' || P.LAST_NAME) AS NAME, P.EMAIL,P.PHONE_NUM, P.IMAGE, P.GENDER, P.ADDRESS, 
+                            P.DATE_OF_BIRTH, D.DEPARTMENT, D.DESIGNATION, D.QUALIFICATION
+                            FROM PERSON P JOIN DOCTOR D ON(P.ID = D.ID)
+                            WHERE P.USER_ID = :user_id
+                            '''
+                cursor.execute(query, [userId])
+                result = cursor.fetchone()
+                docInfo = {}
+                userInfo = getUserInfoDict(result)
+                docInfo.update(userInfo.copy())
+                docInfo['department'] = result[7]
+                docInfo['designation'] = result[8]
+                docInfo['qualification'] = result[9]
+
+                response['userData'] = docInfo
+                response['success'] = True
+                response['errorMessage'] = ''
+                return response
+
+            elif userId[:3] == 'E28':
+                query = '''SELECT (P.FIRST_NAME || ' ' || P.LAST_NAME) AS NAME, P.EMAIL,P.PHONE_NUM, P.IMAGE, P.GENDER, P.ADDRESS, 
+                            P.DATE_OF_BIRTH, E.CATEGORY, E.EDUCATION, E.TRAINING, E.SALARY
+                            FROM PERSON P JOIN EMPLOYEE E ON(P.ID = E.ID)
+                            WHERE P.USER_ID = :user_id
+                            '''
+                cursor.execute(query, [userId])
+                result = cursor.fetchone()
+                empInfo = {}
+                userInfo = getUserInfoDict(result)
+                empInfo.update(userInfo.copy())
+                empInfo['category'] = result[7]
+                empInfo['education'] = result[8]
+                empInfo['training'] = result[9]
+                empInfo['salary'] = result[10]
+
+                response['userData'] = empInfo
+                response['success'] = True
+                response['errorMessage'] = ''
+                return response
+
+            elif userId[:3] == 'P25':
+                query = '''SELECT (P.FIRST_NAME || ' ' || P.LAST_NAME) AS NAME, P.EMAIL,P.PHONE_NUM, P.IMAGE, P.GENDER, P.ADDRESS, 
+                            P.DATE_OF_BIRTH,PT.BIO
+                            FROM PERSON P JOIN PATIENT PT ON(P.ID = PT.ID)
+                            WHERE P.USER_ID = :user_id
+                            '''
+                cursor.execute(query, [userId])
+                result = cursor.fetchone()
+                patientInfo = {}
+                userInfo = getUserInfoDict(result)
+                patientInfo.update(userInfo.copy())
+                patientInfo['bio'] = result[7]
+
+                response['userData'] = patientInfo
+                response['success'] = True
+                response['errorMessage'] = ''
+                return response
+        elif success == 0:
+            return {'success': False, 'errorMessage': "Couldn't update your info"}
+
+    except cx_Oracle.Error as error:
+        errorObj, = error.args
+        response = {'success': False, 'errorMessage': errorObj.message}
+        print(response)
+        return response

@@ -8,41 +8,58 @@ import PeopleIcon from '@material-ui/icons/People';
 import AirlineSeatFlatIcon from '@material-ui/icons/AirlineSeatFlat';
 import LayersIcon from '@material-ui/icons/Layers';
 import { Link } from 'react-router-dom';
-import { } from '@material-ui/icons';
+import { NotificationImportant, Home, AccountCircle, Ballot, LocalHospital, Note } from '@material-ui/icons';
 
 export const mainListItems = (
     <div>
+
         <Link to='/patient/home' style={{ textDecoration: 'none', color: 'black' }}>
             <ListItem button>
                 <ListItemIcon>
-                    <DashboardIcon />
+                    <AccountCircle />
                 </ListItemIcon>
                 <ListItemText primary="Profile" />
+            </ListItem>
+        </Link>
+        <Link to='/home' style={{ textDecoration: 'none', color: 'black' }}>
+            <ListItem button>
+                <ListItemIcon>
+                    <Home />
+                </ListItemIcon>
+                <ListItemText primary="Home" />
             </ListItem>
         </Link>
         <Link to='/patient/next-appointment' style={{ textDecoration: 'none', color: 'black' }}>
             <ListItem button >
                 <ListItemIcon>
-                    <PeopleIcon />
+                    <Ballot />
                 </ListItemIcon>
                 <ListItemText primary="Upcoming Appointments" />
             </ListItem>
         </Link>
-        
-        <Link to="/patient/next-surgery" style={{ textDecoration: 'none', color: 'black' }}>
+
+        <Link to="/patient/surgeries" style={{ textDecoration: 'none', color: 'black' }}>
             <ListItem button>
                 <ListItemIcon>
-                    <AirlineSeatFlatIcon />
+                    <LocalHospital />
                 </ListItemIcon>
-                <ListItemText primary="Upcoming Surgery" />
+                <ListItemText primary="Surgeries" />
             </ListItem>
         </Link>
         <Link to="/patient/test-results" style={{ textDecoration: 'none', color: 'black' }}>
             <ListItem button>
                 <ListItemIcon>
-                    <LayersIcon />
+                    <Note />
                 </ListItemIcon>
                 <ListItemText primary="Test Results" />
+            </ListItem>
+        </Link>
+        <Link to="/patient/notification" style={{ textDecoration: 'none', color: 'black' }}>
+            <ListItem button>
+                <ListItemIcon>
+                    <NotificationImportant />
+                </ListItemIcon>
+                <ListItemText primary="Notifications" />
             </ListItem>
         </Link>
     </div>

@@ -19,42 +19,48 @@ def insertData(msg):
     cursor = connection.cursor()
     query = '''INSERT INTO MONITORING_DATA(PATIENT_ID, HEARTBEAT, SYS_BP, DIAS_BP, TEMPERATURE, OXY_LEVEL, BREATHING_RATE, TIME)
                 VALUES(:patient_id, :heartbeat, :sys_bp, :dia_bp, :body_temp, :oxygen_level, :breathing_rate, :timestamp)'''
-    cursor.execute(query, [patient_id, heartbeat, sys_bp, dia_bp, body_temp, oxygen_level, breathing_rate, timestamp])
+    cursor.execute(query, [patient_id, heartbeat, sys_bp, dia_bp,
+                           body_temp, oxygen_level, breathing_rate, timestamp])
+
     connection.commit()
     cursor.close()
 
-    condition_analyst(patient_id, heartbeat, sys_bp, dia_bp, body_temp, oxygen_level, breathing_rate)
+    condition_analyst(patient_id, heartbeat, sys_bp, dia_bp,
+                      body_temp, oxygen_level, breathing_rate)
 
 
 def consumerFunction():
     print("Initializing Thread")
-    consumer = KafkaConsumer('SensorData', value_deserializer=lambda m: json.loads(m.decode('utf-8')))
+    consumer = KafkaConsumer(
+        'SensorData', value_deserializer=lambda m: json.loads(m.decode('utf-8')))
     for msg in consumer:
         x = threading.Thread(target=insertData, args=(msg, ), daemon=True)
         x.start()
 
 
 def score_calculator(heartbeat, sys_bp, dia_bp, body_temp, oxygen_level, breathing_rate):
+
     score = 0
-    if heartbeat > 93.0 or heartbeat < 55.0:
+    if float(heartbeat) > 93.0 or float(heartbeat) < 55.0:
         score = score + 1
-    if sys_bp > 140.0 :
+    if float(sys_bp) > 140.0:
         score = score + 1
-    if dia_bp < 65.0 :
+    if float(dia_bp) < 65.0:
         score = score + 1
-    if body_temp < 97.0 or body_temp > 103.0:
+    if float(body_temp) < 97.0 or float(body_temp) > 103.0:
         score = score + 1
-    if oxygen_level < 0.88:
+    if float(oxygen_level) < 0.88:
         score = score + 1
-    if breathing_rate > 17.0 or breathing_rate < 13.0:
+    if float(breathing_rate) > 17.0 or float(breathing_rate) < 13.0:
         score = score + 1
     return score
 
 
 def condition_analyst(patient_id, heartbeat, sys_bp, dia_bp, body_temp, oxygen_level, breathing_rate):
-    score = score_calculator(heartbeat, sys_bp, dia_bp, body_temp, oxygen_level, breathing_rate)
+    score = score_calculator(heartbeat, sys_bp, dia_bp,
+                             body_temp, oxygen_level, breathing_rate)
 
-    if score >= 3:
+    if score >= 3.5:
         query = '''SELECT * FROM (SELECT * FROM MONITORING_DATA WHERE PATIENT_ID = (:patient_id) ORDER BY SL_NO DESC) WHERE ROWNUM<=6'''
         connection = connect()
         cursor = connection.cursor()
@@ -78,14 +84,15 @@ def condition_analyst(patient_id, heartbeat, sys_bp, dia_bp, body_temp, oxygen_l
         avg_dia_bp = sum(list_dia_bp)/5
         avg_body_temp = sum(list_body_temp)/5
         avg_oxy_level = sum(list_olevel)/5
-        avg_brate = sum(list_brate)/5   
-        score_avg = score_calculator(avg_hrate, avg_sys_bp, avg_dia_bp, avg_body_temp, avg_oxy_level, avg_brate)
-        if score_avg >= 3.5:
-            query = '''SELECT B.INCHARGE_ID, R.BLOCK_ID, RA.ROOM_NO, (P.FIRST_NAME||' '||P.LAST_NAME) AS NAME, P.USER_ID 
-                        FROM ROOM_ADMISSION RA JOIN ROOM R 
-                        ON (RA.PATIENT_ID = (:patient_id) AND RA.RELEASE_DATE IS NULL AND R.ROOM_NO=RA.ROOM_NO) 
-                        JOIN BLOCK B 
-                        ON (R.BLOCK_ID = B.BLOCK_ID) JOIN PERSON P ON P.ID = (:patient_id)'''
+        avg_brate = sum(list_brate)/5
+        score_avg = score_calculator(
+            avg_hrate, avg_sys_bp, avg_dia_bp, avg_body_temp, avg_oxy_level, avg_brate)
+        if score_avg >= 1.0:
+            query = '''SELECT B.INCHARGE_ID, R.BLOCK_ID, RA.ROOM_NO, (P.FIRST_NAME||' '||P.LAST_NAME) AS NAME, P.USER_ID
+                    FROM ROOM_ADMISSION RA JOIN ROOM R
+                    ON (RA.PATIENT_ID = (:patient_id) AND RA.RELEASE_DATE IS NULL AND R.ROOM_NO=RA.ROOM_NO)
+                    JOIN BLOCK B
+                    ON (R.BLOCK_ID = B.BLOCK_ID) JOIN PERSON P ON P.ID = (:patient_id)'''
             cursor.execute(query, [patient_id])
             result = cursor.fetchall()
             name = result[0][3]
@@ -95,10 +102,14 @@ def condition_analyst(patient_id, heartbeat, sys_bp, dia_bp, body_temp, oxygen_l
             doctor_id = result[0][0]
 
             message = f'''Emergency! The patient {patient_userID}-{name} in block-{block_id}, room-{room_no} needs emergency attention.
-                            Seriousness Level-{score_avg}/5'''
+                        Seriousness Level-{score_avg}/5'''
 
-            query = '''INSERT INTO NOTIFICATION(USER_ID, STATUS, MESSAGE) VALUES
-                        (:doctor_id, 'I', :message)'''
+            print(message)
+
+            query = '''
+            INSERT INTO NOTIFICATION(NOTIFICATION_ID,USER_ID, STATUS, MESSAGE) 
+            VALUES((SELECT MAX(NOTIFICATION_ID)+1 FROM NOTIFICATION),:doctor_id, 'I', :message)
+            '''
             cursor.execute(query, [doctor_id, message])
             connection.commit()
             cursor.close()

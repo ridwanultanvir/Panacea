@@ -11,10 +11,17 @@ import NoteAddIcon from '@material-ui/icons/NoteAdd';
 // import BarChartIcon from '@material-ui/icons/BarChart';
 // import LayersIcon from '@material-ui/icons/Layers';
 // import AssignmentIcon from '@material-ui/icons/Assignment';
+import BarChartIcon from '@material-ui/icons/BarChart';
+import LayersIcon from '@material-ui/icons/Layers';
+import AssignmentIcon from '@material-ui/icons/Assignment';
+import AddCircleIcon from '@material-ui/icons/AddCircle';
+import QueueIcon from '@material-ui/icons/Queue';
 import { Link } from 'react-router-dom';
+import { Home } from '@material-ui/icons';
 
 export const mainListItems = (
     <div>
+
         <Link to='/admin/home' style={{ textDecoration: 'none', color: 'black' }}>
             <ListItem button>
                 <ListItemIcon>
@@ -23,10 +30,18 @@ export const mainListItems = (
                 <ListItemText primary="Dashboard" />
             </ListItem>
         </Link>
+        <Link to='/home' style={{ textDecoration: 'none', color: 'black' }}>
+            <ListItem button>
+                <ListItemIcon>
+                    <Home />
+                </ListItemIcon>
+                <ListItemText primary="Home" />
+            </ListItem>
+        </Link>
         <Link to='/admin/schedule' style={{ textDecoration: 'none', color: 'black' }}>
             <ListItem button >
                 <ListItemIcon>
-                    <PeopleIcon />
+                    <AddCircleIcon />
                 </ListItemIcon>
                 <ListItemText primary="Make Doctor Schedule" />
             </ListItem>
@@ -34,7 +49,7 @@ export const mainListItems = (
         <Link to='/admin/schedule_emp' style={{ textDecoration: 'none', color: 'black' }}>
             <ListItem button >
                 <ListItemIcon>
-                    <PeopleIcon />
+                    <QueueIcon />
                 </ListItemIcon>
                 <ListItemText primary="Make Employee Schedule" />
             </ListItem>
@@ -42,11 +57,12 @@ export const mainListItems = (
         <Link to='/admin/add-user' style={{ textDecoration: 'none', color: 'black' }}>
             <ListItem button>
                 <ListItemIcon>
-                    <NoteAddIcon />
+                    <PeopleIcon />
                 </ListItemIcon>
                 <ListItemText primary="Add user" />
             </ListItem>
         </Link>
+
         <Link to='/admin/data-extractor' style={{ textDecoration: 'none', color: 'black' }}>
             <ListItem button>
                 <ListItemIcon>
@@ -67,6 +83,7 @@ export const mainListItems = (
             </ListItemIcon>
             <ListItemText primary="Integrations" />
         </ListItem> */}
+
     </div>
 );
 

@@ -23,6 +23,7 @@ import {
     addSurgerySchedule,
     loadRoomTypes,
     addAdmitPatient,
+    updateUser,
 } from '../Redux/ActionCreator';
 
 import Home from './HomeComponent';
@@ -59,6 +60,17 @@ import PrepareBill from './Receptionist/Payment/PrepareBill';
 import NurseHome from './Nurse/Homepage/NurseHome';
 import Dispensary from './Nurse/Dispensary/Dispensary'
 
+import Notification from './Patient/Notification/Notification';
+import NotificationDoctor from './Doctor/Notification/Notification';
+import TechnicianNotification from './Technician/Notification/Notification';
+import ReceptionistNotification from './Receptionist/Notification/Notification';
+import PatientTestResults from './Patient/TestResults/TestResult';
+import PatientSurgeryResult from './Patient/SurgeryResult/SurgeryResult';
+import MonitorPatient from './Doctor/MonitorPatient/MonitorPatient';
+import PatientMonitorDetail from './Doctor/MonitorPatient/PatientMonitorDetails';
+import DoctorSchedule from './Doctor/Schedule/Schedule';
+import ReceptionistSchedule from './Receptionist/ReceptionistSchedule/Schedule';
+import TechnicianSchedule from './Technician/Schedule/Schedule';
 
 const mapStateToProps = (state) => {
     return {
@@ -97,6 +109,7 @@ const mapDispatchToProps = (dispatch) => {
         getReceptionistAppointments: (body) => (dispatch(getReceptionistAppointments(body))),
         acceptReceptionistAppointment: (body) => (dispatch(acceptReceptionistAppointment(body))),
         getDoctorsAppointment: (body) => (dispatch(getDoctorsAppointment(body))),
+        updateUser: (body) => (dispatch(updateUser(body))),
     };
 }
 
@@ -111,6 +124,7 @@ class Main extends Component {
         this.renderDoctorSurgeryResultPage = this.renderDoctorSurgeryResultPage.bind(this);
         this.renderDocDiagnosisHistoryPage = this.renderDocDiagnosisHistoryPage.bind(this);
         this.renderSurgerySchedule = this.renderSurgerySchedule.bind(this);
+        this.renderPatientMonitroDetail = this.renderPatientMonitroDetail.bind(this);
     }
 
     renderDoctorDiagnosisPage({ match }) {
@@ -201,6 +215,18 @@ class Main extends Component {
         );
     }
 
+    renderPatientMonitroDetail({ match }) {
+        let patient_id = match.params.patient_id
+        console.log(patient_id);
+
+        return (
+            <PatientMonitorDetail
+                User={this.props.User}
+                patient_id={patient_id}
+            />
+        );
+    }
+
     render() {
         return (
             <React.Fragment>
@@ -275,6 +301,7 @@ class Main extends Component {
                     <Route path="/doctor/home">
                         <DoctorHome
                             User={this.props.User}
+                            updateUser={this.props.updateUser}
                         />
                     </Route>
                     <Route exact path="/doctor/appointment">
@@ -292,6 +319,13 @@ class Main extends Component {
                         />
                     </Route>
                     <Route path="/doctor/appointment/:app_sl_no" component={this.renderDoctorDiagnosisPage} />
+          
+                    <Route exact path="/doctor/monitor-patient">
+                        <MonitorPatient
+                            User={this.props.User}
+                        />
+                    </Route>
+          
                     <Route path="/nurse/home">
                         <NurseHome
                             User={this.props.User}
@@ -302,14 +336,19 @@ class Main extends Component {
                             User = {this.props.User}
                         />
                     </Route>
+                    
+
+                    <Route path="/doctor/monitor-patient/:patient_id" component={this.renderPatientMonitroDetail} />
+
                     <Route path="/patient/home">
-                        <PatientHome 
+                        <PatientHome
                             User={this.props.User}
+                            updateUser={this.props.updateUser}
                         />
                     </Route>
 
-                    <Route path="/patient/next-surgery">
-                        <PatientHome
+                    <Route path="/patient/surgeries">
+                        <PatientSurgeryResult
                             User={this.props.User}
                         />
                     </Route>
@@ -318,14 +357,29 @@ class Main extends Component {
                             User={this.props.User}
                         />
                     </Route>
-                    
-                    <Route path="/patient/test-results">
-                        <PatientHome
+
+                    <Route path="/patient/notification">
+                        <Notification
+                            User={this.props.User}
+                        />
+                    </Route>
+                    <Route path='/patient/test-results'>
+                        <PatientTestResults
                             User={this.props.User}
                         />
                     </Route>
                     <Route exact path='/doctor/surgery'>
                         <DoctorSurgery
+                            User={this.props.User}
+                        />
+                    </Route>
+                    <Route path='/doctor/schedule'>
+                        <DoctorSchedule
+                            User={this.props.User}
+                        />
+                    </Route>
+                    <Route path="/doctor/notification">
+                        <NotificationDoctor
                             User={this.props.User}
                         />
                     </Route>
@@ -337,6 +391,7 @@ class Main extends Component {
                     <Route path='/receptionist/home'>
                         <ReceptionistHome
                             User={this.props.User}
+                            updateUser={this.props.updateUser}
                         />
                     </Route>
                     <Route path='/receptionist/appointments'>
@@ -373,9 +428,20 @@ class Main extends Component {
                             User={this.props.User}
                         />
                     </Route>
+                    <Route path='/receptionist/schedule-receptionist'>
+                        <ReceptionistSchedule
+                            User={this.props.User}
+                        />
+                    </Route>
                     <Route path='/receptionist/approve-service/:diagnosisID' component={this.renderReceptionistServicesPage} />
                     <Route path='/technician/home'>
                         <TechnicianHome
+                            User={this.props.User}
+                            updateUser={this.props.updateUser}
+                        />
+                    </Route>
+                    <Route path='/receptionist/notification'>
+                        <ReceptionistNotification
                             User={this.props.User}
                         />
                     </Route>
@@ -386,7 +452,17 @@ class Main extends Component {
                     </Route>
                     <Route path='/technician/pending-tests/:test_result_id' component={this.renderTechnicianTestResultPage} />
                     <Route path='/receptionist/prepare-bill'>
-                        <PrepareBill
+                        <PrepareBill 
+                            User={this.props.User}
+                        />
+                    </Route>
+                    <Route path='/technician/notification'>
+                        <TechnicianNotification
+                            User={this.props.User}
+                        />
+                    </Route>
+                    <Route path='/technician/schedule'>
+                        <TechnicianSchedule
                             User={this.props.User}
                         />
                     </Route>

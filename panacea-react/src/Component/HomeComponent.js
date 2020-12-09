@@ -179,7 +179,9 @@ export default function Home(props) {
                             <PersonalVideoIcon style={{ fontSize: 70, color: '#303f9f' }} />
                             <Typography variant="h5" style={{ color: '#303f9f' }}>Hospitality</Typography>
                             <Typography variant="body1" style={{ color: '#303f9f' }}>Clinical excellence must be the priority for any health care service provider</Typography>
-                            <Button variant="outlined" style={{ color: '#303f9f', marginTop: 20 }}> Apply for bed</Button>
+                            <Link style={{ textDecoration: 'none' }} to='/sign-in'>
+                                <Button variant="outlined" style={{ color: '#303f9f', marginTop: 20 }}> Sign in</Button>
+                            </Link>
                         </CardContent>
                     </Card>
                 </Grid>
@@ -199,7 +201,9 @@ export default function Home(props) {
                             <LocalHospitalIcon style={{ fontSize: 70, color: '#303f9f' }} />
                             <Typography variant="h5" style={{ color: '#303f9f' }}>Chamber Service</Typography>
                             <Typography variant="body1" style={{ color: '#303f9f' }}>Clinical excellence must be the priority for any health care service provider</Typography>
-                            <Button variant="outlined" style={{ color: '#303f9f', marginTop: 20 }}> Make an appointment</Button>
+                            <Link style={{ textDecoration: 'none' }} to='/appointment'>
+                                <Button variant="outlined" style={{ color: '#303f9f', marginTop: 20 }}> Make an appointment</Button>
+                            </Link>
                         </CardContent>
                     </Card>
                 </Grid>
@@ -374,7 +378,7 @@ function Item(props) {
                         In healthcare sector, service excellence is the facility of the hospital as
                         healthcare service provider to consistently.
                     </Typography>
-                    <Button style={{ marginTop: 20 }} size="large" variant="contained" color="primary">Check Our Services</Button>
+                    {/* <Button style={{ marginTop: 20 }} size="large" variant="contained" color="primary">Check Our Services</Button> */}
                 </CardMedia>
             </CardContent>
         </Card>

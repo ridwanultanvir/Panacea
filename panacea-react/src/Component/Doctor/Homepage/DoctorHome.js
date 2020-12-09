@@ -3,6 +3,7 @@ import { Redirect } from 'react-router-dom';
 import { withStyles, AppBar, Drawer, Toolbar, List, Divider, CssBaseline, Typography, Card, Container, Grid, Box, Link } from '@material-ui/core';
 import { mainListItems, secondaryListItems } from './listItems';
 import CopyRight from '../../Copyright';
+import EditProfile from './EditProfile';
 const drawerWidth = 240;
 
 const styles = (theme) => ({
@@ -104,6 +105,12 @@ class DoctorHome extends Component {
                                         <Typography variant='body1'>Qualification: {userData.qualification}</Typography>
                                         <Typography variant='body1'>Gender: {userData.gender}</Typography>
                                     </Card>
+
+                                    <EditProfile
+                                        userData={userData}
+                                        User={this.props.User}
+                                        updateUser={this.props.updateUser}
+                                    />
                                 </Grid>
                             </Grid>
                             <Box pt={4}>

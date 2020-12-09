@@ -8,4 +8,8 @@ urlpatterns = [
     path('get-patient-data/', views.getPatientData, name='getPatientData'),
     path('registration/', views.registerPatient, name='registerPatient'),
     path('admin/add-user/', views.adminAddUser, name='adminAddUser'),
+    path('get-notifications/', views.getNotification, name='getNotification'),
+    path('notifications/mark-as-read/',
+         views.markNotificationAsRead, name='markNotificationRead'),
+    path('update-user/', views.updateUser, name='updateUser'),
 ]

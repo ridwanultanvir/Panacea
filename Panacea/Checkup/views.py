@@ -227,7 +227,92 @@ def getDiagnosisHistory(request):
 
     return Response(response)
 
+ 
 
+@api_view(['POST'])
+def getPatienttestResults(request):
+    body = request.body.decode('utf-8')
+    data = json.loads(body)
+
+    userID = None
+    token = None
+
+    if 'userID' in data:
+        userID = data['userID']
+    if 'token' in data:
+        token = data['token']
+
+    if(verifyToken(userID, token)):
+        response = execution.getPatienttestResults(data)
+    else:
+        response = {'success': False, 'errorMessage': 'Invalid request'}
+
+    return Response(response)
+
+
+@api_view(['POST'])
+def getPatientSurgeryResult(request):
+    body = request.body.decode('utf-8')
+    data = json.loads(body)
+
+    userID = None
+    token = None
+
+    if 'userID' in data:
+        userID = data['userID']
+    if 'token' in data:
+        token = data['token']
+
+    if(verifyToken(userID, token)):
+        response = execution.getPatientSurgeryResult(data)
+    else:
+        response = {'success': False, 'errorMessage': 'Invalid request'}
+
+    return Response(response)
+
+
+@api_view(['POST'])
+def getAdmittedPatient(request):
+    body = request.body.decode('utf-8')
+    data = json.loads(body)
+
+    userID = None
+    token = None
+
+    if 'userID' in data:
+        userID = data['userID']
+    if 'token' in data:
+        token = data['token']
+
+    if(verifyToken(userID, token)):
+        response = execution.getAdmittedPatient(data)
+    else:
+        response = {'success': False, 'errorMessage': 'Invalid request'}
+
+    return Response(response)
+
+
+@api_view(['POST'])
+def getPatientMonitorData(request):
+    body = request.body.decode('utf-8')
+    data = json.loads(body)
+
+    userID = None
+    token = None
+
+    if 'userID' in data:
+        userID = data['userID']
+    if 'token' in data:
+        token = data['token']
+
+    if(verifyToken(userID, token)):
+        response = execution.getPatientMonitorData(data)
+    else:
+        response = {'success': False, 'errorMessage': 'Invalid request'}
+
+    return Response(response)
+
+  
 @api_view(['POST'])
 def getTestUnderDoc(request):
     body = request.body.decode('utf-8')

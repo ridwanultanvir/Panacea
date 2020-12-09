@@ -10,34 +10,51 @@ import BarChartIcon from '@material-ui/icons/BarChart';
 import LayersIcon from '@material-ui/icons/Layers';
 import AssignmentIcon from '@material-ui/icons/Assignment';
 import { Link } from 'react-router-dom';
-import { } from '@material-ui/icons';
+import { NotificationImportant, Schedule, Home, AccountCircle } from '@material-ui/icons';
 
 export const mainListItems = (
     <div>
+
         <Link to='/technician/home' style={{ textDecoration: 'none', color: 'black' }}>
             <ListItem button>
                 <ListItemIcon>
-                    <PeopleIcon />
+                    <AccountCircle />
                 </ListItemIcon>
                 <ListItemText primary="Profile" />
+            </ListItem>
+        </Link>
+        <Link to='/home' style={{ textDecoration: 'none', color: 'black' }}>
+            <ListItem button>
+                <ListItemIcon>
+                    <Home />
+                </ListItemIcon>
+                <ListItemText primary="Home" />
             </ListItem>
         </Link>
         <Link to='/technician/pending-tests' style={{ textDecoration: 'none', color: 'black' }}>
             <ListItem button >
                 <ListItemIcon>
-                    <DashboardIcon />
+                    <AssignmentIcon />
                 </ListItemIcon>
                 <ListItemText primary="Pending tests" />
             </ListItem>
         </Link>
-        {/* <Link to='#' style={{ textDecoration: 'none', color: 'black' }}>
+        <Link to="/technician/schedule" style={{ textDecoration: 'none', color: 'black' }}>
             <ListItem button>
                 <ListItemIcon>
-                    <DashboardIcon />
+                    <Schedule />
                 </ListItemIcon>
-                <ListItemText primary="All tests" />
+                <ListItemText primary="Schedule" />
             </ListItem>
-        </Link> */}
+        </Link>
+        <Link to="/technician/notification" style={{ textDecoration: 'none', color: 'black' }}>
+            <ListItem button>
+                <ListItemIcon>
+                    <NotificationImportant />
+                </ListItemIcon>
+                <ListItemText primary="Notifications" />
+            </ListItem>
+        </Link>
         {/* <ListItem button>
             <ListItemIcon>
                 <BarChartIcon />

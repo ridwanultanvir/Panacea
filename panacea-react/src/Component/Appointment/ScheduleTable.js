@@ -56,7 +56,7 @@ function stableSort(array, comparator) {
 }
 
 const headCells = [
-    { id: 'name', numeric: true, disablePadding: true, label: 'Schedule ID' },
+    // { id: 'name', numeric: true, disablePadding: true, label: 'Schedule ID' },
     { id: 'calories', numeric: true, disablePadding: false, label: 'Schedule Date' },
     { id: 'fat', numeric: true, disablePadding: false, label: 'Start Time' },
     { id: 'carbs', numeric: true, disablePadding: false, label: 'End Time' },
@@ -243,7 +243,6 @@ export default function ScheduleTable(props) {
                     return response;
                 }
                 else {
-                    console.log('ulala1')
                     let err = new Error('Error ' + response.status + ': ' + response.statusText);
                     err.response = response;
                     throw err;
@@ -378,9 +377,9 @@ export default function ScheduleTable(props) {
                                                     inputProps={{ 'aria-labelledby': labelId }}
                                                 />
                                             </TableCell>
-                                            <TableCell component="th" id={labelId} scope="row" padding="none" align="right">
+                                            {/* <TableCell component="th" id={labelId} scope="row" padding="none" align="right">
                                                 {row.name}
-                                            </TableCell>
+                                            </TableCell> */}
                                             <TableCell align="right">{row.calories}</TableCell>
                                             <TableCell align="right">{row.fat}</TableCell>
                                             <TableCell align="right">{row.carbs}</TableCell>

@@ -1,13 +1,14 @@
-from django.apps import AppConfig
-from threading import Thread 
-import time
+from threading import Thread
 from StreamApp.execution import consumerFunction
+import time
+from django.apps import AppConfig
 
 
 class TestThread(Thread):
 
     def run(self):
         consumerFunction()
+
 
 class StreamappConfig(AppConfig):
     name = 'StreamApp'

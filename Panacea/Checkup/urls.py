@@ -24,4 +24,14 @@ urlpatterns = [
      path('get_med_details/', views.getMedicineData, name='get_med_details'),
      path('sell-medicine/', views.sellMedicine, name='sellMedicine'),
      path('add_to_stock/', views.addStock, name='addStock'),
+    path('patient/get-test-results/', views.getPatienttestResults,
+         name='getPatientTestResults'),
+    path('patient/get-patient-surgery-result/',
+         views.getPatientSurgeryResult, name='getPatientSurgeryResult'),
+    path('doctor/get-admitted-patient/',
+         views.getAdmittedPatient, name='getAdmittedPatient'),
+    path('doctor/get-patient-monitor-data/',
+         views.getPatientMonitorData, name="getPAtientMonitroData"),
+
+
 ]
