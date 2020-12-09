@@ -18,7 +18,6 @@ print(os.getpid())
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-print(os.getpid())
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
@@ -47,7 +46,6 @@ INSTALLED_APPS = [
     'Payment.apps.PaymentConfig',
     'rest_framework',
     'corsheaders',
-    'StreamApp.apps.StreamappConfig'
 ]
 
 MIDDLEWARE = [

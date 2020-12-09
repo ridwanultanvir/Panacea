@@ -3,7 +3,7 @@ import { Redirect } from 'react-router-dom';
 import {
     withStyles, AppBar, Drawer, Toolbar, List,
     Divider, CssBaseline, Typography, Card, Container, Grid, Box, Link, TextField,
-    FormControl, NativeSelect, Button, InputLabel, MenuItem, Select 
+    FormControl, NativeSelect, Button, InputLabel, MenuItem, Select
 } from '@material-ui/core';
 import { mainListItems, secondaryListItems } from '../Homepage/listItems';
 import CopyRight from '../../Copyright';
@@ -73,28 +73,6 @@ class DataExtractorInput extends Component {
             table_header: null,
             table_data: null,
             wardTypeList: null,
-            // firstName: null,
-            // lastName: null,
-            // address: null,
-            // email: null,
-            // phoneNumber: null,
-            // category: null,
-            // dateOfBirth: new Date(),
-            // gender: 'M',
-
-            // docValues: false,
-            // doc_hire_date: new Date(),
-            // docDept: "CARDIOLOGY",
-            // docDesignation: "Consultant",
-            // docDeptHead: null,
-            // qualification: null,
-
-            // empValues: false,
-            // empHireDate: new Date(),
-            // empSalary: null,
-            // empEducation: null,
-            // empCommission: null,
-            // empTraining: null
         }
 
         this.handleLogout = this.handleLogout.bind(this);
@@ -112,7 +90,7 @@ class DataExtractorInput extends Component {
     }
 
     componentDidMount() {
-        this.setState({serial: this.props.serial});
+        this.setState({ serial: this.props.serial });
         // console.log(this.props.serial);
         this.loadWardCategory();
     }
@@ -122,7 +100,7 @@ class DataExtractorInput extends Component {
         let userID = creds.userId;
         let body = {
             'userID': userID,
-            'token': "token",
+            'token': this.props.User.token,
         }
         let baseUrl = 'http://localhost:8000/';
         fetch(baseUrl + 'schedule/ward-category/', {
@@ -133,7 +111,7 @@ class DataExtractorInput extends Component {
             body: JSON.stringify(body)
         })
             .then((response) => {
-                
+
                 if (response.ok) {
                     return response;
                 }
@@ -151,7 +129,7 @@ class DataExtractorInput extends Component {
                     wardTypeListTemp = response.wardCategory.map((block) => {
                         return (<MenuItem value={block.CATEGORY}>{block.CATEGORY}</MenuItem>)
                     })
-                    this.setState({wardTypeList: wardTypeListTemp});
+                    this.setState({ wardTypeList: wardTypeListTemp });
                 }
                 else {
                     let err = new Error(response.errorMessage);
@@ -188,8 +166,8 @@ class DataExtractorInput extends Component {
                 if (response.success) {
                     //alert(response.message);
                     //console.log(response);
-                    this.setState({table_header: response.tableHeader, table_data: response.tableData});
-                    this.setState({displayTable: true});
+                    this.setState({ table_header: response.tableHeader, table_data: response.tableData });
+                    this.setState({ displayTable: true });
                 }
                 else {
                     let err = new Error(response.alertMessage);
@@ -228,11 +206,11 @@ class DataExtractorInput extends Component {
             }
             let url = 'appointment/get-appnt-for-patient';
             //this.fetchData(body, url);
-            this.setState({displayTable: true});
-            
+            this.setState({ displayTable: true });
+
         }
         else if (this.state.serial == "3") {
-            if (this.state.docID === null ) {
+            if (this.state.docID === null) {
                 alert("Please Fill All The Boxes Properly!");
                 return;
             }
@@ -245,7 +223,7 @@ class DataExtractorInput extends Component {
 
         }
         else if (this.state.serial == "4") {
-            if (this.state.docID === null ) {
+            if (this.state.docID === null) {
                 alert("Please Fill All The Boxes Properly!");
                 return;
             }
@@ -330,33 +308,33 @@ class DataExtractorInput extends Component {
                                 {this.state.serial === "1" &&
                                     (
                                         <Grid item xs={12}>
-                                        <Card style={{ padding: 40, width: 900, marginLeft: 10 }}>
-                                            <Typography variant='h6' >Appointment Data For A Patient:</Typography>
-                                            <TextField 
-                                                value={this.state.patientID}
-                                                id="standard-textarea"
-                                                label="Patient ID"
-                                                onChange={(event) => { this.setState({ patientID: event.target.value }) }}
-                                                style={{ width: 600 }}
-                                            />
-                                            <div>
-                                            <FormControl className={classes.formControl} style={{ width: 600, marginTop: 10 }}>
-                                                <InputLabel id="demo-simple-select-label">Range of Time</InputLabel>
-                                                <Select
-                                                    labelId="demo-simple-select-label"
-                                                    id="demo-simple-select"
-                                                    value={this.state.date_range}
-                                                    onChange={(event) => { this.setState({ date_range: event.target.value }) }}
-                                                    >
-                                                    <MenuItem value={7}>1 week</MenuItem>
-                                                    <MenuItem value={15}>15 Days</MenuItem>
-                                                    <MenuItem value={30}>1 Month</MenuItem>
-                                                    <MenuItem value={-1}>All Time</MenuItem>
-                                                </Select>
-                                            </FormControl>
-                                            </div>
-                                        </Card>
-                                    </Grid>
+                                            <Card style={{ padding: 40, width: 900, marginLeft: 10 }}>
+                                                <Typography variant='h6' >Appointment Data For A Patient:</Typography>
+                                                <TextField
+                                                    value={this.state.patientID}
+                                                    id="standard-textarea"
+                                                    label="Patient ID"
+                                                    onChange={(event) => { this.setState({ patientID: event.target.value }) }}
+                                                    style={{ width: 600 }}
+                                                />
+                                                <div>
+                                                    <FormControl className={classes.formControl} style={{ width: 600, marginTop: 10 }}>
+                                                        <InputLabel id="demo-simple-select-label">Range of Time</InputLabel>
+                                                        <Select
+                                                            labelId="demo-simple-select-label"
+                                                            id="demo-simple-select"
+                                                            value={this.state.date_range}
+                                                            onChange={(event) => { this.setState({ date_range: event.target.value }) }}
+                                                        >
+                                                            <MenuItem value={7}>1 week</MenuItem>
+                                                            <MenuItem value={15}>15 Days</MenuItem>
+                                                            <MenuItem value={30}>1 Month</MenuItem>
+                                                            <MenuItem value={-1}>All Time</MenuItem>
+                                                        </Select>
+                                                    </FormControl>
+                                                </div>
+                                            </Card>
+                                        </Grid>
                                     )
                                 }
 
@@ -364,123 +342,123 @@ class DataExtractorInput extends Component {
                                 {this.state.serial === "2" &&
                                     (
                                         <Grid item xs={12}>
-                                        <Card style={{ padding: 40, width: 900, marginLeft: 120 }}>
-                                            <Typography variant='h6'>Total Appointments Each Day Over A Range of Time</Typography>
-                                            <div>
-                                            <FormControl className={classes.formControl} style={{ width: 600, marginTop: 10 }}>
-                                                <InputLabel id="demo-simple-select-label">Range of Time</InputLabel>
-                                                <Select
-                                                    labelId="demo-simple-select-label"
-                                                    id="demo-simple-select"
-                                                    value={this.state.date_range}
-                                                    onChange={(event) => { this.setState({ date_range: event.target.value }) }}
-                                                    >
-                                                    <MenuItem value={7}>1 week</MenuItem>
-                                                    <MenuItem value={15}>15 Days</MenuItem>
-                                                    <MenuItem value={30}>1 Month</MenuItem>
-                                                    <MenuItem value={-1}>All Time</MenuItem>
-                                                </Select>
-                                            </FormControl>
-                                            </div>
-                                        </Card>
-                                    </Grid>
+                                            <Card style={{ padding: 40, width: 900, marginLeft: 120 }}>
+                                                <Typography variant='h6'>Total Appointments Each Day Over A Range of Time</Typography>
+                                                <div>
+                                                    <FormControl className={classes.formControl} style={{ width: 600, marginTop: 10 }}>
+                                                        <InputLabel id="demo-simple-select-label">Range of Time</InputLabel>
+                                                        <Select
+                                                            labelId="demo-simple-select-label"
+                                                            id="demo-simple-select"
+                                                            value={this.state.date_range}
+                                                            onChange={(event) => { this.setState({ date_range: event.target.value }) }}
+                                                        >
+                                                            <MenuItem value={7}>1 week</MenuItem>
+                                                            <MenuItem value={15}>15 Days</MenuItem>
+                                                            <MenuItem value={30}>1 Month</MenuItem>
+                                                            <MenuItem value={-1}>All Time</MenuItem>
+                                                        </Select>
+                                                    </FormControl>
+                                                </div>
+                                            </Card>
+                                        </Grid>
                                     )
                                 }
-                                
+
                                 {this.state.serial === "3" &&
                                     (
                                         <Grid item xs={12}>
-                                        <Card style={{ padding: 40, width: 900, marginLeft: 10 }}>
-                                            <Typography variant='h6' >Appointments Under A Doctor:</Typography>
-                                            <TextField 
-                                                value={this.state.docID}
-                                                id="standard-textarea"
-                                                label="Doctor's ID"
-                                                onChange={(event) => { this.setState({ docID: event.target.value }) }}
-                                                style={{ width: 600 }}
-                                            />
-                                        </Card>
-                                    </Grid>
+                                            <Card style={{ padding: 40, width: 900, marginLeft: 10 }}>
+                                                <Typography variant='h6' >Appointments Under A Doctor:</Typography>
+                                                <TextField
+                                                    value={this.state.docID}
+                                                    id="standard-textarea"
+                                                    label="Doctor's ID"
+                                                    onChange={(event) => { this.setState({ docID: event.target.value }) }}
+                                                    style={{ width: 600 }}
+                                                />
+                                            </Card>
+                                        </Grid>
                                     )
                                 }
 
                                 {this.state.serial === "4" &&
                                     (
                                         <Grid item xs={12}>
-                                        <Card style={{ padding: 40, width: 900, marginLeft: 10 }}>
-                                            <Typography variant='h6' >Tests Recommended By Doctor:</Typography>
-                                            <TextField 
-                                                value={this.state.docID}
-                                                id="standard-textarea"
-                                                label="Doctor's ID"
-                                                onChange={(event) => { this.setState({ docID: event.target.value }) }}
-                                                style={{ width: 600 }}
-                                            />
-                                        </Card>
-                                    </Grid>
+                                            <Card style={{ padding: 40, width: 900, marginLeft: 10 }}>
+                                                <Typography variant='h6' >Tests Recommended By Doctor:</Typography>
+                                                <TextField
+                                                    value={this.state.docID}
+                                                    id="standard-textarea"
+                                                    label="Doctor's ID"
+                                                    onChange={(event) => { this.setState({ docID: event.target.value }) }}
+                                                    style={{ width: 600 }}
+                                                />
+                                            </Card>
+                                        </Grid>
                                     )
                                 }
 
                                 {this.state.serial === "5" &&
                                     (
                                         <Grid item xs={12}>
-                                        <Card style={{ padding: 40, width: 900, marginLeft: 10 }}>
-                                            <Typography variant='h6' >Schedule History:</Typography>
-                                            <TextField 
-                                                value={this.state.employeeID}
-                                                id="standard-textarea"
-                                                label="Employee's ID"
-                                                onChange={(event) => { this.setState({ employeeID: event.target.value }) }}
-                                                style={{ width: 600 }}
-                                            />
-                                        </Card>
-                                    </Grid>
+                                            <Card style={{ padding: 40, width: 900, marginLeft: 10 }}>
+                                                <Typography variant='h6' >Schedule History:</Typography>
+                                                <TextField
+                                                    value={this.state.employeeID}
+                                                    id="standard-textarea"
+                                                    label="Employee's ID"
+                                                    onChange={(event) => { this.setState({ employeeID: event.target.value }) }}
+                                                    style={{ width: 600 }}
+                                                />
+                                            </Card>
+                                        </Grid>
                                     )
                                 }
 
                                 {this.state.serial === "6" &&
                                     (
                                         <Grid item xs={12}>
-                                        <Card style={{ padding: 40, width: 900, marginLeft: 120 }}>
-                                            <Typography variant='h6'>Employees In a Ward Type On a Date</Typography>
-                                            {this.state.wardTypeList !== null &&
-                                                (<div>
-                                                    <FormControl className={classes.formControl}>
-                                                <Typography noWrap>
-                                                    Select Ward Category:
+                                            <Card style={{ padding: 40, width: 900, marginLeft: 120 }}>
+                                                <Typography variant='h6'>Employees In a Ward Type On a Date</Typography>
+                                                {this.state.wardTypeList !== null &&
+                                                    (<div>
+                                                        <FormControl className={classes.formControl}>
+                                                            <Typography noWrap>
+                                                                Select Ward Category:
                                                 </Typography>
-                                                <Select
-                                                    labelId="demo-simple-select-placeholder-label-label"
-                                                    id="demo-simple-select-placeholder-label"
-                                                    label="Select Ward"
-                                                    value={this.state.wardTypeSelected}
-                                                    onChange={(event) => {this.setState({wardCategory: event.target.value})}}
-                                                    displayEmpty
-                                                    className={classes.selectEmpty}
-                                                >
-                                                    <MenuItem value="">
-                                                        <em>None</em>
-                                                    </MenuItem>
-                                                    {this.state.wardTypeList} 
-                                                </Select></FormControl></div>)
+                                                            <Select
+                                                                labelId="demo-simple-select-placeholder-label-label"
+                                                                id="demo-simple-select-placeholder-label"
+                                                                label="Select Ward"
+                                                                value={this.state.wardTypeSelected}
+                                                                onChange={(event) => { this.setState({ wardCategory: event.target.value }) }}
+                                                                displayEmpty
+                                                                className={classes.selectEmpty}
+                                                            >
+                                                                <MenuItem value="">
+                                                                    <em>None</em>
+                                                                </MenuItem>
+                                                                {this.state.wardTypeList}
+                                                            </Select></FormControl></div>)
 
-                                            }
-                                            <div style={{ display: "flex", marginTop: 20 }}>
-                                                <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                                                    <KeyboardDatePicker
-                                                        required
-                                                        id="date-of-birth"
-                                                        label="Date"
-                                                        format="dd/MM/yyyy"
-                                                        value={this.state.sch_on_Date}
-                                                        onChange={(date) => {this.setState({sch_on_Date: date})}}
-                                                        KeyboardButtonProps={{
-                                                            'aria-label': 'change date',
-                                                        }}
-                                                        style={{ width: 400 }}
-                                                    />
-                                                </MuiPickersUtilsProvider>
-                                            </div>
+                                                }
+                                                <div style={{ display: "flex", marginTop: 20 }}>
+                                                    <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                                                        <KeyboardDatePicker
+                                                            required
+                                                            id="date-of-birth"
+                                                            label="Date"
+                                                            format="dd/MM/yyyy"
+                                                            value={this.state.sch_on_Date}
+                                                            onChange={(date) => { this.setState({ sch_on_Date: date }) }}
+                                                            KeyboardButtonProps={{
+                                                                'aria-label': 'change date',
+                                                            }}
+                                                            style={{ width: 400 }}
+                                                        />
+                                                    </MuiPickersUtilsProvider>
+                                                </div>
                                             </Card>
                                         </Grid>
                                     )
@@ -489,7 +467,7 @@ class DataExtractorInput extends Component {
 
 
 
-                                
+
 
                                 <Grid item xs={12}>
                                     <Button variant='contained' color='primary' style={{ marginLeft: 10 }} onClick={() => { this.handleConfirm() }}>View</Button>
@@ -499,8 +477,8 @@ class DataExtractorInput extends Component {
                                     (
                                         <Grid item xs={12}>
                                             <DataDisplayTable
-                                                tableHeader = {this.state.table_header}
-                                                tableData = {this.state.table_data}
+                                                tableHeader={this.state.table_header}
+                                                tableData={this.state.table_data}
                                             />
                                         </Grid>
                                     )
