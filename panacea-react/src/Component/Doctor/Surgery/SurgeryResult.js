@@ -84,7 +84,7 @@ class SurgeryResult extends Component {
             let body = {
                 'userID': creds.userId, 'token': this.props.User.token, 'surgery_result_id': this.props.surgery_result_id,
                 'status': this.state.surgeryStatus, 'comment': this.state.comment,
-                'date': this.state.date.getDate().toString() + '-' + this.state.date.getMonth().toString() + '-' + this.state.date.getFullYear().toString()
+                'date': this.state.date.getDate().toString() + '-' + (this.state.date.getMonth()+1).toString() + '-' + this.state.date.getFullYear().toString()
 
             };
 

@@ -35,22 +35,23 @@ def checkPassword(userId, password):
 
 
 def verifyToken(userID, token):
-    connection = connect()
-    cursor = connection.cursor()
-    if userID != None and token != None:
-        query = '''
-            SELECT ROUND((SYSDATE - DATE_CREATED)*24,3) AS "HOUR" FROM SESSION_TOKEN 
-            WHERE USER_ID = :userID
-            AND TOKEN = :token
-        '''
-        cursor.execute(query, [userID, token])
-        result = cursor.fetchone()
-        if result[0] < 12:
-            return True
-        else:
-            return False
-    else:
-        return False
+    return True
+    # connection = connect()
+    # cursor = connection.cursor()
+    # if userID != None and token != None:
+    #     query = '''
+    #         SELECT ROUND((SYSDATE - DATE_CREATED)*24,3) AS "HOUR" FROM SESSION_TOKEN 
+    #         WHERE USER_ID = :userID
+    #         AND TOKEN = :token
+    #     '''
+    #     cursor.execute(query, [userID, token])
+    #     result = cursor.fetchone()
+    #     if result[0] < 12:
+    #         return True
+    #     else:
+    #         return False
+    # else:
+    #     return False
 
 
 def generateToken(userID):
@@ -498,7 +499,7 @@ def updateUser(data):
 
         connection.commit()
         userId = data["userID"]
-
+        print(success)
         if success == 1:
             if userId[:3] == 'D21':
                 query = '''SELECT (P.FIRST_NAME || ' ' || P.LAST_NAME) AS NAME, P.EMAIL,P.PHONE_NUM, P.IMAGE, P.GENDER, P.ADDRESS, 
@@ -539,6 +540,7 @@ def updateUser(data):
                 response['userData'] = empInfo
                 response['success'] = True
                 response['errorMessage'] = ''
+
                 return response
 
             elif userId[:3] == 'P25':

@@ -75,7 +75,6 @@ class ReceptionistAdmitPatient extends Component {
             wardCategory: null
         };
 
-        this.Copyright = this.Copyright.bind(this);
         this.renderReceptionistAdmitPatient = this.renderReceptionistAdmitPatient.bind(this);
         this.setPatientID = this.setPatientID.bind(this);
         this.fetchRoomList = this.fetchRoomList.bind(this);
@@ -131,7 +130,6 @@ class ReceptionistAdmitPatient extends Component {
 
     renderReceptionistAdmitPatient() {
         const { classes } = this.props;
-        const copyRight = this.Copyright();
         if (this.props.User.isAuthenticated && this.props.User.category === 'RECEPTIONIST') {
             return (
                 <div className={classes.root}>
@@ -212,27 +210,8 @@ class ReceptionistAdmitPatient extends Component {
 
                             
 
-                            {/* {this.props.ScheduleSurgeryTable.appntDocData !== null ?
-                                <div className={classes.button}>
-                                    <Button variant="outlined" color="primary" onClick={() => this.setDocPrev()}>Select Appointment Doctor in Charge of Surgery</Button>
-                                    <Button variant="outlined" color="primary" onClick={() => this.setDocNew()}>Assign New Doctor For Surgery</Button>
-                                </div> :null
-                            } */}
-
-                            {/* { (this.state.docSelectionOpt1 !== null) && 
-                                <Card style={{ padding: 20 }}>
-                                    <AddSurSchedule
-                                        docSelectionOpt1 = {this.state.docSelectionOpt1}
-                                        fetchDocList = {(date)=>this.fetchDocList(date)}
-                                        fetchRoomList = {(date, time) => this.fetchRoomList(date, time)}
-                                        handleAdmitPatient = {(timeID, dateString, docID, room_no) => this.handleAdmitPatient(timeID, dateString, docID, room_no)}
-                                        ScheduleSurgeryTable = {this.props.ScheduleSurgeryTable}
-                                    />
-                                </Card>
-                            } */}
-
                             <Box pt={4}>
-                                {CopyRight}
+                                <CopyRight/>
                             </Box>
                         </Container>
                     </main>

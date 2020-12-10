@@ -457,8 +457,8 @@ def admitPatient(patientID, room_no, admission_date):
     resultTemp = cursor.fetchall()
     if len(resultTemp) > 0:
         return {'success': True, 'alertMessage': "Error in Insertion. Patient Already Admitted!"}
-    query = '''INSERT INTO ROOM_ADMISSION(PATIENT_ID, ROOM_NO, ADMISSION_DATE)
-                VALUES ((select ID from Person where USER_ID = (:patientID)), :room_no, TO_DATE(:admission_date, 'DD/MM/YYYY'))'''
+    query = '''INSERT INTO ROOM_ADMISSION(PATIENT_ID, ROOM_NO, ADMISSION_DATE, PAID)
+                VALUES ((select ID from Person where USER_ID = (:patientID)), :room_no, TO_DATE(:admission_date, 'DD/MM/YYYY'), 'F')'''
     cursor.execute(query, [patientID, room_no, admission_date])
     connection.commit()
     cursor.close()
