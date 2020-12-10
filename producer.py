@@ -158,3 +158,4 @@ if __name__ == '__main__':
             producer.send("SensorData", sensor_data)
             time.sleep(5)
         time.sleep(1)
+        # streaming to server
