@@ -15,7 +15,7 @@ def returnPaymentData(patientID):
                             TO_CHAR(CH.CHECKUP_DATE, 'DD/MM/YYYY') AS VISITING_DATE, A.PROB_DESC
                             FROM CHECKUP CH JOIN APPOINTMENT A
                             ON (CH.APP_SL_NO = A.APP_SL_NO AND A.PATIENT_ID = (SELECT ID FROM PERSON WHERE USER_ID = (:patientID))
-                            AND A.STATUS='accepted' AND CH.PAYMENT_STATUS = 'DUE') JOIN 
+                            AND A.STATUS='accepted' AND CH.PAYMENT_STATUS = 'DUE' ) JOIN 
                             (SELECT P.ID AS ID,(P.FIRST_NAME||' '||P.LAST_NAME) AS NAME, DOC.DEPARTMENT, DOC.VISITING_FEE
                             FROM PERSON P JOIN DOCTOR DOC ON P.ID = DOC.ID ) 
                             D ON (D.ID = A.DOCTOR_ID) ORDER BY VISITING_DATE DESC'''
@@ -26,7 +26,7 @@ def returnPaymentData(patientID):
                         AND RA.ROOM_NO IN 
                         (SELECT R.ROOM_NO FROM ROOM R JOIN BLOCK B
                         ON R.BLOCK_ID = B.BLOCK_ID AND B.CATEGORY = 'SURGERY' AND R.STATUS='active')
-                        AND RA.RELEASE_DATE IS NULL AND RA.ADMISSION_DATE <= SYSDATE)'''
+                        AND RA.RELEASE_DATE IS NOT NULL AND RA.ADMISSION_DATE <= SYSDATE AND RA.PAID = 'F')'''
 
     query_room_bill = '''SELECT R.ROOM_NO, TO_CHAR(RA.ADMISSION_DATE, 'DD/MM/YYYY') AS ADMISSION_DATE, 
                         (TRUNC(SYSDATE-RA.ADMISSION_DATE)+1) AS DAYS_BETWEEN, R.CHARGE
@@ -46,6 +46,7 @@ def returnPaymentData(patientID):
         #  checkup bill
         cursor.execute(query_checkup_bill, [patientID])
         resultCheckUpBillTemp = cursor.fetchall()
+
         checkUpTableHeaders = [["Doctor Name", "Department", "Visiting Fee", "Visiting Date", "Description"]]
         resultCheckUpBill = []
         total_checkup_bill = 0
@@ -123,7 +124,7 @@ def returnPaymentData(patientID):
         return response
     except cx_Oracle.Error as error:
         errorObj, = error.args
-        response = {'success': False, 'alertMessage': errorObj}
+        response = {'success': False, 'alertMessage': 'Failure'}
         return response
 
 

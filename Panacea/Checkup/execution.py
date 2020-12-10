@@ -315,7 +315,7 @@ def technicianPendingTests(data):
             SELECT T.TEST_RESULT_ID,S.SERVICE_NAME, (P.FIRST_NAME || ' ' || P.LAST_NAME) AS "PATIENT NAME" 
             FROM TEST_RESULTS T JOIN SERVICE S ON(T.SERVICE_ID = S.SERVICE_ID)
             JOIN PERSON P ON(T.PATIENT_ID = P.ID)
-            WHERE T.COMPLETED = 'T' OR T.COMPLETED = 'A'
+            WHERE T.COMPLETED = 'T' OR T.COMPLETED = 'A' ORDER BY T.TEST_RESULT_ID DESC
             '''
             cursor.execute(query)
             result = cursor.fetchall()
@@ -333,7 +333,7 @@ def technicianPendingTests(data):
             SELECT T.TEST_RESULT_ID,S.SERVICE_NAME, (P.FIRST_NAME || ' ' || P.LAST_NAME) AS "PATIENT NAME" 
             FROM TEST_RESULTS T JOIN SERVICE S ON(T.SERVICE_ID = S.SERVICE_ID)
             JOIN PERSON P ON(T.PATIENT_ID = P.ID)
-            WHERE T.COMPLETED = 'A'
+            WHERE T.COMPLETED = 'A' ORDER BY T.TEST_RESULT_ID DESC
             '''
             cursor.execute(query)
             result = cursor.fetchall()
@@ -449,6 +449,17 @@ def updateSurgeryResult(data):
 
         cursor.execute(query, [data['comment'], data['status'],
                                data['date'], data['surgery_result_id']])
+        connection.commit()
+
+        query = '''UPDATE ROOM_ADMISSION SET RELEASE_DATE = ADMISSION_DATE WHERE ADMISSION_SL = 
+                    (SELECT RA.ADMISSION_SL FROM ROOM_ADMISSION RA JOIN 
+                    (SELECT SS.PATIENT_ID, SS.ROOM_NO, SR.SURGERY_DATE
+                    FROM
+                    SURGERY_RESULTS SR JOIN SURGERY_SCHEDULE SS ON
+                    (SR.SUR_SCHE_NO = SS.SUR_SCHE_NO AND SR.SURGERY_RESULT_ID = :surgery_result_id)) S
+                    ON (S.PATIENT_ID = RA.PATIENT_ID AND S.ROOM_NO = RA.ROOM_NO AND S.SURGERY_DATE = RA.ADMISSION_DATE))'''
+
+        cursor.execute(query, [data['surgery_result_id']])
         connection.commit()
 
         response = {'success': True, 'errorMessage': ''}
