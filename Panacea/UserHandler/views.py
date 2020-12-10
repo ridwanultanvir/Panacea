@@ -122,3 +122,24 @@ def updateUser(request):
         response = {'success': False, 'errorMessage': 'Invalid request'}
 
     return Response(response)
+
+
+@api_view(['POST'])
+def getDashBoardData(request):
+    body = request.body.decode('utf-8')
+    data = json.loads(body)
+
+    userID = None
+    token = None
+
+    if 'userID' in data:
+        userID = data['userID']
+    if 'token' in data:
+        token = data['token']
+
+    if(execution.verifyToken(userID, token)):
+        response = execution.getDashBoardData(data)
+    else:
+        response = {'success': False, 'errorMessage': 'Invalid request'}
+
+    return Response(response)
