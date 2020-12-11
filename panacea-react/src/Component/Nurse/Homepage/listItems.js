@@ -11,7 +11,7 @@ import LayersIcon from '@material-ui/icons/Layers';
 import AssignmentIcon from '@material-ui/icons/Assignment';
 import AirlineSeatFlatIcon from '@material-ui/icons/AirlineSeatFlat';
 import { Link } from 'react-router-dom';
-import { } from '@material-ui/icons';
+import { Schedule } from '@material-ui/icons';
 
 export const mainListItems = (
     <div>
