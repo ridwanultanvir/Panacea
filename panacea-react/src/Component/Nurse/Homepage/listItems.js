@@ -24,12 +24,12 @@ export const mainListItems = (
             </ListItem>
         </Link>
         {/* <Link to='/receptionist/appointments' style={{ textDecoration: 'none', color: 'black' }}> */}
-            <ListItem button >
-                <ListItemIcon>
-                    <PeopleIcon />
-                </ListItemIcon>
-                <ListItemText primary="My Schedule" />
-            </ListItem>
+        <ListItem button >
+            <ListItemIcon>
+                <PeopleIcon />
+            </ListItemIcon>
+            <ListItemText primary="My Schedule" />
+        </ListItem>
         {/* </Link> */}
         <Link to='/nurse/dispensary' style={{ textDecoration: 'none', color: 'black' }}>
             <ListItem button>
@@ -39,7 +39,16 @@ export const mainListItems = (
                 <ListItemText primary="Dispensary" />
             </ListItem>
         </Link>
-        
+
+        <Link to="/nurse/schedule" style={{ textDecoration: 'none', color: 'black' }}>
+            <ListItem button>
+                <ListItemIcon>
+                    <Schedule />
+                </ListItemIcon>
+                <ListItemText primary="Schedule" />
+            </ListItem>
+        </Link>
+
         {/* <ListItem button>
             <ListItemIcon>
                 <BarChartIcon />

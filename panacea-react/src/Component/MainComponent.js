@@ -71,6 +71,7 @@ import PatientMonitorDetail from './Doctor/MonitorPatient/PatientMonitorDetails'
 import DoctorSchedule from './Doctor/Schedule/Schedule';
 import ReceptionistSchedule from './Receptionist/ReceptionistSchedule/Schedule';
 import TechnicianSchedule from './Technician/Schedule/Schedule';
+import NurseSchedule from './Nurse/Schedule/Schedule'
 
 const mapStateToProps = (state) => {
     return {
@@ -139,14 +140,14 @@ class Main extends Component {
         );
     }
 
-    renderDataExtractorInput({match}) {
+    renderDataExtractorInput({ match }) {
         let serial = match.params.serial;
         //console.log(serial);
         return (
             <DataExtractorInput
                 User={this.props.User}
                 serial={serial}
-            /> 
+            />
         )
     }
 
@@ -297,7 +298,7 @@ class Main extends Component {
 
                         />
                     </Route>
-                    <Route path="/admin/in-data-for-extraction/:serial" component={this.renderDataExtractorInput}/>
+                    <Route path="/admin/in-data-for-extraction/:serial" component={this.renderDataExtractorInput} />
                     <Route path="/doctor/home">
                         <DoctorHome
                             User={this.props.User}
@@ -319,13 +320,13 @@ class Main extends Component {
                         />
                     </Route>
                     <Route path="/doctor/appointment/:app_sl_no" component={this.renderDoctorDiagnosisPage} />
-          
+
                     <Route exact path="/doctor/monitor-patient">
                         <MonitorPatient
                             User={this.props.User}
                         />
                     </Route>
-          
+
                     <Route path="/nurse/home">
                         <NurseHome
                             User={this.props.User}
@@ -333,10 +334,15 @@ class Main extends Component {
                     </Route>
                     <Route path='/nurse/dispensary'>
                         <Dispensary
-                            User = {this.props.User}
+                            User={this.props.User}
                         />
                     </Route>
-                    
+                    <Route path='/nurse/schedule'>
+                        <NurseSchedule
+                            User={this.props.User}
+                        />
+                    </Route>
+
 
                     <Route path="/doctor/monitor-patient/:patient_id" component={this.renderPatientMonitroDetail} />
 
@@ -452,7 +458,7 @@ class Main extends Component {
                     </Route>
                     <Route path='/technician/pending-tests/:test_result_id' component={this.renderTechnicianTestResultPage} />
                     <Route path='/receptionist/prepare-bill'>
-                        <PrepareBill 
+                        <PrepareBill
                             User={this.props.User}
                         />
                     </Route>
