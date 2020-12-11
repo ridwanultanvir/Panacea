@@ -12,4 +12,5 @@ urlpatterns = [
     path('notifications/mark-as-read/',
          views.markNotificationAsRead, name='markNotificationRead'),
     path('update-user/', views.updateUser, name='updateUser'),
+    path('admin/dashboard-data/', views.getDashBoardData, name='getDashBoarddata'),
 ]

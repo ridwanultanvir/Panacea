@@ -40,7 +40,7 @@ def verifyToken(userID, token):
     # cursor = connection.cursor()
     # if userID != None and token != None:
     #     query = '''
-    #         SELECT ROUND((SYSDATE - DATE_CREATED)*24,3) AS "HOUR" FROM SESSION_TOKEN 
+    #         SELECT ROUND((SYSDATE - DATE_CREATED)*24,3) AS "HOUR" FROM SESSION_TOKEN
     #         WHERE USER_ID = :userID
     #         AND TOKEN = :token
     #     '''
@@ -562,6 +562,102 @@ def updateUser(data):
                 return response
         elif success == 0:
             return {'success': False, 'errorMessage': "Couldn't update your info"}
+
+    except cx_Oracle.Error as error:
+        errorObj, = error.args
+        response = {'success': False, 'errorMessage': errorObj.message}
+        print(response)
+        return response
+
+
+def getDashBoardData(data):
+    connection = connect()
+    cursor = connection.cursor()
+    response = {}
+
+    try:
+        query = '''
+        SELECT COUNT(A.APP_SL_NO) AS "TOTAL APPOINTMENTS", D.DEPARTMENT
+        FROM APPOINTMENT A JOIN SCHEDULE S ON(A.SCHEDULE_ID = S.SCHEDULE_ID)
+        JOIN PERSON P ON (A.DOCTOR_ID = P.ID)
+        JOIN DOCTOR D ON (P.ID = D.ID)
+        WHERE (SYSDATE - S.SCHEDULE_DATE) <= 30
+        GROUP BY D.DEPARTMENT
+        '''
+
+        cursor.execute(query)
+        result = cursor.fetchall()
+
+        totalAppointments = []
+
+        for app_no in result:
+            totalAppointments.append({'dept': app_no[1], 'total': app_no[0]})
+
+        response['totalAppointments'] = totalAppointments
+
+        query = '''
+        SELECT COUNT(DISTINCT(PATIENT_ID))
+        FROM APPOINTMENT A JOIN SCHEDULE S ON(A.SCHEDULE_ID = S.SCHEDULE_ID)
+        WHERE (SYSDATE - S.SCHEDULE_DATE) <= 30
+        '''
+
+        cursor.execute(query)
+        result = cursor.fetchone()
+
+        response['totalPatientsServedLast30Days'] = result[0]
+
+        query = '''
+        SELECT TO_CHAR(NVL(AP.SCHEDULE_DATE, NVL(TR.TEST_DATE, SR.SURGERY_DATE))) AS "DATE",
+        NVL(AP.TOTAL_APPOINTMENTS, 0) AS "TOTAL APPOINTMENTS", NVL(TR.TOTAL_TESTS, 0) AS "TOTAL_TESTS",
+        NVL(SR.TOTAL_SURGERIES,0) AS "TOTAL_SURGERIES"
+        FROM
+        (SELECT COUNT(*) "TOTAL_APPOINTMENTS", S.SCHEDULE_DATE
+        FROM APPOINTMENT A JOIN SCHEDULE S ON(A.SCHEDULE_ID = S.SCHEDULE_ID)
+        GROUP BY S.SCHEDULE_DATE) AP
+        FULL JOIN
+        (SELECT COUNT(*) AS "TOTAL_TESTS", TEST_DATE
+        FROM TEST_RESULTS
+        GROUP BY TEST_DATE
+        HAVING TEST_DATE IS NOT NULL) TR 
+        ON(TRUNC(AP.SCHEDULE_DATE) = TRUNC(TR.TEST_DATE))
+        FULL JOIN
+        (SELECT COUNT(*) AS "TOTAL_SURGERIES", SURGERY_DATE FROM SURGERY_RESULTS
+        WHERE SURGERY_DATE IS NOT NULL
+        GROUP BY SURGERY_DATE) SR ON(TRUNC(AP.SCHEDULE_DATE) = TRUNC(SR.SURGERY_DATE) OR TRUNC(TR.TEST_DATE) = TRUNC(SR.SURGERY_DATE))
+        ORDER BY AP.SCHEDULE_DATE DESC, TR.TEST_DATE DESC, SR.SURGERY_DATE DESC
+        '''
+
+        cursor.execute(query)
+        result = cursor.fetchall()
+
+        totalActivityPerDay = []
+
+        for actitvity in result:
+            totalActivityPerDay.append(
+                {'date': actitvity[0], 'total_appointments': actitvity[1], 'total_tests': actitvity[2], 'total_surgeries': actitvity[3]})
+
+        response['totalActivityPerDay'] = totalActivityPerDay
+
+        query = '''
+        SELECT TO_CHAR(TRANSACTION_TIME),SUM(TOTAL_AMOUNT)
+        FROM BILL
+        GROUP BY TRANSACTION_TIME
+        ORDER BY TRANSACTION_TIME DESC
+        '''
+        cursor.execute(query)
+        result = cursor.fetchall()
+
+        bills = []
+
+        for bill in result:
+            bills.append(
+                {'transaction_date': bill[0], 'total_amount': bill[1]})
+
+        response['bills'] = bills
+
+        response['success'] = True
+        response['errorMessage'] = ''
+        return response
 
     except cx_Oracle.Error as error:
         errorObj, = error.args
