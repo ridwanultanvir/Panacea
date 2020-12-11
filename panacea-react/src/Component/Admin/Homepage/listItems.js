@@ -68,21 +68,9 @@ export const mainListItems = (
                 <ListItemIcon>
                     <ListAltIcon />
                 </ListItemIcon>
-                <ListItemText primary="Data Extractor" />
+                <ListItemText primary="Analytics" />
             </ListItem>
         </Link>
-        {/* <ListItem button>
-            <ListItemIcon>
-                <BarChartIcon />
-            </ListItemIcon>
-            <ListItemText primary="Reports" />
-        </ListItem>
-        <ListItem button>
-            <ListItemIcon>
-                <LayersIcon />
-            </ListItemIcon>
-            <ListItemText primary="Integrations" />
-        </ListItem> */}
 
     </div>
 );

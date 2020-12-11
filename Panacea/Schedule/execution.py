@@ -635,15 +635,13 @@ def scheduleOnWardDate(wardCategory, sch_on_date):
         response['success'] = True
         return response
     except cx_Oracle.Error as error:
-        errorObj, = error.args
-        print(error)
         response = {'success': False, 'alertMessage': "Failed"}
         return response
-      
+
+
 def getUserSchedule(data):
     connection = connect()
     cursor = connection.cursor()
-    print('ulalalala')
     try:
         query = '''
         SELECT S.SCHEDULE_ID, TO_CHAR(S.SCHEDULE_DATE), T.START_TIME, T.END_TIME, T.SHIFT_TITLE 
@@ -669,4 +667,101 @@ def getUserSchedule(data):
         errorObj, = error.args
         response = {'success': False, 'errorMessage': errorObj.message}
         print(response)
+        return response
+
+
+def getWardDetailsDisp(blockID):
+    connection = connect()
+    cursor = connection.cursor()
+    try:
+        query = '''SELECT P.ID, P.USER_ID FROM BLOCK B JOIN PERSON P ON 
+                    (B.BLOCK_ID = (:blockID) AND B.INCHARGE_ID = P.ID)'''
+
+        cursor.execute(query, [blockID])
+        result = cursor.fetchall()
+        print(result, blockID)
+        if (len(result) != 0):
+            actual_id = result[0][0]
+            user_id = result[0][1]
+            if "D" in user_id:
+                query = '''SELECT (P.FIRST_NAME||' '||P.LAST_NAME) AS NAME, P.EMAIL, P.PHONE_NUM, P.ADDRESS, 
+                        (ROUND(MONTHS_BETWEEN(SYSDATE, P.DATE_OF_BIRTH)/12)||' years '||FLOOR(MOD(MONTHS_BETWEEN(SYSDATE, P.DATE_OF_BIRTH), 12))||' months') as AGE,
+                        D.DEPARTMENT, D.DESIGNATION, D.QUALIFICATION FROM PERSON P JOIN DOCTOR D ON
+                        (P.ID = D.ID AND P.ID = :actual_id)'''
+            else:
+                query = '''SELECT (P.FIRST_NAME||' '||P.LAST_NAME) AS NAME, P.EMAIL, P.PHONE_NUM, P.ADDRESS, 
+                            (ROUND(MONTHS_BETWEEN(SYSDATE, P.DATE_OF_BIRTH)/12)||' years '||FLOOR(MOD(MONTHS_BETWEEN(SYSDATE, P.DATE_OF_BIRTH), 12))||' months') as AGE,
+                            E.CATEGORY, E.EDUCATION, E.TRAINING FROM PERSON P JOIN EMPLOYEE E
+                            ON (P.ID = E.ID AND P.ID = :actual_id)'''
+            cursor.execute(query, [actual_id])
+            result = cursor.fetchall()
+            inchargeInfo = {
+                'name': result[0][0],
+                'email': result[0][1],
+                'phn': result[0][2],
+                'address': result[0][3],
+                'age': result[0][4],
+            }
+            if "D" in user_id:
+                inchargeInfo['department'] = result[0][5]
+                inchargeInfo['designation'] = result[0][6]
+                inchargeInfo['qualification'] = result[0][7]
+                inchargeInfo['type'] = "doctor"
+            else:
+                inchargeInfo['category'] = result[0][5]
+                inchargeInfo['education'] = result[0][6]
+                inchargeInfo['training'] = result[0][7]
+                inchargeInfo['type'] = "employee"
+        else:
+            inchargeInfo = {}
+        # all employees in this ward today
+        query = '''SELECT (P.FIRST_NAME||' '||P.LAST_NAME) AS NAME, P.EMAIL, P.PHONE_NUM, D.DESIGNATION AS CATEGORY
+                    FROM PERSON P JOIN DOCTOR D ON (P.ID = D.ID)
+                    JOIN SCHEDULE SCH ON (SCH.ID = P.ID AND SCH.BLOCK_ID = (:blockID) AND SCH.SCHEDULE_DATE = TRUNC(SYSDATE))
+                    UNION
+                    SELECT (P.FIRST_NAME||' '||P.LAST_NAME) AS NAME, P.EMAIL, P.PHONE_NUM, E.CATEGORY AS CATEGORY
+                    FROM PERSON P JOIN EMPLOYEE E ON (P.ID = E.ID)
+                    JOIN SCHEDULE SCH ON (SCH.ID = P.ID AND SCH.BLOCK_ID = (:blockID) AND SCH.SCHEDULE_DATE = TRUNC(SYSDATE))'''
+        cursor.execute(query, [blockID])
+        result = cursor.fetchall()
+        print(result)
+        employeeInWard = []
+        for R in result:
+            result_row = []
+            for elem in R:
+                result_row.append(elem)
+            employeeInWard.append(result_row)
+        employeeHeader = [["Name", "Email", "Phone Number", "Category", "Block ID"]]
+            
+        # all patients in this ward
+        query = '''SELECT (SELECT (FIRST_NAME||' '||LAST_NAME) FROM PERSON WHERE ID= RA.PATIENT_ID), 
+                (SELECT USER_ID FROM PERSON WHERE ID= RA.PATIENT_ID),
+                TO_CHAR(RA.ADMISSION_DATE, 'DD/MM/YYYY') FROM ROOM_ADMISSION RA JOIN
+                ROOM R ON (R.ROOM_NO = RA.ROOM_NO AND RA.RELEASE_DATE IS NULL) JOIN BLOCK B
+                ON (B.BLOCK_ID = R.BLOCK_ID AND B.BLOCK_ID = :blockID)'''
+        cursor.execute(query, [blockID])
+        result = cursor.fetchall()
+
+        patientInWard = []
+        for R in result:
+            result_row = []
+            for elem in R:
+                result_row.append(elem)
+            patientInWard.append(result_row)
+        patientHeader = [["Name", "Patient ID", "Admission Date"]]
+        
+        response = {}
+        response['patientInWard'] = patientInWard
+        response['employeeInWard'] = employeeInWard
+        response['employeeHeader'] = employeeHeader
+        response['patientHeader'] = patientHeader
+        response['inchargeInfo'] = inchargeInfo
+        response['success'] = True
+        response['switch9'] = True
+        return response
+
+    except cx_Oracle.Error as error:
+        errorObj, = error.args
+        print(error)
+        response = {'success': False, 'errorMessage': errorObj.message}
         return response

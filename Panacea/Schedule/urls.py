@@ -24,4 +24,5 @@ urlpatterns = [
     path('get-schedule-for-employee/', views.scheduleHistory, name='scheduleHistory'),
     path('schedule-on-date/', views.scheduleOnDate, name='scheduleOnDate'),
     path('get-user-schedule/', views.getUserSchedule, name="getUserSchedule"),
+    path('ward-details-disp/', views.getWardDetailsDisp, name='getWardDetailsDisp')
 ]
