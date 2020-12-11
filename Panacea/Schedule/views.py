@@ -354,3 +354,26 @@ def getUserSchedule(request):
         response = {'success': False, 'errorMessage': 'Invalid request'}
 
     return Response(response)
+
+
+
+@api_view(['POST'])
+def getWardDetailsDisp(request):
+    body = request.body.decode('utf-8')
+    data = json.loads(body)
+
+    userID = None
+    token = None
+
+    if 'userID' in data:
+        userID = data['userID']
+    if 'token' in data:
+        token = data['token']
+    if 'blockID' in data:
+        blockID = data['blockID']
+    if(verifyToken(userID, token)):
+        response = execution.getWardDetailsDisp(blockID)
+    else:
+        response = {'success': False, 'errorMessage': 'Verification Failed'}
+
+    return Response(response)

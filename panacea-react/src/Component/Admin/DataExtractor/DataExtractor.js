@@ -176,12 +176,7 @@ class DataExtractor extends Component {
                                 </ListItemIcon>
                                 <ListItemText primary="Appointments For a Patient" />
                                 </ListItem>
-                                <ListItem button onClick={() => this.handleClick('2')}>
-                                <ListItemIcon>
-                                    <AssessmentIcon />
-                                </ListItemIcon>
-                                <ListItemText primary="Appointments Each Day Over a Range of Time" />
-                                </ListItem>
+                                
                                 <ListItem button onClick={() => this.handleClick('3')}>
                                 <ListItemIcon>
                                     <AssessmentIcon />
@@ -206,12 +201,7 @@ class DataExtractor extends Component {
                                 </ListItemIcon>
                                 <ListItemText primary="Employees Assigned In Wards On a Date" />
                                 </ListItem>
-                                <ListItem button onClick={() => this.handleClick('7')}>
-                                <ListItemIcon>
-                                    <AssessmentIcon />
-                                </ListItemIcon>
-                                <ListItemText primary="Hospital Bill Income In a Range of Time" />
-                                </ListItem>
+                                
                                 <ListItem button onClick={() => this.handleClick('8')}>
                                 <ListItemIcon>
                                     <AssessmentIcon />
@@ -223,12 +213,6 @@ class DataExtractor extends Component {
                                     <AssessmentIcon />
                                 </ListItemIcon>
                                 <ListItemText primary="Ward History" />
-                                </ListItem>
-                                <ListItem button onClick={() => this.handleClick('10')}>
-                                <ListItemIcon>
-                                    <AssessmentIcon />
-                                </ListItemIcon>
-                                <ListItemText primary="Patient Analytics" />
                                 </ListItem>
                             </List>
                             <Divider />

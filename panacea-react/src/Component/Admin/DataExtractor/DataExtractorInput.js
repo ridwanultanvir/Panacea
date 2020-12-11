@@ -73,6 +73,8 @@ class DataExtractorInput extends Component {
             table_header: null,
             table_data: null,
             wardTypeList: null,
+            wardSelForDets: null,
+            switch9: false,
         }
 
         this.handleLogout = this.handleLogout.bind(this);
@@ -164,10 +166,22 @@ class DataExtractorInput extends Component {
             .then((response) => response.json())
             .then((response) => {
                 if (response.success) {
-                    //alert(response.message);
-                    //console.log(response);
-                    this.setState({ table_header: response.tableHeader, table_data: response.tableData });
-                    this.setState({ displayTable: true });
+                    console.log(response);
+                    if (response.switch9 === true) {
+                        this.setState({
+                            switch9: true,
+                            employeeHeader: response.employeeHeader,
+                            patientHeader: response.patientHeader,
+                            inchargeInfo: response.inchargeInfo,
+                            patientInWard: response.patientInWard,
+                            employeeInWard: response.employeeInWard,
+                        });
+                    }
+                    else {
+                        this.setState({ table_header: response.tableHeader, table_data: response.tableData });
+                        this.setState({ displayTable: true });
+                    }
+                    
                 }
                 else {
                     let err = new Error(response.alertMessage);
@@ -262,6 +276,22 @@ class DataExtractorInput extends Component {
             this.fetchData(body, url);
 
         }
+        else if (this.state.serial == "9") {
+            if (this.state.wardSelForDets === null) {
+                alert("Please Fill All The Boxes Properly!");
+                return;
+            }
+            let month = this.state.sch_on_Date.getMonth() + 1;
+            let date = this.state.sch_on_Date.getDate().toString() + '/' + month.toString() + '/' + this.state.sch_on_Date.getFullYear().toString()
+            body = {
+                'userID': creds.userId, 'token': this.props.User.token,
+                'blockID': this.state.wardSelForDets,
+            }
+            console.log(body['blockID'])
+            let url = 'schedule/ward-details-disp/';
+            this.fetchData(body, url);
+
+        }
     }
 
 
@@ -338,32 +368,6 @@ class DataExtractorInput extends Component {
                                     )
                                 }
 
-
-                                {this.state.serial === "2" &&
-                                    (
-                                        <Grid item xs={12}>
-                                            <Card style={{ padding: 40, width: 900, marginLeft: 120 }}>
-                                                <Typography variant='h6'>Total Appointments Each Day Over A Range of Time</Typography>
-                                                <div>
-                                                    <FormControl className={classes.formControl} style={{ width: 600, marginTop: 10 }}>
-                                                        <InputLabel id="demo-simple-select-label">Range of Time</InputLabel>
-                                                        <Select
-                                                            labelId="demo-simple-select-label"
-                                                            id="demo-simple-select"
-                                                            value={this.state.date_range}
-                                                            onChange={(event) => { this.setState({ date_range: event.target.value }) }}
-                                                        >
-                                                            <MenuItem value={7}>1 week</MenuItem>
-                                                            <MenuItem value={15}>15 Days</MenuItem>
-                                                            <MenuItem value={30}>1 Month</MenuItem>
-                                                            <MenuItem value={-1}>All Time</MenuItem>
-                                                        </Select>
-                                                    </FormControl>
-                                                </div>
-                                            </Card>
-                                        </Grid>
-                                    )
-                                }
 
                                 {this.state.serial === "3" &&
                                     (
@@ -466,9 +470,50 @@ class DataExtractorInput extends Component {
 
 
 
+                                {this.state.serial === "8" &&
+                                    (
+                                        <Grid item xs={12}>
+                                            <Card style={{ padding: 40, width: 900, marginLeft: 120 }}>
+                                                <Typography variant='h6'>Surgeries Performed</Typography>
+                                                <div>
+                                                    <FormControl className={classes.formControl} style={{ width: 600, marginTop: 10 }}>
+                                                        <InputLabel id="demo-simple-select-label">Range of Time</InputLabel>
+                                                        <Select
+                                                            labelId="demo-simple-select-label"
+                                                            id="demo-simple-select"
+                                                            value={this.state.date_range}
+                                                            onChange={(event) => { this.setState({ date_range: event.target.value }) }}
+                                                        >
+                                                            <MenuItem value={1}>Today</MenuItem>
+                                                            <MenuItem value={7}>1 week</MenuItem>
+                                                            <MenuItem value={15}>15 Days</MenuItem>
+                                                            <MenuItem value={30}>1 Month</MenuItem>
+                                                            <MenuItem value={-1}>All Time</MenuItem>
+                                                        </Select>
+                                                    </FormControl>
+                                                </div>
+                                            </Card>
+                                        </Grid>
+                                    )
+                                }
 
 
-
+                                {this.state.serial === "9" &&
+                                    (
+                                        <Grid item xs={12}>
+                                            <Card style={{ padding: 40, width: 900, marginLeft: 120 }}>
+                                                <Typography variant='h6'>Ward Details</Typography>
+                                                <TextField
+                                                    value={this.state.wardSelForDets}
+                                                    id="standard-textarea"
+                                                    label="Block ID"
+                                                    onChange={(event) => { this.setState({ wardSelForDets: event.target.value }) }}
+                                                    style={{ marginLeft: 10, width: 600 }}
+                                                />
+                                            </Card>
+                                        </Grid>
+                                    )
+                                }
                                 <Grid item xs={12}>
                                     <Button variant='contained' color='primary' style={{ marginLeft: 10 }} onClick={() => { this.handleConfirm() }}>View</Button>
                                 </Grid>
@@ -479,6 +524,26 @@ class DataExtractorInput extends Component {
                                             <DataDisplayTable
                                                 tableHeader={this.state.table_header}
                                                 tableData={this.state.table_data}
+                                            />
+                                        </Grid>
+                                    )
+                                }
+
+                                {this.state.switch9 === true &&
+                                    (
+                                        
+                                        <Grid item xs={12}>
+                                            <Typography variant='h6'>Employees/Doctor Working In This Ward Currently</Typography>
+                                            <DataDisplayTable
+                                                tableHeader={this.state.employeeHeader}
+                                                tableData={this.state.employeeInWard}
+                                            />
+                                        
+                                            <Typography variant='h6'>Patients In This Ward Currently</Typography>
+                                        
+                                            <DataDisplayTable
+                                                tableHeader={this.state.patientHeader}
+                                                tableData={this.state.patientInWard}
                                             />
                                         </Grid>
                                     )
