@@ -1,0 +1,17 @@
+topic - SensorData
+
+
+# for running zookeeper
+.\bin\windows\zookeeper-server-start.bat .\config\zookeeper.properties
+
+# for server 
+.\bin\windows\kafka-server-start.bat .\config\server.properties
+
+# console consumer
+.\bin\windows\kafka-console-consumer.bat --bootstrap-server localhost:9092 --topic SensorData
+
+#create topic
+.\bin\windows\kafka-topics.bat --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic EmergencyCall
+
+#see all topics
+.\bin\windows\kafka-topics.bat --list --zookeeper localhost:2181

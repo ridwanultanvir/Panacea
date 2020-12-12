@@ -152,10 +152,10 @@ if __name__ == '__main__':
         for i in random.sample(range(0, 90), 90):
             condition = init_data_list[i]
             sensor_data, condition = get_sensor_data(condition, i)
-            sensor_data['patient_id'] = 32
+            sensor_data['patient_id'] = 99
             init_data_list[i] = condition
             print(sensor_data)
             producer.send("SensorData", sensor_data)
-            time.sleep(5)
+            time.sleep(4)
         time.sleep(1)
         # streaming to server

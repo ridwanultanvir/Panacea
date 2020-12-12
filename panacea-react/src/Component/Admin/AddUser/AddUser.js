@@ -3,7 +3,7 @@ import { Redirect } from 'react-router-dom';
 import {
     withStyles, AppBar, Drawer, Toolbar, List,
     Divider, CssBaseline, Typography, Card, Container, Grid, Box, Link, TextField,
-    FormControl, NativeSelect, Button
+    FormControl, NativeSelect, Button, InputLabel
 } from '@material-ui/core';
 import { mainListItems, secondaryListItems } from '../Homepage/listItems';
 import CopyRight from '../../Copyright';
@@ -315,7 +315,8 @@ class AddUser extends Component {
                                                 onBlur={(event) => { this.setState({ phoneNumber: event.target.value }) }}
                                                 style={{ width: 400 }}
                                             />
-                                            <FormControl className={classes.formControl} style={{ width: 400, marginTop: 16, marginLeft: 20 }}>
+                                            <FormControl className={classes.formControl} style={{ width: 400, marginLeft: 20 }}>
+                                                <InputLabel>Employee Type</InputLabel>
                                                 <NativeSelect
                                                     inputRef={this.category}
                                                     defaultValue={null}

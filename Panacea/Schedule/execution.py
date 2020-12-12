@@ -242,7 +242,7 @@ def getAppntWithSl(diagnosisID):
     resultTemp = cursor.fetchall()
     cursor.close()
 
-    print(appntSerial)
+    # print(appntSerial)
     result = {
         'appointmentData': {
             'app_sl_no': appntSerial,
@@ -452,7 +452,8 @@ def admitPatient(patientID, room_no, admission_date):
     connection = connect()
     cursor = connection.cursor()
     query = '''SELECT ROOM_NO FROM ROOM_ADMISSION
-                WHERE PATIENT_ID = (select ID from Person where USER_ID = (:patientID)) AND RELEASE_DATE IS NULL'''
+                WHERE PATIENT_ID = (select ID from Person where USER_ID = (:patientID)) AND RELEASE_DATE IS NULL AND 
+								ROOM_NO NOT IN (SELECT R.ROOM_NO FROM ROOM R JOIN BLOCK B ON R.BLOCK_ID = B.BLOCK_ID AND B.CATEGORY = 'SURGERY')'''
     cursor.execute(query, [patientID])
     resultTemp = cursor.fetchall()
     if len(resultTemp) > 0:
@@ -724,14 +725,14 @@ def getWardDetailsDisp(blockID):
                     JOIN SCHEDULE SCH ON (SCH.ID = P.ID AND SCH.BLOCK_ID = (:blockID) AND SCH.SCHEDULE_DATE = TRUNC(SYSDATE))'''
         cursor.execute(query, [blockID])
         result = cursor.fetchall()
-        print(result)
+        # print(result)
         employeeInWard = []
         for R in result:
             result_row = []
             for elem in R:
                 result_row.append(elem)
             employeeInWard.append(result_row)
-        employeeHeader = [["Name", "Email", "Phone Number", "Category", "Block ID"]]
+        employeeHeader = [["Name", "Email", "Phone Number", "Category"]]
             
         # all patients in this ward
         query = '''SELECT (SELECT (FIRST_NAME||' '||LAST_NAME) FROM PERSON WHERE ID= RA.PATIENT_ID), 

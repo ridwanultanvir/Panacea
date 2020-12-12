@@ -202,12 +202,12 @@ class DataExtractor extends Component {
                                 <ListItemText primary="Employees Assigned In Wards On a Date" />
                                 </ListItem>
                                 
-                                <ListItem button onClick={() => this.handleClick('8')}>
+                                {/* <ListItem button onClick={() => this.handleClick('8')}>
                                 <ListItemIcon>
                                     <AssessmentIcon />
                                 </ListItemIcon>
                                 <ListItemText primary="Surgeries Performed" />
-                                </ListItem>
+                                </ListItem> */}
                                 <ListItem button onClick={() => this.handleClick('9')}>
                                 <ListItemIcon>
                                     <AssessmentIcon />
