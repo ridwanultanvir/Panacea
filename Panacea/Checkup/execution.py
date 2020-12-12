@@ -921,7 +921,7 @@ def getPatientMonitorData(data):
         (ROUND((SYSDATE - CAST(TIME AS DATE))*24,2)-FLOOR((SYSDATE - CAST(TIME AS DATE))*24))*60 AS "MINUTE", TO_CHAR(CAST(TIME AS DATE),'MM/DD/YYYY HH:MI:SS') AS "TIME"
         FROM MONITORING_DATA
         WHERE PATIENT_ID = (SELECT ID FROM PERSON WHERE USER_ID = :pat_id)
-        ORDER BY HOUR, MINUTE
+        ORDER BY SL_NO DESC
         '''
 
         cursor.execute(query, [data['patient_id']])

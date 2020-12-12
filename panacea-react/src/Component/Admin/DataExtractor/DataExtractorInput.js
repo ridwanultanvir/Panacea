@@ -166,8 +166,8 @@ class DataExtractorInput extends Component {
             .then((response) => response.json())
             .then((response) => {
                 if (response.success) {
-                    console.log(response);
                     if (response.switch9 === true) {
+                        console.log(response.employeeHeader);
                         this.setState({
                             switch9: true,
                             employeeHeader: response.employeeHeader,
@@ -515,7 +515,7 @@ class DataExtractorInput extends Component {
                                     )
                                 }
                                 <Grid item xs={12}>
-                                    <Button variant='contained' color='primary' style={{ marginLeft: 10 }} onClick={() => { this.handleConfirm() }}>View</Button>
+                                    <Button variant='contained' color='primary' style={{ marginLeft: 120 }} onClick={() => { this.handleConfirm() }}>View</Button>
                                 </Grid>
 
                                 {this.state.displayTable === true &&

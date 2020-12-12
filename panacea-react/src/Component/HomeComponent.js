@@ -366,13 +366,13 @@ function Item(props) {
         <Card>
             <CardContent>
                 <CardMedia style={{ height: 600, padding: 180 }} image={props.item.image} >
-                    <Typography variant="h2" >
+                    <Typography variant="h2" style={{color:'#a6d1e3'}}>
                         <Box fontWeight="fontWeightBold" m={1}>
-                            HEALTH CARE
+                            PANACEA
                         </Box>
                     </Typography>
-                    <Typography variant="h2">
-                        FOR WHOLE FAMILY
+                    <Typography variant="h4" style={{color:'#6ac5eb'}}>
+                        HEALTH CARE FOR WHOLE FAMILY
                     </Typography>
                     <Typography variant="body1" >
                         In healthcare sector, service excellence is the facility of the hospital as
